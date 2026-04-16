@@ -1,0 +1,2174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jarvis Sales OS Prototype</title>
+    <style>
+      :root {
+        --theme-rgba: 52, 211, 153;
+        --theme: rgba(var(--theme-rgba), 0.95);
+        --theme-1: rgba(var(--theme-rgba), 1);
+        --theme-85: rgba(var(--theme-rgba), 0.85);
+        --theme-60: rgba(var(--theme-rgba), 0.60);
+        --theme-35: rgba(var(--theme-rgba), 0.35);
+        --theme-12: rgba(var(--theme-rgba), 0.12);
+        --theme-06: rgba(var(--theme-rgba), 0.06);
+        --theme-hex: #34d399;
+
+        --bg-900: #050607;
+        --panel-800: rgba(255,255,255,0.04);
+        --panel-700: rgba(255,255,255,0.06);
+        --muted: rgba(255,255,255,0.55);
+        --muted-2: rgba(255,255,255,0.35);
+
+        --info: rgba(34, 211, 238, 0.95);
+        --success: var(--theme);
+        --warn: #f0b348;
+        --danger: #de4f85;
+
+        --stroke-1: rgba(255,255,255,0.08);
+        --stroke-2: rgba(255,255,255,0.03);
+
+        --shadow-1: 0 6px 18px rgba(0,0,0,0.45);
+        --shadow-2: 0 18px 34px rgba(0,0,0,0.5);
+        --glow-theme: 0 0 18px rgba(var(--theme-rgba), 0.18);
+
+        --grad-theme: linear-gradient(90deg, rgba(var(--theme-rgba), 0.95), rgba(34,211,238,0.25));
+        --grad-theme-strong: linear-gradient(90deg, rgba(var(--theme-rgba), 1), rgba(34,211,238,0.55));
+
+        --radius-lg: 16px;
+        --radius-pill: 9999px;
+        --btn-height: 46px;
+        --input-height: 40px;
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg-900);
+        color: white;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .page-bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 18% 16%, rgba(52,211,153,0.12), transparent 28%),
+          radial-gradient(circle at 84% 18%, rgba(34,211,238,0.12), transparent 32%),
+          radial-gradient(circle at 25% 92%, rgba(52,211,153,0.08), transparent 28%),
+          linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: auto, auto, auto, 28px 28px, 28px 28px;
+        mask-image: radial-gradient(circle at center, black 56%, transparent 92%);
+      }
+
+      .app {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        width: 280px;
+        border-right: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.02);
+        backdrop-filter: blur(20px);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .main {
+        flex: 1;
+        padding: 24px;
+      }
+
+      .glass {
+        background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+        border: 1px solid var(--stroke-1);
+        box-shadow: var(--shadow-1), inset 0 1px 0 rgba(255,255,255,0.05);
+        backdrop-filter: blur(16px);
+      }
+
+      .glass-soft {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.06);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+        backdrop-filter: blur(12px);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 9999px;
+        padding: 7px 12px;
+        font-size: 12px;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .theme-chip {
+        background: rgba(var(--theme-rgba), 0.12);
+        color: rgba(180,255,223,0.96);
+        border: 1px solid rgba(var(--theme-rgba), 0.28);
+        box-shadow: var(--glow-theme);
+      }
+
+      .cyan-chip {
+        background: rgba(34,211,238,0.12);
+        color: rgba(178,245,255,0.96);
+        border: 1px solid rgba(34,211,238,0.26);
+      }
+
+      .warn-chip {
+        background: rgba(240,179,72,0.12);
+        color: rgba(255,225,160,0.96);
+        border: 1px solid rgba(240,179,72,0.28);
+      }
+
+      .danger-chip {
+        background: rgba(222,79,133,0.12);
+        color: rgba(255,190,216,0.96);
+        border: 1px solid rgba(222,79,133,0.25);
+      }
+
+      .nav-item {
+        border-radius: 18px;
+        padding: 14px 16px;
+        color: rgba(255,255,255,0.68);
+        border: 1px solid transparent;
+      }
+
+      .nav-item.active {
+        color: #eafff5;
+        background: rgba(52,211,153,0.12);
+        border-color: rgba(52,211,153,0.22);
+        box-shadow: 0 0 0 1px rgba(52,211,153,0.08);
+      }
+
+      .hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .hero h1 {
+        margin: 10px 0 0;
+        font-size: 42px;
+        line-height: 1.08;
+        letter-spacing: -0.04em;
+      }
+
+      .subtle {
+        color: rgba(255,255,255,0.45);
+      }
+
+      .btn-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        height: 46px;
+        border-radius: 9999px;
+        padding: 0 20px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        border: none;
+        background: var(--theme);
+        color: #04110c;
+        font-weight: 600;
+        box-shadow: 0 0 24px rgba(52,211,153,0.24);
+      }
+
+      .btn-secondary {
+        color: rgba(255,255,255,0.78);
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(8px);
+      }
+
+      .section-grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .metric-card,
+      .section-card {
+        border-radius: 28px;
+        padding: 20px;
+      }
+
+      .metric-value {
+        font-size: 44px;
+        font-weight: 650;
+        letter-spacing: -0.04em;
+      }
+
+      .line {
+        margin-top: 16px;
+        height: 1px;
+        background: var(--grad-theme-strong);
+        opacity: 0.8;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 16px;
+        margin-top: 16px;
+      }
+
+      .lane-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .lane-card,
+      .mini-card,
+      .alert-card,
+      .script-card,
+      .conversation-card,
+      .side-card {
+        border-radius: 24px;
+        padding: 16px;
+      }
+
+      .progress {
+        margin-top: 18px;
+        height: 8px;
+        border-radius: 9999px;
+        background: rgba(255,255,255,0.05);
+        overflow: hidden;
+      }
+
+      .progress > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+      }
+
+      .table-wrap {
+        margin-top: 24px;
+        border-radius: 24px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(0,0,0,0.20);
+        padding: 16px;
+      }
+
+      .table-head,
+      .table-row {
+        display: grid;
+        grid-template-columns: 3fr 2fr 3fr 2fr 2fr;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .table-head {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: rgba(255,255,255,0.35);
+      }
+
+      .table-row {
+        margin-top: 12px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.06);
+        background: rgba(255,255,255,0.025);
+        font-size: 14px;
+      }
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        color: rgba(255,255,255,0.85);
+        font-size: 12px;
+      }
+
+      .customer-cell {
+        display: flex;
+        align-items: center;
+      }
+
+      .right-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .bottom-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 16px;
+        margin-top: 16px;
+      }
+
+      .chat-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 16px;
+        margin-top: 20px;
+      }
+
+      .bubble-user,
+      .bubble-ai,
+      .bubble-suggest {
+        border-radius: 18px;
+        padding: 14px 16px;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .bubble-user {
+        margin-left: auto;
+        max-width: 86%;
+        background: rgba(52,211,153,0.10);
+        border: 1px solid rgba(52,211,153,0.15);
+        color: rgba(236,255,246,0.96);
+      }
+
+      .bubble-ai {
+        max-width: 88%;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.82);
+      }
+
+      .bubble-suggest {
+        margin-top: 14px;
+        background: rgba(34,211,238,0.10);
+        border: 1px solid rgba(34,211,238,0.20);
+        color: rgba(230,252,255,0.95);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+      }
+
+      .stat-big {
+        font-size: 40px;
+        font-weight: 650;
+        letter-spacing: -0.04em;
+      }
+
+      .muted-text { color: rgba(255,255,255,0.5); }
+      .tiny { font-size: 12px; }
+      .small { font-size: 14px; }
+      .title-xl { font-size: 24px; font-weight: 650; }
+      .title-lg { font-size: 20px; font-weight: 650; }
+      .title-md { font-size: 18px; font-weight: 600; }
+      .mb-6 { margin-bottom: 24px; }
+      .mt-2 { margin-top: 8px; }
+      .mt-3 { margin-top: 12px; }
+      .mt-4 { margin-top: 16px; }
+      .mt-5 { margin-top: 20px; }
+      .mt-6 { margin-top: 24px; }
+      .space-y > * + * { margin-top: 12px; }
+
+      @media (max-width: 1200px) {
+        .section-grid-4,
+        .lane-grid,
+        .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .two-col,
+        .bottom-grid,
+        .chat-grid { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 900px) {
+        .app { display: block; }
+        .sidebar {
+          width: auto;
+          border-right: none;
+          border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .section-grid-4,
+        .lane-grid,
+        .stats-grid { grid-template-columns: 1fr; }
+        .table-head { display: none; }
+        .table-row {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+        .hero h1 { font-size: 34px; }
+      }
+
+      /* ── Tab navigation ── */
+      .tab-nav {
+        display: flex;
+        gap: 4px;
+        margin-top: 16px;
+        padding: 4px;
+        background: rgba(0,0,0,0.28);
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.07);
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .tab-nav::-webkit-scrollbar { display: none; }
+      .tab-btn {
+        flex-shrink: 0;
+        padding: 7px 13px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: rgba(255,255,255,0.48);
+        font-size: 12.5px;
+        cursor: pointer;
+        transition: all 0.18s;
+        white-space: nowrap;
+        font-family: inherit;
+      }
+      .tab-btn:hover { color: rgba(255,255,255,0.72); background: rgba(255,255,255,0.05); }
+      .tab-btn.active {
+        background: rgba(52,211,153,0.13);
+        color: rgba(180,255,223,0.95);
+        border-color: rgba(52,211,153,0.24);
+        box-shadow: 0 0 12px rgba(52,211,153,0.10);
+      }
+      .tab-panel { display: none; margin-top: 16px; }
+      .tab-panel.active { display: block; }
+      .step-line {
+        display: flex; gap: 14px; padding: 12px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        align-items: flex-start;
+      }
+      .step-line:last-child { border-bottom: none; }
+      .step-num {
+        width: 26px; height: 26px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 11px; font-weight: 600; flex-shrink: 0;
+        background: rgba(52,211,153,0.12); color: rgba(180,255,223,0.9);
+        border: 1px solid rgba(52,211,153,0.22);
+      }
+      .step-num.warn { background: rgba(240,179,72,0.12); color: rgba(255,225,160,0.9); border-color: rgba(240,179,72,0.24); }
+      .step-num.cyan { background: rgba(34,211,238,0.12); color: rgba(178,245,255,0.9); border-color: rgba(34,211,238,0.22); }
+      .step-num.danger { background: rgba(222,79,133,0.12); color: rgba(255,190,216,0.9); border-color: rgba(222,79,133,0.22); }
+      .mini-stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+      .metric-chip {
+        padding: 10px 14px; border-radius: 14px;
+        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+        text-align: center;
+      }
+      .metric-chip .val { font-size: 22px; font-weight: 650; letter-spacing: -0.03em; }
+      .toggle-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 13px; border-radius: 12px;
+        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      }
+      .tgl {
+        width: 34px; height: 19px; border-radius: 10px;
+        background: rgba(52,211,153,0.82); position: relative;
+        cursor: pointer; flex-shrink: 0; transition: background 0.2s;
+      }
+      .tgl::after {
+        content: ''; position: absolute;
+        width: 13px; height: 13px; border-radius: 50%;
+        background: white; top: 3px; right: 3px; transition: all 0.2s;
+      }
+      .tgl.off { background: rgba(255,255,255,0.15); }
+      .tgl.off::after { right: auto; left: 3px; }
+      .risk-badge {
+        display: flex; align-items: flex-start; gap: 12px;
+        padding: 12px 16px; border-radius: 14px; margin-top: 14px;
+        background: rgba(222,79,133,0.08); border: 1px solid rgba(222,79,133,0.20);
+      }
+      .queue-item {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 11px 13px; border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.03);
+        margin-top: 8px;
+      }
+      .script-card[data-goto-tab] { cursor: pointer; transition: all 0.18s; }
+      .script-card[data-goto-tab]:hover {
+        border-color: rgba(52,211,153,0.28) !important;
+        background: rgba(52,211,153,0.05) !important;
+      }
+
+      /* ── Page switching ── */
+      .page-content { display: none; }
+      .page-content.active { display: block; }
+      .nav-item { cursor: pointer; }
+      .nav-item:hover:not(.active) { color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.04); }
+
+      /* ── 客户分层中心 ── */
+      .score-badge {
+        width: 40px; height: 40px; border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 15px; font-weight: 700; flex-shrink: 0;
+      }
+      .seg-row {
+        display: flex; align-items: center; gap: 14px;
+        padding: 14px 16px; border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.07);
+        background: rgba(255,255,255,0.025);
+        margin-top: 10px; font-size: 14px;
+      }
+      .seg-row:first-child { margin-top: 0; }
+      .filter-chip {
+        padding: 6px 13px; border-radius: 9999px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.6); font-size: 12px; cursor: pointer;
+        transition: all 0.15s;
+      }
+      .filter-chip.on {
+        background: rgba(52,211,153,0.13);
+        border-color: rgba(52,211,153,0.28);
+        color: rgba(180,255,223,0.92);
+      }
+
+      /* ── 人工接管池 ── */
+      .pool-card {
+        border-radius: 20px; padding: 16px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.03);
+        margin-top: 10px; cursor: pointer;
+        transition: border-color 0.15s;
+      }
+      .pool-card:hover { border-color: rgba(52,211,153,0.25); }
+      .pool-card.selected {
+        border-color: rgba(52,211,153,0.35);
+        background: rgba(52,211,153,0.05);
+      }
+      .pool-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 16px; margin-top: 16px; }
+      @media (max-width: 1200px) { .pool-grid { grid-template-columns: 1fr; } }
+
+      /* ── 并行任务看板 ── */
+      .kanban-col {
+        border-radius: 20px; padding: 16px;
+        background: rgba(0,0,0,0.20);
+        border: 1px solid rgba(255,255,255,0.07);
+        min-height: 420px;
+      }
+      .kanban-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 20px; }
+      @media (max-width: 1200px) { .kanban-grid { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 900px) { .kanban-grid { grid-template-columns: 1fr; } }
+      .kanban-card {
+        padding: 12px; border-radius: 14px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        margin-top: 10px; font-size: 13px;
+      }
+      .kanban-card:first-child { margin-top: 0; }
+      .agent-dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        display: inline-block; margin-right: 6px; flex-shrink: 0;
+      }
+
+      /* ── 复盘与策略优化 ── */
+      .review-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; margin-top: 16px; }
+      @media (max-width: 1200px) { .review-grid { grid-template-columns: 1fr; } }
+      .bar-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; font-size: 13px; }
+      .bar-track {
+        flex: 1; height: 8px; border-radius: 9999px;
+        background: rgba(255,255,255,0.05); overflow: hidden;
+      }
+      .bar-fill { height: 100%; border-radius: inherit; }
+      .insight-card {
+        padding: 14px; border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.07);
+        background: rgba(255,255,255,0.03);
+        margin-top: 10px; font-size: 13px; line-height: 1.7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-bg"></div>
+    <div class="app">
+      <aside class="sidebar">
+        <div>
+          <div class="pill theme-chip" style="text-transform: uppercase; letter-spacing: 0.24em; font-size: 11px;">Jarvis Sales OS</div>
+          <div class="title-xl mt-4">销售数字员工控制台</div>
+        </div>
+
+        <div>
+          <div class="nav-item active" data-page="overview">总览驾驶舱</div>
+          <div class="nav-item" data-page="segment">客户分层中心</div>
+          <div class="nav-item" data-page="scripts">自动跟进剧本</div>
+          <div class="nav-item" data-page="pool">人工接管池</div>
+          <div class="nav-item" data-page="kanban">并行任务看板</div>
+          <div class="nav-item" data-page="review">复盘与策略优化</div>
+        </div>
+
+        <div class="glass section-card" style="margin-top: auto;">
+          <div class="tiny subtle" style="text-transform: uppercase; letter-spacing: 0.22em;">Agent Capacity</div>
+          <div class="metric-value mt-3" style="font-size: 40px;">2.6x</div>
+          <div class="small subtle mt-2" style="line-height: 1.8;">单销售并行覆盖客户数，相比纯人工模式。</div>
+          <div class="progress mt-4"><span style="width:72%; background: var(--grad-theme-strong);"></span></div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div id="page-overview" class="page-content active">
+        <section class="hero">
+          <div>
+            <div class="tiny subtle" style="text-transform: uppercase; letter-spacing: 0.26em;">实时作战层 · AI 托管中</div>
+          </div>
+          <h1>今日销售运营全局</h1>
+          <div class="btn-row">
+            <button class="btn-primary">启动自动托管</button>
+            <button class="btn-secondary">查看风险规则</button>
+          </div>
+        </section>
+
+        <section class="section-grid-4">
+          <div class="glass metric-card">
+            <div class="small subtle">新线索</div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; gap: 12px;" class="mt-4">
+              <div class="metric-value">428</div>
+              <span class="pill theme-chip">+32 今日新增</span>
+            </div>
+            <div class="line"></div>
+          </div>
+          <div class="glass metric-card">
+            <div class="small subtle">AI 养熟（C类）</div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; gap: 12px;" class="mt-4">
+              <div class="metric-value">212</div>
+              <span class="pill theme-chip">60% 自动托管</span>
+            </div>
+            <div class="line"></div>
+          </div>
+          <div class="glass metric-card">
+            <div class="small subtle">人工接管</div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; gap: 12px;" class="mt-4">
+              <div class="metric-value">74</div>
+              <span class="pill theme-chip">高价值机会</span>
+            </div>
+            <div class="line"></div>
+          </div>
+          <div class="glass metric-card">
+            <div class="small subtle">已成交</div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; gap: 12px;" class="mt-4">
+              <div class="metric-value">31</div>
+              <span class="pill theme-chip">转化率 7.2%</span>
+            </div>
+            <div class="line"></div>
+          </div>
+        </section>
+
+        <section class="two-col">
+          <div class="glass section-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap: 12px; flex-wrap: wrap;">
+              <div>
+                <div class="tiny subtle" style="text-transform: uppercase; letter-spacing: 0.22em;">并行执行视图</div>
+                <div class="title-lg mt-2">客户分层与执行泳道</div>
+              </div>
+              <div class="pill cyan-chip">目标：60 人 → 35 人规模承接</div>
+            </div>
+
+            <div class="lane-grid">
+              <div class="glass-soft lane-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap: 10px;">
+                  <div class="small" style="color: rgba(255,255,255,0.72);">AI 全自动</div>
+                  <div class="pill theme-chip">低风险</div>
+                </div>
+                <div class="metric-value mt-4">286</div>
+                <div class="small subtle mt-3" style="line-height: 1.8;">处理低风险问答 / 标准跟进 / 召回</div>
+                <div class="progress"><span style="width:78%; background: var(--grad-theme-strong);"></span></div>
+              </div>
+
+              <div class="glass-soft lane-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap: 10px;">
+                  <div class="small" style="color: rgba(255,255,255,0.72);">AI + 人协作</div>
+                  <div class="pill cyan-chip">中风险</div>
+                </div>
+                <div class="metric-value mt-4">102</div>
+                <div class="small subtle mt-3" style="line-height: 1.8;">AI 起草，人确认，高频适用于中意向客户</div>
+                <div class="progress"><span style="width:56%; background: linear-gradient(90deg, rgba(34,211,238,0.85), rgba(34,211,238,0.25));"></span></div>
+              </div>
+
+              <div class="glass-soft lane-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap: 10px;">
+                  <div class="small" style="color: rgba(255,255,255,0.72);">人工专注</div>
+                  <div class="pill warn-chip">高价值</div>
+                </div>
+                <div class="metric-value mt-4">39</div>
+                <div class="small subtle mt-3" style="line-height: 1.8;">高客单 / 高意向 / 情绪敏感客户</div>
+                <div class="progress"><span style="width:34%; background: linear-gradient(90deg, rgba(240,179,72,0.9), rgba(240,179,72,0.2));"></span></div>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <div class="table-head">
+                <div>客户</div>
+                <div>来源</div>
+                <div>当前阶段</div>
+                <div>下一动作</div>
+                <div>标签</div>
+              </div>
+
+              <div class="table-row">
+                <div class="customer-cell">
+                  <span class="avatar" style="background: rgba(52,211,153,0.15);">林</span>
+                  <div>
+                    <div>林女士</div>
+                    <div class="tiny subtle">最近 8 分钟活跃</div>
+                  </div>
+                </div>
+                <div class="subtle">小红书私信</div>
+                <div><span class="pill theme-chip">A类 · 高意向</span></div>
+                <div class="subtle">15 分钟内人工回复</div>
+                <div><span class="pill" style="border:1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.76);">预算明确</span></div>
+              </div>
+
+              <div class="table-row">
+                <div class="customer-cell">
+                  <span class="avatar" style="background: rgba(34,211,238,0.15);">J</span>
+                  <div>
+                    <div>Jason Chen</div>
+                    <div class="tiny subtle">最近 14 分钟活跃</div>
+                  </div>
+                </div>
+                <div class="subtle">WhatsApp</div>
+                <div><span class="pill cyan-chip">B类 · 可自动跟进</span></div>
+                <div class="subtle">20:30 AI 发案例</div>
+                <div><span class="pill" style="border:1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.76);">反复比较</span></div>
+              </div>
+
+              <div class="table-row">
+                <div class="customer-cell">
+                  <span class="avatar" style="background: rgba(255,255,255,0.10);">王</span>
+                  <div>
+                    <div>王同学</div>
+                    <div class="tiny subtle">最近 1 天活跃</div>
+                  </div>
+                </div>
+                <div class="subtle">企业微信</div>
+                <div><span class="pill warn-chip">C类 · 自动养熟</span></div>
+                <div class="subtle">明日 10:00 自动召回</div>
+                <div><span class="pill" style="border:1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.76);">低活跃</span></div>
+              </div>
+
+              <div class="table-row">
+                <div class="customer-cell">
+                  <span class="avatar" style="background: rgba(52,211,153,0.15);">E</span>
+                  <div>
+                    <div>Emily</div>
+                    <div class="tiny subtle">最近 21 分钟活跃</div>
+                  </div>
+                </div>
+                <div class="subtle">官网线索</div>
+                <div><span class="pill theme-chip">A类 · 待报价</span></div>
+                <div class="subtle">今晚 21:00 销售跟进</div>
+                <div><span class="pill" style="border:1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.76);">已要方案</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="right-stack">
+            <div class="glass section-card">
+              <div class="tiny subtle" style="text-transform: uppercase; letter-spacing: 0.22em;">风险 / 接管中心</div>
+              <div class="title-lg mt-2">系统正在替你做判断</div>
+              <div class="space-y mt-5">
+                <div class="alert-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <span class="pill danger-chip">高风险</span>
+                    <button class="btn-secondary" style="height: 32px; padding: 0 12px; font-size: 12px;">立即接管</button>
+                  </div>
+                  <div class="title-md mt-3">12 个客户进入高意向窗口</div>
+                  <div class="small subtle mt-2" style="line-height: 1.8;">建议在 30 分钟内由人工接管，避免 AI 继续自动跟进造成流失。</div>
+                </div>
+
+                <div class="alert-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <span class="pill warn-chip">执行中</span>
+                    <button class="btn-secondary" style="height: 32px; padding: 0 12px; font-size: 12px;">批量审阅</button>
+                  </div>
+                  <div class="title-md mt-3">56 个低意向客户已进入 Day 3 触达</div>
+                  <div class="small subtle mt-2" style="line-height: 1.8;">系统准备发送案例型话术，可批量审阅后自动执行。</div>
+                </div>
+
+                <div class="alert-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <span class="pill cyan-chip">优化建议</span>
+                    <button class="btn-secondary" style="height: 32px; padding: 0 12px; font-size: 12px;">更新剧本</button>
+                  </div>
+                  <div class="title-md mt-3">7 个客户价格异议频繁出现</div>
+                  <div class="small subtle mt-2" style="line-height: 1.8;">建议更新“价格顾虑”剧本，当前版本回复后成交率下降 12%。</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass section-card">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap: 12px; flex-wrap: wrap;">
+                <div>
+                  <div class="tiny subtle" style="text-transform: uppercase; letter-spacing: 0.22em;">自动化剧本</div>
+                  <div class="title-lg mt-2">可规模复制的销售动作</div>
+                </div>
+                <span class="pill theme-chip">Skill Library · 5 个剧本</span>
+              </div>
+
+              <!-- Tab 导航栏 -->
+              <div class="tab-nav" id="scriptTabs">
+                <button class="tab-btn active" data-tab="overview">全部剧本</button>
+                <button class="tab-btn" data-tab="price">价格顾虑</button>
+                <button class="tab-btn" data-tab="case">案例触达</button>
+                <button class="tab-btn" data-tab="offer">限时优惠</button>
+                <button class="tab-btn" data-tab="first">首次接触</button>
+                <button class="tab-btn" data-tab="revival">沉默唤醒</button>
+              </div>
+
+              <div id="scriptTabContent">
+
+                <!-- ── 全部剧本 ── -->
+                <div class="tab-panel active" id="tab-overview">
+                  <div class="space-y" style="margin-top:4px;">
+                    <div class="script-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2);" data-goto-tab="price">
+                      <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap;">
+                        <div class="title-md">价格顾虑</div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                          <span class="pill theme-chip">62% 自动化</span>
+                          <span class="pill cyan-chip">+18% 回复率</span>
+                        </div>
+                      </div>
+                      <div class="small subtle mt-2" style="line-height:1.8;">用于 B/C 类客户的标准化异议处理，默认自动发送第 1、2 轮。</div>
+                    </div>
+                    <div class="script-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2);" data-goto-tab="case">
+                      <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap;">
+                        <div class="title-md">案例触达</div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                          <span class="pill theme-chip">88% 自动化</span>
+                          <span class="pill cyan-chip">+24% 唤醒率</span>
+                        </div>
+                      </div>
+                      <div class="small subtle mt-2" style="line-height:1.8;">适合 Day 3 / Day 7 养熟节点，优先推送同城市成交案例。</div>
+                    </div>
+                    <div class="script-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2);" data-goto-tab="offer">
+                      <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap;">
+                        <div class="title-md">限时优惠</div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                          <span class="pill warn-chip">人工确认</span>
+                          <span class="pill cyan-chip">+11% 成交率</span>
+                        </div>
+                      </div>
+                      <div class="small subtle mt-2" style="line-height:1.8;">高风险动作，必须进入主管审批或人工发送流程。</div>
+                    </div>
+                    <div class="script-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2);" data-goto-tab="first">
+                      <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap;">
+                        <div class="title-md">首次接触</div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                          <span class="pill theme-chip">95% 自动化</span>
+                          <span class="pill cyan-chip">+31% 资质完善率</span>
+                        </div>
+                      </div>
+                      <div class="small subtle mt-2" style="line-height:1.8;">新线索 24h 内自动触达 + 意向摸底，完成评分后分配泳道。</div>
+                    </div>
+                    <div class="script-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2);" data-goto-tab="revival">
+                      <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap;">
+                        <div class="title-md">沉默唤醒</div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                          <span class="pill theme-chip">79% 自动化</span>
+                          <span class="pill cyan-chip">唤醒率 31%</span>
+                        </div>
+                      </div>
+                      <div class="small subtle mt-2" style="line-height:1.8;">三阶段递进策略，针对 7 天无互动客户，Day 7/14/21 自动触达。</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ── 价格顾虑 ── -->
+                <div class="tab-panel" id="tab-price">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <div>
+                      <div class="small" style="color:rgba(255,255,255,0.72); font-weight:600;">价格顾虑异议处理</div>
+                      <div class="tiny subtle mt-1">触发后自动执行 2 轮，第 3 轮交人工，适用 B/C 类客户</div>
+                    </div>
+                    <span class="pill theme-chip" style="font-size:11px;">B/C 类客户</span>
+                  </div>
+                  <div class="mini-stat-row">
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(180,255,223,0.95);">62%</div>
+                      <div class="tiny subtle mt-1">自动化率</div>
+                    </div>
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(178,245,255,0.95);">+18%</div>
+                      <div class="tiny subtle mt-1">回复率提升</div>
+                    </div>
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(255,225,160,0.95);">4.2m</div>
+                      <div class="tiny subtle mt-1">平均响应</div>
+                    </div>
+                  </div>
+                  <div style="margin-top:14px; padding:14px; border-radius:16px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.07);">
+                    <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.18em; margin-bottom:8px;">触发关键词</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                      <span class="pill" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); color:rgba(255,255,255,0.74); font-size:11px;">价格</span>
+                      <span class="pill" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); color:rgba(255,255,255,0.74); font-size:11px;">太贵了</span>
+                      <span class="pill" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); color:rgba(255,255,255,0.74); font-size:11px;">预算不够</span>
+                      <span class="pill" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); color:rgba(255,255,255,0.74); font-size:11px;">划算吗</span>
+                      <span class="pill" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); color:rgba(255,255,255,0.74); font-size:11px;">别家更便宜</span>
+                    </div>
+                  </div>
+                  <div style="margin-top:12px; padding:14px; border-radius:16px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.07);">
+                    <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.18em;">执行步骤</div>
+                    <div class="step-line">
+                      <div class="step-num">1</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">AI 识别异议关键词 → 打标、暂停其他序列</div>
+                        <div class="tiny subtle mt-1">进入本剧本独立执行</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num">2</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">发送「价值锚定」话术（第 1 轮）<span style="color:rgba(180,255,223,0.7); font-size:12px;"> · 自动</span></div>
+                        <div class="tiny subtle mt-1">强调差异化价值点，不直接讨论折扣</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num cyan">3</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">24h 无响应 → 推送同类成交案例（第 2 轮）<span style="color:rgba(180,255,223,0.7); font-size:12px;"> · 自动</span></div>
+                        <div class="tiny subtle mt-1">优先匹配同行业同城市，佐证价格合理性</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num warn">4</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">3 天未成交 → 升级人工跟进</div>
+                        <div class="tiny subtle mt-1">移入人工池，标注「价格敏感」标签</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="margin-top:12px; background:rgba(0,0,0,0.18); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:14px;">
+                    <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.18em; margin-bottom:10px;">样例对话</div>
+                    <div class="bubble-user" style="border-radius:14px; padding:10px 14px; font-size:13px;">你们比别家贵不少，能便宜一点吗？</div>
+                    <div class="bubble-ai mt-3" style="border-radius:14px; padding:10px 14px; font-size:13px;">我理解你的顾虑。我们的核心差别在于 [价值点1] 和 [价值点2]——这两块的长期收益差距是明显的。我把几个同类客户的结果数据发你，看看值不值？</div>
+                  </div>
+                  <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+                    <div class="toggle-row">
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">自动发送前两轮</div>
+                        <div class="tiny subtle">识别异议后无需人工确认</div>
+                      </div>
+                      <div class="tgl"></div>
+                    </div>
+                    <div class="toggle-row">
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">单客户最多触发 2 轮</div>
+                        <div class="tiny subtle">超出后自动移入人工池，避免过度打扰</div>
+                      </div>
+                      <div class="tgl"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ── 案例触达 ── -->
+                <div class="tab-panel" id="tab-case">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <div>
+                      <div class="small" style="color:rgba(255,255,255,0.72); font-weight:600;">案例触达 · 养熟节点推送</div>
+                      <div class="tiny subtle mt-1">Day 3 / Day 7 触发，匹配同城市同行业成交案例</div>
+                    </div>
+                    <span class="pill cyan-chip" style="font-size:11px;">B/C 类客户</span>
+                  </div>
+                  <div class="mini-stat-row">
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(180,255,223,0.95);">88%</div>
+                      <div class="tiny subtle mt-1">自动化率</div>
+                    </div>
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(178,245,255,0.95);">+24%</div>
+                      <div class="tiny subtle mt-1">唤醒率提升</div>
+                    </div>
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(180,255,223,0.95);">D3/D7</div>
+                      <div class="tiny subtle mt-1">触发节点</div>
+                    </div>
+                  </div>
+                  <div style="margin-top:14px; padding:14px; border-radius:16px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.07);">
+                    <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.18em;">执行步骤</div>
+                    <div class="step-line">
+                      <div class="step-num">1</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">Day 3：首次接触后 3 天无成交，进入本剧本</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num cyan">2</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">检索匹配案例（同城市同行业优先）</div>
+                        <div class="tiny subtle mt-1">最多推 2 个，匹配失败则转人工选案例</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num">3</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">AI 生成个性化推文 + 附加数据截图<span style="color:rgba(180,255,223,0.7); font-size:12px;"> · 自动</span></div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num cyan">4</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">Day 7 仍无响应 → 换角度推第 2 次<span style="color:rgba(180,255,223,0.7); font-size:12px;"> · 自动</span></div>
+                        <div class="tiny subtle mt-1">侧重结果数据而非过程描述</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num warn">5</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">Day 7 后仍无互动 → 切入沉默唤醒序列</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="margin-top:12px; background:rgba(0,0,0,0.18); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:14px;">
+                    <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.18em; margin-bottom:10px;">样例对话</div>
+                    <div class="bubble-ai" style="border-radius:14px; padding:10px 14px; font-size:13px;">嗨 Jason，上次聊到你对 [方向] 感兴趣。有个同城市案例，他们跑了 3 个月 GMV 涨了 42%——发给你参考，有想法随时聊？</div>
+                  </div>
+                  <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+                    <div class="toggle-row">
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">案例自动匹配发送</div>
+                        <div class="tiny subtle">匹配失败时转人工选案例再发</div>
+                      </div>
+                      <div class="tgl"></div>
+                    </div>
+                    <div class="toggle-row">
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">7 天内不重复推同一案例</div>
+                      </div>
+                      <div class="tgl"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ── 限时优惠 ── -->
+                <div class="tab-panel" id="tab-offer">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <div>
+                      <div class="small" style="color:rgba(255,255,255,0.72); font-weight:600;">限时优惠 · 临门一脚</div>
+                      <div class="tiny subtle mt-1">高风险动作，必须通过主管审批后由人工发送</div>
+                    </div>
+                    <span class="pill danger-chip" style="font-size:11px;">⚠ 高风险 · 需审批</span>
+                  </div>
+                  <div class="risk-badge">
+                    <span style="font-size:18px; flex-shrink:0;">⚠️</span>
+                    <div>
+                      <div class="small" style="color:rgba(255,190,216,0.95); font-weight:600;">此剧本不允许 AI 自动发送</div>
+                      <div class="tiny" style="color:rgba(255,190,216,0.62); margin-top:3px; line-height:1.7;">优惠信息一旦发出无法撤回，且可能影响价格体系，必须人工判断发送时机。</div>
+                    </div>
+                  </div>
+                  <div class="mini-stat-row">
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(255,220,160,0.95);">+11%</div>
+                      <div class="tiny subtle mt-1">成交率提升</div>
+                    </div>
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(255,190,216,0.9);">3</div>
+                      <div class="tiny subtle mt-1">待审批队列</div>
+                    </div>
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(255,190,216,0.8);">0%</div>
+                      <div class="tiny subtle mt-1">自动发送率</div>
+                    </div>
+                  </div>
+                  <div style="margin-top:14px; padding:14px; border-radius:16px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.07);">
+                    <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.18em;">审批流程</div>
+                    <div class="step-line">
+                      <div class="step-num">1</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">AI 识别高意向客户 + 冲量节点</div>
+                        <div class="tiny subtle mt-1">月末/季末 或 客户主动砍价 + A 类高意向</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num cyan">2</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">AI 起草优惠方案草稿</div>
+                        <div class="tiny subtle mt-1">填写客户背景、当前进度、建议优惠幅度</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num danger">3</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">主管审批（30 分钟内需处理）</div>
+                        <div class="tiny subtle mt-1">支持修改话术 / 调整优惠力度后确认</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num warn">4</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">销售人工发送</div>
+                        <div class="tiny subtle mt-1">选择客户活跃时机，避免敏感时间段</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="margin-top:12px; padding:14px; border-radius:16px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.07);">
+                    <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.18em; margin-bottom:8px;">待审批队列（3 条）</div>
+                    <div class="queue-item">
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">林女士 · A类</div>
+                        <div class="tiny subtle">草稿已就绪，建议优惠 9 折</div>
+                      </div>
+                      <div style="display:flex; gap:8px; align-items:center;">
+                        <span class="pill danger-chip" style="font-size:11px;">紧急</span>
+                        <button class="btn-secondary" style="height:28px; padding:0 10px; font-size:12px; border-radius:8px;">审批</button>
+                      </div>
+                    </div>
+                    <div class="queue-item">
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">Emily · A类</div>
+                        <div class="tiny subtle">已询价 2 次，建议赠送配套服务</div>
+                      </div>
+                      <div style="display:flex; gap:8px; align-items:center;">
+                        <span class="pill warn-chip" style="font-size:11px;">今日</span>
+                        <button class="btn-secondary" style="height:28px; padding:0 10px; font-size:12px; border-radius:8px;">审批</button>
+                      </div>
+                    </div>
+                    <div class="queue-item">
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">Jason Chen · B类</div>
+                        <div class="tiny subtle">反复比较中，建议搭配案例</div>
+                      </div>
+                      <div style="display:flex; gap:8px; align-items:center;">
+                        <span class="pill" style="background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.58); font-size:11px;">待处理</span>
+                        <button class="btn-secondary" style="height:28px; padding:0 10px; font-size:12px; border-radius:8px;">审批</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ── 首次接触 ── -->
+                <div class="tab-panel" id="tab-first">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <div>
+                      <div class="small" style="color:rgba(255,255,255,0.72); font-weight:600;">首次接触 · 新线索冷启动</div>
+                      <div class="tiny subtle mt-1">新线索 24h 内自动触达，完成意向摸底 + 评分分配</div>
+                    </div>
+                    <span class="pill theme-chip" style="font-size:11px;">适用全部线索</span>
+                  </div>
+                  <div class="mini-stat-row">
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(180,255,223,0.95);">95%</div>
+                      <div class="tiny subtle mt-1">自动化率</div>
+                    </div>
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(178,245,255,0.95);">8m</div>
+                      <div class="tiny subtle mt-1">平均评分时长</div>
+                    </div>
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(180,255,223,0.95);">+31%</div>
+                      <div class="tiny subtle mt-1">资质完善率</div>
+                    </div>
+                  </div>
+                  <div style="margin-top:14px; padding:14px; border-radius:16px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.07);">
+                    <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.18em;">执行步骤</div>
+                    <div class="step-line">
+                      <div class="step-num">1</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">新线索入库 → 5 分钟内自动发欢迎语<span style="color:rgba(180,255,223,0.7); font-size:12px;"> · 自动</span></div>
+                        <div class="tiny subtle mt-1">一句话介绍服务定位，激活对话</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num cyan">2</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">发送意向摸底（≤ 3 个核心问题）<span style="color:rgba(180,255,223,0.7); font-size:12px;"> · 自动</span></div>
+                        <div class="tiny subtle mt-1">需求方向 · 预算范围 · 决策时间</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num">3</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">AI 打分分配泳道</div>
+                        <div class="tiny subtle mt-1">A类 → 人工接管池　B/C类 → 自动跟进序列</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num warn">4</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">24h 无响应 → 二次触达</div>
+                        <div class="tiny subtle mt-1">换话术再试一次，仍无响应降级 C 类进入养熟序列</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="margin-top:12px; background:rgba(0,0,0,0.18); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:14px;">
+                    <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.18em; margin-bottom:10px;">样例对话</div>
+                    <div class="bubble-ai" style="border-radius:14px; padding:10px 14px; font-size:13px;">嗨！我是你的专属顾问，很高兴认识你～<br>为了给你更精准的方案，想先了解下：<br>① 主要想解决哪个方向的问题？<br>② 大概预算范围在哪里？<br>③ 有明确的启动时间吗？</div>
+                    <div class="bubble-user mt-3" style="border-radius:14px; padding:10px 14px; font-size:13px;">外卖运营优化，预算 5 万以内，最近一个月想启动</div>
+                    <div class="bubble-ai mt-3" style="border-radius:14px; padding:10px 14px; font-size:13px;">完美！预算和时间都很清晰，我帮你匹配一个对口案例——稍等一下。</div>
+                  </div>
+                </div>
+
+                <!-- ── 沉默唤醒 ── -->
+                <div class="tab-panel" id="tab-revival">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <div>
+                      <div class="small" style="color:rgba(255,255,255,0.72); font-weight:600;">沉默唤醒 · 三阶段递进策略</div>
+                      <div class="tiny subtle mt-1">7 天无互动触发，三节点递进，超 30 天自动归档</div>
+                    </div>
+                    <span class="pill" style="background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.13); color:rgba(255,255,255,0.68); font-size:11px;">79% 自动化</span>
+                  </div>
+                  <div class="mini-stat-row">
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(180,255,223,0.95);">31%</div>
+                      <div class="tiny subtle mt-1">唤醒率</div>
+                    </div>
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(178,245,255,0.95);">3 步</div>
+                      <div class="tiny subtle mt-1">递进阶段</div>
+                    </div>
+                    <div class="metric-chip">
+                      <div class="val" style="color:rgba(255,190,216,0.9);">D30</div>
+                      <div class="tiny subtle mt-1">自动归档</div>
+                    </div>
+                  </div>
+                  <div style="margin-top:14px; padding:14px; border-radius:16px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.07);">
+                    <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.18em;">三阶段执行计划</div>
+                    <div class="step-line">
+                      <div class="step-num" style="font-size:10px; background:rgba(34,211,238,0.12); color:rgba(178,245,255,0.9); border-color:rgba(34,211,238,0.22);">D7</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">价值提醒（低干扰）<span style="color:rgba(180,255,223,0.7); font-size:12px;"> · 全自动</span></div>
+                        <div class="tiny subtle mt-1">轻量提醒，不提销售，只问"上次聊的有没有想法"</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num" style="font-size:10px; background:rgba(52,211,153,0.12); color:rgba(180,255,223,0.9); border-color:rgba(52,211,153,0.22);">D14</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">新内容 / 新案例推送（中强度）<span style="color:rgba(180,255,223,0.7); font-size:12px;"> · 全自动</span></div>
+                        <div class="tiny subtle mt-1">发送新功能介绍或更新的成交案例，附加明确 CTA</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num" style="font-size:10px; background:rgba(240,179,72,0.12); color:rgba(255,225,160,0.9); border-color:rgba(240,179,72,0.24);">D21</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">限时返单优惠（高强度，<span style="color:rgba(255,225,160,0.9);">需主管审批</span>）</div>
+                        <div class="tiny subtle mt-1">认定为最后机会窗口，推出针对性优惠，人工发送</div>
+                      </div>
+                    </div>
+                    <div class="step-line">
+                      <div class="step-num" style="font-size:10px; background:rgba(222,79,133,0.12); color:rgba(255,190,216,0.9); border-color:rgba(222,79,133,0.22);">D30</div>
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">自动归档</div>
+                        <div class="tiny subtle mt-1">移出活跃序列，标注「长期沉默」，可在未来活动中批量激活</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+                    <div class="toggle-row">
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">D7 / D14 全自动发送</div>
+                        <div class="tiny subtle">前两阶段无需人工干预</div>
+                      </div>
+                      <div class="tgl"></div>
+                    </div>
+                    <div class="toggle-row">
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">D21 自动进入审批队列</div>
+                        <div class="tiny subtle">关闭后需人工手动提交，不推荐</div>
+                      </div>
+                      <div class="tgl"></div>
+                    </div>
+                    <div class="toggle-row">
+                      <div>
+                        <div class="small" style="color:rgba(255,255,255,0.78);">30 天后自动归档</div>
+                        <div class="tiny subtle">保留历史数据，可在后续活动中批量再激活</div>
+                      </div>
+                      <div class="tgl"></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div><!-- #scriptTabContent -->
+            </div>
+          </div>
+        </section>
+
+        <section class="bottom-grid">
+          <div class="glass section-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+              <div>
+                <div class="tiny subtle" style="text-transform: uppercase; letter-spacing: 0.22em;">人工接管工作台</div>
+                <div class="title-lg mt-2">只把最值钱的客户交给人</div>
+              </div>
+              <div class="pill" style="border:1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7);">接管阈值：预算明确 / 强意向 / 情绪波动 / 要求报价</div>
+            </div>
+
+            <div class="chat-grid">
+              <div class="conversation-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2);">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap: 10px; flex-wrap: wrap;">
+                  <div>
+                    <div class="title-md">林女士 · A类高意向</div>
+                    <div class="small subtle mt-1" style="line-height: 1.8;">需求明确，已询问价格与排期，适合销售立即介入。</div>
+                  </div>
+                  <span class="pill theme-chip">AI 已托管 2 轮</span>
+                </div>
+
+                <div class="bubble-user mt-5">你们这个是一对一顾问服务吗？预算大概多少？最近能排上吗？</div>
+                <div class="bubble-ai mt-3">当前可安排顾问 1v1 方案，价格会根据服务周期不同浮动。我先给你匹配一个适合的方案，也可以结合你的目标帮你缩一下预算范围。</div>
+                <div class="bubble-suggest">
+                  <div class="tiny" style="text-transform: uppercase; letter-spacing: 0.18em; color: rgba(198,246,255,0.74);">AI 建议销售现在这么回</div>
+                  <div class="mt-2">“我看你的需求已经比较明确了，我这边直接帮你按目标和时间给一个更具体的方案。你更倾向先看价格区间，还是我先帮你把合适的服务组合列出来？”</div>
+                </div>
+              </div>
+
+              <div class="side-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);">
+                <div class="small subtle">接管原因</div>
+                <div class="space-y mt-3">
+                  <div class="mini-card" style="background: rgba(255,255,255,0.05);">客户已主动询价，进入成交窗口</div>
+                  <div class="mini-card" style="background: rgba(255,255,255,0.05);">预算 / 时间双确认，适合人工推进</div>
+                  <div class="mini-card" style="background: rgba(255,255,255,0.05);">AI 连续两轮回复后，点击率上升但需人工锁单</div>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 20px;">
+                  <button class="btn-primary" style="border-radius: 18px; padding: 0;">一键接管</button>
+                  <button class="btn-secondary" style="border-radius: 18px; padding: 0;">继续自动化</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass section-card">
+            <div class="tiny subtle" style="text-transform: uppercase; letter-spacing: 0.22em;">管理视角</div>
+
+            <div class="mini-card mt-5" style="border:1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2);">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap: 12px;">
+                <div class="small subtle">AI 托管覆盖率</div>
+                <span class="pill theme-chip">68%</span>
+              </div>
+              <div class="stat-big mt-4">824</div>
+              <div class="small subtle mt-2" style="line-height: 1.8;">今日由系统自动处理的触达、回复、提醒与召回动作</div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="mini-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);">
+                <div class="small subtle">人力节省</div>
+                <div class="stat-big mt-3">41.7%</div>
+                <div class="tiny subtle mt-2">按重复触达工时估算</div>
+              </div>
+              <div class="mini-card" style="border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);">
+                <div class="small subtle">高意向响应速度</div>
+                <div class="stat-big mt-3">-63%</div>
+                <div class="tiny subtle mt-2">从平均 38 分钟降至 14 分钟</div>
+              </div>
+            </div>
+
+            <div class="mini-card mt-4" style="border:1px solid rgba(52,211,153,0.18); background: rgba(52,211,153,0.08);">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <div class="small" style="color: rgba(210,255,231,0.78);">本周 AI 接管率</div>
+                <span class="tiny" style="color:rgba(180,255,223,0.8);">目标 70%</span>
+              </div>
+              <div class="progress mt-3"><span style="width:68%; background: var(--grad-theme-strong);"></span></div>
+              <div style="display:flex; justify-content:space-between; margin-top:6px;">
+                <div class="tiny subtle">当前 68%</div>
+                <div class="tiny" style="color:rgba(180,255,223,0.7);">较上周 +4%</div>
+              </div>
+              <div class="small mt-3" style="line-height: 1.9; color: rgba(236,255,245,0.78);">
+                高意向客户接管率已达 100%，C 类全自动覆盖率持续上升，系统处于健康运行区间。
+              </div>
+            </div>
+          </div>
+        </section>
+        </div><!-- #page-overview -->
+
+        <!-- ════════════════════════════════ 客户分层中心 ════════════════════════════════ -->
+        <div id="page-segment" class="page-content">
+          <section class="hero">
+            <div>
+              <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.26em;">客户分层中心 · 实时评分</div>
+              <h1>把 428 个线索分成三条赛道</h1>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary">重新评分全部客户</button>
+              <button class="btn-secondary">编辑分层规则</button>
+            </div>
+          </section>
+
+          <section class="section-grid-4" style="margin-top:24px;">
+            <div class="glass metric-card">
+              <div class="small subtle">A 类 · 高意向</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value" style="color:rgba(180,255,223,0.95);">74</div>
+                <span class="pill theme-chip">→ 人工接管池</span>
+              </div>
+              <div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">B 类 · 可培育</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value" style="color:rgba(178,245,255,0.95);">142</div>
+                <span class="pill cyan-chip">→ AI + 人协作</span>
+              </div>
+              <div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">C 类 · 自动养熟</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value" style="color:rgba(255,225,160,0.95);">212</div>
+                <span class="pill warn-chip">→ 全自动序列</span>
+              </div>
+              <div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">今日新评分</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">32</div>
+                <span class="pill theme-chip">+8 升级 A 类</span>
+              </div>
+              <div class="line"></div>
+            </div>
+          </section>
+
+          <section class="two-col" style="margin-top:16px;">
+            <div class="glass section-card">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+                <div>
+                  <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.22em;">客户列表</div>
+                  <div class="title-lg mt-2">按分层筛选查看</div>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <span class="filter-chip on" data-seg="all">全部</span>
+                  <span class="filter-chip" data-seg="A">A 类</span>
+                  <span class="filter-chip" data-seg="B">B 类</span>
+                  <span class="filter-chip" data-seg="C">C 类</span>
+                </div>
+              </div>
+              <div id="segList" style="margin-top:16px;">
+                <div class="seg-row" data-seg="A">
+                  <div class="score-badge" style="background:rgba(52,211,153,0.15); color:rgba(180,255,223,0.95);">A</div>
+                  <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                      <div><span style="font-weight:600;">林女士</span> <span class="subtle" style="font-size:12px;">· 小红书</span></div>
+                      <span class="pill theme-chip" style="font-size:11px;">高意向 · 待报价</span>
+                    </div>
+                    <div class="tiny subtle mt-1">预算明确，已问及排期，上次活跃 8 分钟前</div>
+                  </div>
+                  <button class="btn-secondary" style="height:30px; padding:0 12px; font-size:12px; flex-shrink:0;">接管</button>
+                </div>
+                <div class="seg-row" data-seg="A">
+                  <div class="score-badge" style="background:rgba(52,211,153,0.15); color:rgba(180,255,223,0.95);">A</div>
+                  <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                      <div><span style="font-weight:600;">Emily</span> <span class="subtle" style="font-size:12px;">· 官网</span></div>
+                      <span class="pill theme-chip" style="font-size:11px;">高意向 · 已要方案</span>
+                    </div>
+                    <div class="tiny subtle mt-1">已要方案，询价 2 次，今晚 21:00 跟进</div>
+                  </div>
+                  <button class="btn-secondary" style="height:30px; padding:0 12px; font-size:12px; flex-shrink:0;">接管</button>
+                </div>
+                <div class="seg-row" data-seg="B">
+                  <div class="score-badge" style="background:rgba(34,211,238,0.15); color:rgba(178,245,255,0.95);">B</div>
+                  <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                      <div><span style="font-weight:600;">Jason Chen</span> <span class="subtle" style="font-size:12px;">· WhatsApp</span></div>
+                      <span class="pill cyan-chip" style="font-size:11px;">中意向 · 反复比较</span>
+                    </div>
+                    <div class="tiny subtle mt-1">AI 托管中，20:30 自动发案例</div>
+                  </div>
+                  <button class="btn-secondary" style="height:30px; padding:0 12px; font-size:12px; flex-shrink:0;">查看</button>
+                </div>
+                <div class="seg-row" data-seg="B">
+                  <div class="score-badge" style="background:rgba(34,211,238,0.15); color:rgba(178,245,255,0.95);">B</div>
+                  <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                      <div><span style="font-weight:600;">赵先生</span> <span class="subtle" style="font-size:12px;">· 企微</span></div>
+                      <span class="pill cyan-chip" style="font-size:11px;">中意向 · 价格比较中</span>
+                    </div>
+                    <div class="tiny subtle mt-1">Day 4，价格顾虑剧本执行中</div>
+                  </div>
+                  <button class="btn-secondary" style="height:30px; padding:0 12px; font-size:12px; flex-shrink:0;">查看</button>
+                </div>
+                <div class="seg-row" data-seg="C">
+                  <div class="score-badge" style="background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.55);">C</div>
+                  <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                      <div><span style="font-weight:600;">王同学</span> <span class="subtle" style="font-size:12px;">· 企微</span></div>
+                      <span class="pill warn-chip" style="font-size:11px;">低活跃 · 养熟中</span>
+                    </div>
+                    <div class="tiny subtle mt-1">1 天无互动，明日 10:00 自动召回</div>
+                  </div>
+                  <button class="btn-secondary" style="height:30px; padding:0 12px; font-size:12px; flex-shrink:0;">查看</button>
+                </div>
+                <div class="seg-row" data-seg="C">
+                  <div class="score-badge" style="background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.55);">C</div>
+                  <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                      <div><span style="font-weight:600;">刘小姐</span> <span class="subtle" style="font-size:12px;">· 抖音</span></div>
+                      <span class="pill warn-chip" style="font-size:11px;">Day 7 沉默唤醒</span>
+                    </div>
+                    <div class="tiny subtle mt-1">沉默 7 天，今日自动发价值提醒</div>
+                  </div>
+                  <button class="btn-secondary" style="height:30px; padding:0 12px; font-size:12px; flex-shrink:0;">查看</button>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div class="glass section-card">
+                <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.22em;">分层评分规则</div>
+                <div class="title-lg mt-2">AI 如何判断客户等级</div>
+                <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
+                  <div class="toggle-row">
+                    <div><div class="small" style="color:rgba(255,255,255,0.78);">主动询价 / 要报价</div><div class="tiny subtle">直接升 A 类</div></div>
+                    <span class="pill theme-chip" style="font-size:11px;">+40 分</span>
+                  </div>
+                  <div class="toggle-row">
+                    <div><div class="small" style="color:rgba(255,255,255,0.78);">预算范围已明确</div><div class="tiny subtle">加权提升</div></div>
+                    <span class="pill theme-chip" style="font-size:11px;">+25 分</span>
+                  </div>
+                  <div class="toggle-row">
+                    <div><div class="small" style="color:rgba(255,255,255,0.78);">7 天内 3 次以上互动</div><div class="tiny subtle">活跃度加分</div></div>
+                    <span class="pill cyan-chip" style="font-size:11px;">+18 分</span>
+                  </div>
+                  <div class="toggle-row">
+                    <div><div class="small" style="color:rgba(255,255,255,0.78);">情绪关键词检测</div><div class="tiny subtle">急迫/犹豫/对比</div></div>
+                    <span class="pill cyan-chip" style="font-size:11px;">+12 分</span>
+                  </div>
+                  <div class="toggle-row">
+                    <div><div class="small" style="color:rgba(255,255,255,0.78);">7 天无响应</div><div class="tiny subtle">自动降级</div></div>
+                    <span class="pill danger-chip" style="font-size:11px;">-15 分</span>
+                  </div>
+                </div>
+              </div>
+              <div class="glass section-card">
+                <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.22em;">今日升降级记录</div>
+                <div class="title-lg mt-2">8 个客户等级变动</div>
+                <div style="margin-top:14px; display:flex; flex-direction:column; gap:8px;">
+                  <div class="queue-item"><div><div class="small" style="color:rgba(180,255,223,0.9);">林女士 C → A</div><div class="tiny subtle">主动询价触发升级</div></div><span class="pill theme-chip" style="font-size:11px;">↑ 升级</span></div>
+                  <div class="queue-item"><div><div class="small" style="color:rgba(178,245,255,0.9);">赵先生 C → B</div><div class="tiny subtle">连续 3 天互动</div></div><span class="pill cyan-chip" style="font-size:11px;">↑ 升级</span></div>
+                  <div class="queue-item"><div><div class="small" style="color:rgba(255,190,216,0.8);">陈先生 B → C</div><div class="tiny subtle">8 天无回复</div></div><span class="pill danger-chip" style="font-size:11px;">↓ 降级</span></div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div><!-- #page-segment -->
+
+        <!-- ════════════════════════════════ 自动跟进剧本 ════════════════════════════════ -->
+        <div id="page-scripts" class="page-content">
+          <section class="hero">
+            <div>
+              <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.26em;">自动跟进剧本 · Skill Library</div>
+              <h1>可规模复制的销售动作</h1>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary">新建剧本</button>
+              <button class="btn-secondary">批量应用</button>
+            </div>
+          </section>
+
+          <section class="section-grid-4" style="margin-top:24px;">
+            <div class="glass metric-card">
+              <div class="small subtle">运行中剧本</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">5</div>
+                <span class="pill theme-chip">全部启用</span>
+              </div><div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">今日触达次数</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">312</div>
+                <span class="pill theme-chip">88% 自动化</span>
+              </div><div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">回复率均值</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">34%</div>
+                <span class="pill cyan-chip">+6% 本周</span>
+              </div><div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">待审批动作</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">3</div>
+                <span class="pill danger-chip">需处理</span>
+              </div><div class="line"></div>
+            </div>
+          </section>
+
+          <section style="margin-top:16px; display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px;">
+            <div class="glass section-card" style="grid-column: 1 / -1;">
+              <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.22em;">剧本库</div>
+              <div class="title-lg mt-2">点击任意剧本查看详情与配置</div>
+            </div>
+            <div class="glass section-card" style="cursor:pointer;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                <div class="title-md">首次接触</div>
+                <span class="pill theme-chip">95% 自动化</span>
+              </div>
+              <div class="small subtle mt-2" style="line-height:1.8;">新线索 5 分钟内触达 + 意向摸底，完成评分分配。</div>
+              <div class="progress mt-4"><span style="width:95%; background:var(--grad-theme-strong);"></span></div>
+              <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <span class="tiny subtle">今日执行 87 次</span><span class="pill cyan-chip" style="font-size:11px;">+31% 资质率</span>
+              </div>
+            </div>
+            <div class="glass section-card" style="cursor:pointer;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                <div class="title-md">价格顾虑</div>
+                <span class="pill theme-chip">62% 自动化</span>
+              </div>
+              <div class="small subtle mt-2" style="line-height:1.8;">识别价格异议关键词，自动发送价值锚定话术 2 轮。</div>
+              <div class="progress mt-4"><span style="width:62%; background:var(--grad-theme-strong);"></span></div>
+              <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <span class="tiny subtle">今日执行 44 次</span><span class="pill cyan-chip" style="font-size:11px;">+18% 回复率</span>
+              </div>
+            </div>
+            <div class="glass section-card" style="cursor:pointer;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                <div class="title-md">案例触达</div>
+                <span class="pill theme-chip">88% 自动化</span>
+              </div>
+              <div class="small subtle mt-2" style="line-height:1.8;">Day 3/Day 7 自动匹配同城市案例推送。</div>
+              <div class="progress mt-4"><span style="width:88%; background:var(--grad-theme-strong);"></span></div>
+              <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <span class="tiny subtle">今日执行 62 次</span><span class="pill cyan-chip" style="font-size:11px;">+24% 唤醒率</span>
+              </div>
+            </div>
+            <div class="glass section-card" style="cursor:pointer;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                <div class="title-md">沉默唤醒</div>
+                <span class="pill theme-chip">79% 自动化</span>
+              </div>
+              <div class="small subtle mt-2" style="line-height:1.8;">D7/D14/D21 三阶段递进，超 30 天自动归档。</div>
+              <div class="progress mt-4"><span style="width:79%; background:var(--grad-theme-strong);"></span></div>
+              <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <span class="tiny subtle">今日执行 78 次</span><span class="pill cyan-chip" style="font-size:11px;">唤醒率 31%</span>
+              </div>
+            </div>
+            <div class="glass section-card" style="cursor:pointer; border-color:rgba(222,79,133,0.20);">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                <div class="title-md">限时优惠</div>
+                <span class="pill danger-chip">⚠ 需审批</span>
+              </div>
+              <div class="small subtle mt-2" style="line-height:1.8;">高风险动作，AI 起草 + 主管审批 + 人工发送。</div>
+              <div class="progress mt-4"><span style="width:0%; background:var(--grad-theme-strong);"></span></div>
+              <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <span class="tiny subtle">3 条等待审批</span><span class="pill cyan-chip" style="font-size:11px;">+11% 成交率</span>
+              </div>
+            </div>
+            <div class="glass section-card" style="cursor:pointer; border-style:dashed; border-color:rgba(255,255,255,0.12); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; min-height:120px;">
+              <div style="font-size:28px; color:rgba(255,255,255,0.2);">+</div>
+              <div class="small subtle">新建自定义剧本</div>
+            </div>
+          </section>
+        </div><!-- #page-scripts -->
+
+        <!-- ════════════════════════════════ 人工接管池 ════════════════════════════════ -->
+        <div id="page-pool" class="page-content">
+          <section class="hero">
+            <div>
+              <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.26em;">人工接管池 · 12 个高意向客户</div>
+              <h1>只把最值钱的客户交给人</h1>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary">一键接管全部 A 类</button>
+              <button class="btn-secondary">设置接管阈值</button>
+            </div>
+          </section>
+
+          <div class="pool-grid">
+            <div>
+              <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.18em; margin-bottom:4px;">待接管队列 · 12 人</div>
+              <div id="poolList">
+                <div class="pool-card selected" data-pool="lin">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <div>
+                      <div style="font-weight:600;">林女士</div>
+                      <div class="tiny subtle mt-1">小红书 · 8 分钟前活跃</div>
+                    </div>
+                    <span class="pill danger-chip" style="font-size:11px;">紧急 · 询价中</span>
+                  </div>
+                  <div class="tiny subtle mt-2" style="line-height:1.7;">预算明确，已询问价格与排期，AI 已托管 2 轮对话。</div>
+                </div>
+                <div class="pool-card" data-pool="emily">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <div>
+                      <div style="font-weight:600;">Emily</div>
+                      <div class="tiny subtle mt-1">官网 · 21 分钟前活跃</div>
+                    </div>
+                    <span class="pill theme-chip" style="font-size:11px;">高意向 · 待跟进</span>
+                  </div>
+                  <div class="tiny subtle mt-2" style="line-height:1.7;">已要方案，询价 2 次，今晚 21:00 须跟进。</div>
+                </div>
+                <div class="pool-card" data-pool="zhang">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <div>
+                      <div style="font-weight:600;">张总</div>
+                      <div class="tiny subtle mt-1">企微 · 35 分钟前活跃</div>
+                    </div>
+                    <span class="pill warn-chip" style="font-size:11px;">决策层 · 情绪波动</span>
+                  </div>
+                  <div class="tiny subtle mt-2" style="line-height:1.7;">检测到"另外考虑"关键词，属情绪波动客户，需人工介入。</div>
+                </div>
+                <div class="pool-card" data-pool="chen">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <div>
+                      <div style="font-weight:600;">陈女士</div>
+                      <div class="tiny subtle mt-1">小红书 · 1 小时前</div>
+                    </div>
+                    <span class="pill theme-chip" style="font-size:11px;">高意向 · 要合同</span>
+                  </div>
+                  <div class="tiny subtle mt-2" style="line-height:1.7;">询问合同条款，已进入成交最后环节。</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass section-card" id="poolDetail">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                <div>
+                  <div class="title-md">林女士 · A类高意向</div>
+                  <div class="small subtle mt-1" style="line-height:1.8;">需求明确，已询问价格与排期，适合销售立即介入。</div>
+                </div>
+                <span class="pill theme-chip">AI 已托管 2 轮</span>
+              </div>
+              <div style="margin-top:16px; padding:13px; border-radius:16px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.07);">
+                <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.16em; margin-bottom:10px;">对话记录</div>
+                <div class="bubble-user" style="border-radius:14px; padding:10px 14px; font-size:13px;">你们这个是一对一顾问服务吗？预算大概多少？最近能排上吗？</div>
+                <div class="bubble-ai mt-3" style="border-radius:14px; padding:10px 14px; font-size:13px;">当前可安排顾问 1v1 方案，价格会根据服务周期不同浮动。我先给你匹配一个适合的方案，也可以结合你的目标帮你缩一下预算范围。</div>
+                <div class="bubble-suggest" style="border-radius:14px; padding:10px 14px; font-size:13px; margin-top:10px;">
+                  <div class="tiny" style="text-transform:uppercase; letter-spacing:0.16em; color:rgba(198,246,255,0.74);">AI 建议销售现在这么回</div>
+                  <div style="margin-top:6px;">"我看你的需求已经比较明确了，我这边直接帮你按目标和时间给一个更具体的方案。你更倾向先看价格区间，还是我先帮你把合适的服务组合列出来？"</div>
+                </div>
+              </div>
+              <div style="margin-top:14px; padding:13px; border-radius:16px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.07);">
+                <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.16em; margin-bottom:8px;">接管原因</div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <div class="mini-card" style="background:rgba(255,255,255,0.05); border:none; padding:8px 12px; font-size:13px;">客户已主动询价，进入成交窗口</div>
+                  <div class="mini-card" style="background:rgba(255,255,255,0.05); border:none; padding:8px 12px; font-size:13px;">预算 / 时间双确认，适合人工推进</div>
+                  <div class="mini-card" style="background:rgba(255,255,255,0.05); border:none; padding:8px 12px; font-size:13px;">AI 连续两轮回复后，点击率上升但需人工锁单</div>
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:14px;">
+                <button class="btn-primary" style="border-radius:18px;">一键接管</button>
+                <button class="btn-secondary" style="border-radius:18px;">继续自动化</button>
+              </div>
+            </div>
+          </div>
+        </div><!-- #page-pool -->
+
+        <!-- ════════════════════════════════ 并行任务看板 ════════════════════════════════ -->
+        <div id="page-kanban" class="page-content">
+          <section class="hero">
+            <div>
+              <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.26em;">并行任务看板 · 实时执行层</div>
+              <h1>824 个 AI 并行任务，今日实时执行中</h1>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary">暂停全部 AI 任务</button>
+              <button class="btn-secondary">查看执行日志</button>
+            </div>
+          </section>
+
+          <section class="section-grid-4" style="margin-top:24px;">
+            <div class="glass metric-card">
+              <div class="small subtle">执行中任务</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">824</div>
+                <span class="pill theme-chip">今日累计</span>
+              </div><div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">成功完成</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">761</div>
+                <span class="pill theme-chip">92.4% 成功率</span>
+              </div><div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">等待人工确认</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">19</div>
+                <span class="pill warn-chip">需处理</span>
+              </div><div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">异常任务</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">4</div>
+                <span class="pill danger-chip">需关注</span>
+              </div><div class="line"></div>
+            </div>
+          </section>
+
+          <div class="kanban-grid">
+            <div class="kanban-col">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <div class="small" style="font-weight:600;">待执行</div>
+                <span class="pill" style="background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); font-size:11px;">58 个</span>
+              </div>
+              <div style="margin-top:14px;">
+                <div class="kanban-card">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="agent-dot" style="background:rgba(52,211,153,0.8);"></span>
+                    <span class="tiny" style="color:rgba(180,255,223,0.8);">首次接触</span>
+                  </div>
+                  <div style="color:rgba(255,255,255,0.78);">刘小姐 · 今日 15:30</div>
+                  <div class="tiny subtle mt-1">新线索入库，5分钟后自动欢迎</div>
+                </div>
+                <div class="kanban-card">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="agent-dot" style="background:rgba(34,211,238,0.8);"></span>
+                    <span class="tiny" style="color:rgba(178,245,255,0.8);">案例触达</span>
+                  </div>
+                  <div style="color:rgba(255,255,255,0.78);">Jason Chen · 今日 20:30</div>
+                  <div class="tiny subtle mt-1">Day 3 养熟，推送同城市案例</div>
+                </div>
+                <div class="kanban-card">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="agent-dot" style="background:rgba(52,211,153,0.8);"></span>
+                    <span class="tiny" style="color:rgba(180,255,223,0.8);">沉默唤醒</span>
+                  </div>
+                  <div style="color:rgba(255,255,255,0.78);">王同学 · 明日 10:00</div>
+                  <div class="tiny subtle mt-1">D7 价值提醒</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kanban-col">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <div class="small" style="font-weight:600;">执行中</div>
+                <span class="pill theme-chip" style="font-size:11px;">43 个</span>
+              </div>
+              <div style="margin-top:14px;">
+                <div class="kanban-card" style="border-color:rgba(52,211,153,0.2);">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="agent-dot" style="background:rgba(52,211,153,1); box-shadow:0 0 6px rgba(52,211,153,0.6);"></span>
+                    <span class="tiny" style="color:rgba(180,255,223,0.8);">价格顾虑 · 第 1 轮</span>
+                  </div>
+                  <div style="color:rgba(255,255,255,0.78);">赵先生</div>
+                  <div class="tiny subtle mt-1">已发出，等待回复...</div>
+                  <div class="progress mt-2" style="margin-top:8px; height:4px;"><span style="width:65%; background:var(--grad-theme-strong);"></span></div>
+                </div>
+                <div class="kanban-card" style="border-color:rgba(52,211,153,0.2);">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="agent-dot" style="background:rgba(52,211,153,1); box-shadow:0 0 6px rgba(52,211,153,0.6);"></span>
+                    <span class="tiny" style="color:rgba(180,255,223,0.8);">首次接触 · 意向摸底</span>
+                  </div>
+                  <div style="color:rgba(255,255,255,0.78);">孙女士</div>
+                  <div class="tiny subtle mt-1">3 个核心问题已发，等待回复</div>
+                  <div class="progress mt-2" style="margin-top:8px; height:4px;"><span style="width:45%; background:var(--grad-theme-strong);"></span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="kanban-col">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <div class="small" style="font-weight:600;">待人工确认</div>
+                <span class="pill warn-chip" style="font-size:11px;">19 个</span>
+              </div>
+              <div style="margin-top:14px;">
+                <div class="kanban-card" style="border-color:rgba(240,179,72,0.25);">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="agent-dot" style="background:rgba(240,179,72,0.9);"></span>
+                    <span class="tiny" style="color:rgba(255,225,160,0.8);">限时优惠 · 草稿</span>
+                  </div>
+                  <div style="color:rgba(255,255,255,0.78);">林女士</div>
+                  <div class="tiny subtle mt-1">建议 9 折，等待主管审批</div>
+                  <button class="btn-secondary" style="height:26px; padding:0 10px; font-size:11px; border-radius:8px; margin-top:8px;">审批</button>
+                </div>
+                <div class="kanban-card" style="border-color:rgba(240,179,72,0.25);">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="agent-dot" style="background:rgba(240,179,72,0.9);"></span>
+                    <span class="tiny" style="color:rgba(255,225,160,0.8);">案例选择 · 待确认</span>
+                  </div>
+                  <div style="color:rgba(255,255,255,0.78);">Emily</div>
+                  <div class="tiny subtle mt-1">未找到精准匹配案例，请人工选择</div>
+                  <button class="btn-secondary" style="height:26px; padding:0 10px; font-size:11px; border-radius:8px; margin-top:8px;">选择</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="kanban-col">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <div class="small" style="font-weight:600;">已完成</div>
+                <span class="pill" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); color:rgba(255,255,255,0.6); font-size:11px;">今日 761 个</span>
+              </div>
+              <div style="margin-top:14px;">
+                <div class="kanban-card">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="agent-dot" style="background:rgba(52,211,153,0.5);"></span>
+                    <span class="tiny subtle">首次接触 · 完成</span>
+                  </div>
+                  <div style="color:rgba(255,255,255,0.6);">陈女士 · 14:22</div>
+                  <div class="tiny subtle mt-1">评分 A，已移入接管池 ✓</div>
+                </div>
+                <div class="kanban-card">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="agent-dot" style="background:rgba(34,211,238,0.5);"></span>
+                    <span class="tiny subtle">案例触达 · 完成</span>
+                  </div>
+                  <div style="color:rgba(255,255,255,0.6);">张总 · 13:05</div>
+                  <div class="tiny subtle mt-1">已读未回，进入价格顾虑序列 ✓</div>
+                </div>
+                <div class="kanban-card">
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <span class="agent-dot" style="background:rgba(52,211,153,0.5);"></span>
+                    <span class="tiny subtle">沉默唤醒 D14 · 完成</span>
+                  </div>
+                  <div style="color:rgba(255,255,255,0.6);">李先生 · 11:48</div>
+                  <div class="tiny subtle mt-1">已回复，升级 B 类 ✓</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- #page-kanban -->
+
+        <!-- ════════════════════════════════ 复盘与策略优化 ════════════════════════════════ -->
+        <div id="page-review" class="page-content">
+          <section class="hero">
+            <div>
+              <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.26em;">复盘与策略优化 · 本周数据</div>
+              <h1>数据驱动，持续迭代剧本</h1>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary">导出复盘报告</button>
+              <button class="btn-secondary">更新剧本策略</button>
+            </div>
+          </section>
+
+          <section class="section-grid-4" style="margin-top:24px;">
+            <div class="glass metric-card">
+              <div class="small subtle">本周成交</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">31</div>
+                <span class="pill theme-chip">+8 vs 上周</span>
+              </div><div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">线索转化率</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">7.2%</div>
+                <span class="pill theme-chip">+1.4%</span>
+              </div><div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">人均覆盖客户</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">2.6x</div>
+                <span class="pill cyan-chip">vs 纯人工</span>
+              </div><div class="line"></div>
+            </div>
+            <div class="glass metric-card">
+              <div class="small subtle">AI 优化建议</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:12px;" class="mt-4">
+                <div class="metric-value">3</div>
+                <span class="pill warn-chip">待采纳</span>
+              </div><div class="line"></div>
+            </div>
+          </section>
+
+          <div class="review-grid">
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div class="glass section-card">
+                <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.22em;">各剧本回复率</div>
+                <div class="title-lg mt-2">本周执行效果</div>
+                <div style="margin-top:16px;">
+                  <div class="bar-row">
+                    <div style="width:70px; color:rgba(255,255,255,0.6); flex-shrink:0;">首次接触</div>
+                    <div class="bar-track"><div class="bar-fill" style="width:68%; background:var(--grad-theme-strong);"></div></div>
+                    <div style="width:36px; text-align:right; color:rgba(180,255,223,0.9); flex-shrink:0;">68%</div>
+                  </div>
+                  <div class="bar-row">
+                    <div style="width:70px; color:rgba(255,255,255,0.6); flex-shrink:0;">案例触达</div>
+                    <div class="bar-track"><div class="bar-fill" style="width:54%; background:var(--grad-theme-strong);"></div></div>
+                    <div style="width:36px; text-align:right; color:rgba(180,255,223,0.9); flex-shrink:0;">54%</div>
+                  </div>
+                  <div class="bar-row">
+                    <div style="width:70px; color:rgba(255,255,255,0.6); flex-shrink:0;">价格顾虑</div>
+                    <div class="bar-track"><div class="bar-fill" style="width:42%; background:linear-gradient(90deg, rgba(34,211,238,0.9), rgba(34,211,238,0.3));"></div></div>
+                    <div style="width:36px; text-align:right; color:rgba(178,245,255,0.9); flex-shrink:0;">42%</div>
+                  </div>
+                  <div class="bar-row">
+                    <div style="width:70px; color:rgba(255,255,255,0.6); flex-shrink:0;">沉默唤醒</div>
+                    <div class="bar-track"><div class="bar-fill" style="width:31%; background:linear-gradient(90deg, rgba(34,211,238,0.9), rgba(34,211,238,0.3));"></div></div>
+                    <div style="width:36px; text-align:right; color:rgba(178,245,255,0.9); flex-shrink:0;">31%</div>
+                  </div>
+                  <div class="bar-row">
+                    <div style="width:70px; color:rgba(255,255,255,0.6); flex-shrink:0;">限时优惠</div>
+                    <div class="bar-track"><div class="bar-fill" style="width:78%; background:linear-gradient(90deg, rgba(240,179,72,0.9), rgba(240,179,72,0.3));"></div></div>
+                    <div style="width:36px; text-align:right; color:rgba(255,225,160,0.9); flex-shrink:0;">78%</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="glass section-card">
+                <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.22em;">漏斗分析</div>
+                <div class="title-lg mt-2">本周转化路径</div>
+                <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
+                  <div style="padding:12px 16px; border-radius:14px; background:rgba(52,211,153,0.10); border:1px solid rgba(52,211,153,0.18); display:flex; justify-content:space-between; align-items:center;">
+                    <div class="small" style="color:rgba(180,255,223,0.9);">新线索进入</div>
+                    <span style="font-size:20px; font-weight:650; color:rgba(180,255,223,0.95);">428</span>
+                  </div>
+                  <div style="padding:12px 16px; border-radius:14px; background:rgba(34,211,238,0.08); border:1px solid rgba(34,211,238,0.16); display:flex; justify-content:space-between; align-items:center;">
+                    <div class="small" style="color:rgba(178,245,255,0.9);">首次回复</div>
+                    <span style="font-size:20px; font-weight:650; color:rgba(178,245,255,0.95);">289 <span class="tiny subtle">67.5%</span></span>
+                  </div>
+                  <div style="padding:12px 16px; border-radius:14px; background:rgba(240,179,72,0.08); border:1px solid rgba(240,179,72,0.16); display:flex; justify-content:space-between; align-items:center;">
+                    <div class="small" style="color:rgba(255,225,160,0.9);">进入意向培育</div>
+                    <span style="font-size:20px; font-weight:650; color:rgba(255,225,160,0.95);">158 <span class="tiny subtle">54.7%</span></span>
+                  </div>
+                  <div style="padding:12px 16px; border-radius:14px; background:rgba(52,211,153,0.12); border:1px solid rgba(52,211,153,0.22); display:flex; justify-content:space-between; align-items:center;">
+                    <div class="small" style="color:rgba(180,255,223,0.9);">人工接管</div>
+                    <span style="font-size:20px; font-weight:650; color:rgba(180,255,223,0.95);">74 <span class="tiny subtle">46.8%</span></span>
+                  </div>
+                  <div style="padding:12px 16px; border-radius:14px; background:rgba(52,211,153,0.18); border:1px solid rgba(52,211,153,0.30); display:flex; justify-content:space-between; align-items:center;">
+                    <div class="small" style="color:rgba(180,255,223,0.95); font-weight:600;">成交 🎉</div>
+                    <span style="font-size:20px; font-weight:650; color:rgba(180,255,223,1);">31 <span class="tiny subtle">41.9%</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div class="glass section-card">
+                <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.22em;">AI 优化建议</div>
+                <div class="title-lg mt-2">3 条待采纳策略</div>
+                <div style="margin-top:14px; display:flex; flex-direction:column; gap:8px;">
+                  <div class="insight-card" style="border-color:rgba(222,79,133,0.22); background:rgba(222,79,133,0.06);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                      <span class="pill danger-chip" style="font-size:11px;">影响较大</span>
+                      <button class="btn-secondary" style="height:26px; padding:0 10px; font-size:11px; border-radius:8px;">采纳</button>
+                    </div>
+                    <div style="color:rgba(255,190,216,0.9); font-weight:600; margin-top:8px;">更新"价格顾虑"剧本第 2 轮话术</div>
+                    <div style="color:rgba(255,190,216,0.6); margin-top:4px;">当前版本第 2 轮发出后成交率下降 12%，建议换成"同城市案例 + 限时排期"组合话术。</div>
+                  </div>
+                  <div class="insight-card" style="border-color:rgba(240,179,72,0.22); background:rgba(240,179,72,0.06);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                      <span class="pill warn-chip" style="font-size:11px;">中等影响</span>
+                      <button class="btn-secondary" style="height:26px; padding:0 10px; font-size:11px; border-radius:8px;">采纳</button>
+                    </div>
+                    <div style="color:rgba(255,225,160,0.9); font-weight:600; margin-top:8px;">首次接触问题数减至 2 个</div>
+                    <div style="color:rgba(255,225,160,0.6); margin-top:4px;">3 问版本完成率 68%，2 问版本 A/B 测试完成率 81%，建议切换。</div>
+                  </div>
+                  <div class="insight-card" style="border-color:rgba(34,211,238,0.20); background:rgba(34,211,238,0.06);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                      <span class="pill cyan-chip" style="font-size:11px;">长期优化</span>
+                      <button class="btn-secondary" style="height:26px; padding:0 10px; font-size:11px; border-radius:8px;">采纳</button>
+                    </div>
+                    <div style="color:rgba(178,245,255,0.9); font-weight:600; margin-top:8px;">沉默唤醒 D7 换用视频内容</div>
+                    <div style="color:rgba(178,245,255,0.6); margin-top:4px;">图文唤醒率 22%，视频内容在同类客户测试中唤醒率 38%，值得推广。</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="glass section-card">
+                <div class="tiny subtle" style="text-transform:uppercase; letter-spacing:0.22em;">本周销售排行</div>
+                <div class="title-lg mt-2">Top 5 人效表现</div>
+                <div style="margin-top:14px; display:flex; flex-direction:column; gap:8px;">
+                  <div class="queue-item">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <div style="width:26px; height:26px; border-radius:50%; background:rgba(52,211,153,0.2); color:rgba(180,255,223,0.9); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">1</div>
+                      <div><div class="small" style="color:rgba(255,255,255,0.85);">小王</div><div class="tiny subtle">成交 9 单 · 覆盖 68 客户</div></div>
+                    </div>
+                    <span class="pill theme-chip" style="font-size:11px;">2.8x 人效</span>
+                  </div>
+                  <div class="queue-item">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <div style="width:26px; height:26px; border-radius:50%; background:rgba(34,211,238,0.15); color:rgba(178,245,255,0.9); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">2</div>
+                      <div><div class="small" style="color:rgba(255,255,255,0.85);">小李</div><div class="tiny subtle">成交 7 单 · 覆盖 55 客户</div></div>
+                    </div>
+                    <span class="pill cyan-chip" style="font-size:11px;">2.4x 人效</span>
+                  </div>
+                  <div class="queue-item">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <div style="width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.6); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">3</div>
+                      <div><div class="small" style="color:rgba(255,255,255,0.85);">小张</div><div class="tiny subtle">成交 6 单 · 覆盖 47 客户</div></div>
+                    </div>
+                    <span class="pill" style="background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.6); font-size:11px;">2.1x 人效</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- #page-review -->
+
+      </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+      // ── 侧边栏页面切换 ──
+      var navItems = document.querySelectorAll('.nav-item[data-page]');
+      var pages = document.querySelectorAll('.page-content');
+      navItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+          navItems.forEach(function(n) { n.classList.remove('active'); });
+          this.classList.add('active');
+          var pageId = 'page-' + this.getAttribute('data-page');
+          pages.forEach(function(p) { p.classList.remove('active'); });
+          var target = document.getElementById(pageId);
+          if (target) target.classList.add('active');
+        });
+      });
+
+      // ── 自动化剧本 Tab 切换 ──
+      var tabNav = document.getElementById('scriptTabs');
+      if (tabNav) {
+        var btns = tabNav.querySelectorAll('.tab-btn');
+        var panels = document.querySelectorAll('#scriptTabContent .tab-panel');
+        btns.forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            btns.forEach(function(b) { b.classList.remove('active'); });
+            this.classList.add('active');
+            var tabId = this.getAttribute('data-tab');
+            panels.forEach(function(p) { p.classList.remove('active'); });
+            document.getElementById('tab-' + tabId).classList.add('active');
+          });
+        });
+        document.querySelectorAll('[data-goto-tab]').forEach(function(el) {
+          el.addEventListener('click', function() {
+            var targetTab = this.getAttribute('data-goto-tab');
+            var btn = tabNav.querySelector('[data-tab="' + targetTab + '"]');
+            if (btn) btn.click();
+          });
+        });
+      }
+
+      // ── Toggle 开关 ──
+      document.querySelectorAll('.tgl').forEach(function(tgl) {
+        tgl.addEventListener('click', function() { this.classList.toggle('off'); });
+      });
+
+      // ── 客户分层中心筛选器 ──
+      document.querySelectorAll('.filter-chip[data-seg]').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+          document.querySelectorAll('.filter-chip[data-seg]').forEach(function(c) { c.classList.remove('on'); });
+          this.classList.add('on');
+          var seg = this.getAttribute('data-seg');
+          document.querySelectorAll('#segList .seg-row').forEach(function(row) {
+            row.style.display = (seg === 'all' || row.getAttribute('data-seg') === seg) ? 'flex' : 'none';
+          });
+        });
+      });
+
+      // ── 人工接管池：点击左侧条目高亮 ──
+      document.querySelectorAll('#poolList .pool-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          document.querySelectorAll('#poolList .pool-card').forEach(function(c) { c.classList.remove('selected'); });
+          this.classList.add('selected');
+        });
+      });
+
+    });
+  </script>
+  </body>
+</html>
