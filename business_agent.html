@@ -1,0 +1,2683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>商业模式生成 Agent · 前端交互原型</title>
+    <style>
+      :root {
+        --theme-rgba: 52, 211, 153;
+        --theme: rgba(var(--theme-rgba), 0.95);
+        --theme-1: rgba(var(--theme-rgba), 1);
+        --theme-85: rgba(var(--theme-rgba), 0.85);
+        --theme-60: rgba(var(--theme-rgba), 0.6);
+        --theme-35: rgba(var(--theme-rgba), 0.35);
+        --theme-12: rgba(var(--theme-rgba), 0.12);
+        --theme-06: rgba(var(--theme-rgba), 0.06);
+
+        --bg-900: #050607;
+        --muted: rgba(255, 255, 255, 0.55);
+
+        --shadow-1: 0 6px 18px rgba(0, 0, 0, 0.45);
+        --shadow-2: 0 18px 34px rgba(0, 0, 0, 0.5);
+        --glow-theme: 0 0 18px rgba(var(--theme-rgba), 0.18);
+
+        --radius-pill: 9999px;
+        --btn-height: 46px;
+        --input-height: 40px;
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg-900);
+        color: white;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      a { color: inherit; text-decoration: none; }
+      button { font: inherit; }
+
+      .page-bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 18% 16%, rgba(52, 211, 153, 0.12), transparent 30%),
+          radial-gradient(circle at 84% 18%, rgba(34, 211, 238, 0.12), transparent 34%),
+          radial-gradient(circle at 25% 92%, rgba(52, 211, 153, 0.08), transparent 28%),
+          linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: auto, auto, auto, 28px 28px, 28px 28px;
+        mask-image: radial-gradient(circle at center, black 58%, transparent 92%);
+      }
+
+      .app { position: relative; z-index: 1; display: flex; min-height: 100vh; }
+
+      .sidebar {
+        width: 300px;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+        padding: 18px 16px 16px;
+      }
+
+      .brand { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+      .brand-left { display: flex; align-items: center; gap: 10px; }
+      .logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        background: rgba(52, 211, 153, 0.14);
+        border: 1px solid rgba(52, 211, 153, 0.25);
+        box-shadow: var(--glow-theme);
+        color: rgba(190, 255, 232, 0.95);
+        font-weight: 900;
+        letter-spacing: -0.02em;
+      }
+      .brand-title { font-weight: 800; letter-spacing: -0.02em; }
+      .brand-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+      .menu-btn {
+        display: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.82);
+        cursor: pointer;
+      }
+
+      .nav { margin-top: 10px; display: grid; gap: 8px; }
+      .nav-group-title {
+        margin: 14px 8px 8px;
+        font-size: 11px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      .nav-item {
+        border-radius: 16px;
+        padding: 12px 12px;
+        color: rgba(255, 255, 255, 0.7);
+        border: 1px solid transparent;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .nav-item:hover { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.06); }
+      .nav-item.active {
+        color: #eafff5;
+        background: rgba(52, 211, 153, 0.12);
+        border-color: rgba(52, 211, 153, 0.22);
+        box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.08);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: var(--radius-pill);
+        font-size: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.7);
+        white-space: nowrap;
+      }
+      .badge.theme { background: rgba(52, 211, 153, 0.12); color: rgba(190, 255, 232, 0.95); border: 1px solid rgba(52, 211, 153, 0.22); }
+      .badge.cyan { background: rgba(34, 211, 238, 0.1); color: rgba(190, 248, 255, 0.92); border: 1px solid rgba(34, 211, 238, 0.2); }
+      .badge.warn { background: rgba(240, 179, 72, 0.1); color: rgba(255, 228, 175, 0.92); border: 1px solid rgba(240, 179, 72, 0.22); }
+      .badge.danger { background: rgba(222, 79, 133, 0.1); color: rgba(255, 199, 220, 0.92); border: 1px solid rgba(222, 79, 133, 0.2); }
+
+      .main { flex: 1; padding: 22px 22px 40px; display: grid; grid-template-rows: auto 1fr; gap: 16px; }
+      .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+      .crumbs { color: rgba(255, 255, 255, 0.55); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .topbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+
+      .btn {
+        height: var(--btn-height);
+        border-radius: var(--radius-pill);
+        padding: 0 18px;
+        font-size: 14px;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.82);
+      }
+      .btn:hover { border-color: rgba(255, 255, 255, 0.16); background: rgba(255, 255, 255, 0.06); }
+      .btn:active { transform: translateY(0.5px); }
+      .btn.primary { border: none; background: var(--theme); color: #04110c; font-weight: 700; box-shadow: 0 0 26px rgba(52, 211, 153, 0.22); }
+      .btn.ghost { background: transparent; border-color: rgba(255, 255, 255, 0.1); }
+      .btn.small { height: 38px; padding: 0 14px; font-size: 13px; }
+
+      .card {
+        border-radius: 24px;
+        padding: 16px;
+        background: radial-gradient(120% 90% at 18% 8%, rgba(52, 211, 153, 0.1) 0%, rgba(34, 211, 238, 0.06) 44%, rgba(0, 0, 0, 0) 76%),
+          rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: var(--shadow-1);
+        backdrop-filter: blur(10px);
+      }
+      .card.soft { box-shadow: none; }
+      .card-title { font-size: 18px; font-weight: 850; letter-spacing: -0.02em; }
+      .card-sub { margin-top: 6px; color: rgba(255, 255, 255, 0.55); font-size: 13px; line-height: 1.6; }
+
+      .grid-2 { display: grid; grid-template-columns: 1.25fr 1fr; gap: 16px; align-items: start; }
+      .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+      .stack { display: grid; gap: 12px; }
+
+      .field label { display: block; font-size: 12px; color: rgba(255, 255, 255, 0.55); margin: 0 0 6px; }
+      .input, .select, .textarea {
+        width: 100%;
+        height: var(--input-height);
+        border-radius: 14px;
+        padding: 10px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.18);
+        color: rgba(255, 255, 255, 0.88);
+        outline: none;
+      }
+      .textarea { height: 120px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+      .input:focus, .select:focus, .textarea:focus { border-color: rgba(var(--theme-rgba), 0.42); box-shadow: 0 0 0 3px rgba(var(--theme-rgba), 0.1); }
+
+      .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+      .row.between { justify-content: space-between; }
+      .pillbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: var(--radius-pill);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 12px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .pill.active {
+        background: rgba(52, 211, 153, 0.12);
+        border-color: rgba(52, 211, 153, 0.22);
+        color: rgba(190, 255, 232, 0.95);
+        box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.06);
+      }
+
+      .split { display: grid; grid-template-columns: 1fr 380px; gap: 16px; align-items: start; }
+      .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+      .tab {
+        height: 34px;
+        border-radius: var(--radius-pill);
+        padding: 0 12px;
+        font-size: 12px;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .tab.active {
+        background: rgba(34, 211, 238, 0.1);
+        border-color: rgba(34, 211, 238, 0.22);
+        color: rgba(190, 248, 255, 0.92);
+      }
+
+      .divider { height: 1px; background: rgba(255, 255, 255, 0.08); margin: 10px 0; }
+      .list { display: grid; gap: 10px; }
+      .list-item { border-radius: 18px; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(0, 0, 0, 0.18); }
+      .li-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+      .li-title { font-weight: 800; letter-spacing: -0.02em; }
+      .li-sub { margin-top: 6px; color: rgba(255, 255, 255, 0.55); font-size: 13px; line-height: 1.5; }
+
+      .kvs { margin-top: 10px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .kv { border-radius: 14px; padding: 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); }
+      .kv .k { font-size: 11px; color: rgba(255, 255, 255, 0.45); }
+      .kv .v { margin-top: 4px; font-weight: 700; color: rgba(255, 255, 255, 0.86); }
+
+      .action-list { display: grid; gap: 10px; }
+      .action-row {
+        display: grid;
+        grid-template-columns: 84px 1fr;
+        gap: 10px;
+        align-items: start;
+      }
+      .action-day {
+        height: 38px;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.03);
+        color: rgba(190, 248, 255, 0.92);
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .action-input { height: 64px; }
+
+      .icon-btn {
+        height: 38px;
+        width: 38px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.03);
+        color: rgba(255, 255, 255, 0.78);
+        cursor: pointer;
+        display: inline-grid;
+        place-items: center;
+      }
+      .icon-btn:hover { border-color: rgba(255, 255, 255, 0.16); background: rgba(255, 255, 255, 0.05); }
+
+      .list-editor { display: grid; gap: 10px; margin-top: 10px; }
+      .list-row {
+        display: grid;
+        grid-template-columns: 1fr 38px;
+        gap: 10px;
+        align-items: start;
+      }
+      .list-input { height: 44px; }
+      .suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+      .risk-table { display: grid; gap: 10px; margin-top: 10px; }
+      .risk-head, .risk-row {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr 1.2fr 38px;
+        gap: 10px;
+        align-items: start;
+      }
+      .risk-head div {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.52);
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        padding: 0 2px;
+      }
+      .risk-input { height: 64px; }
+
+      .cost-table { display: grid; gap: 10px; margin-top: 10px; }
+      .cost-head, .cost-row {
+        display: grid;
+        grid-template-columns: 0.9fr 0.6fr 1.4fr 38px;
+        gap: 10px;
+        align-items: start;
+      }
+      .cost-head div {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.52);
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        padding: 0 2px;
+      }
+      .cost-input { height: 44px; }
+      .cost-note { height: 64px; }
+
+      .moat-table { display: grid; gap: 10px; margin-top: 10px; }
+      .moat-head, .moat-row {
+        display: grid;
+        grid-template-columns: 0.8fr 1.2fr 1.4fr 38px;
+        gap: 10px;
+        align-items: start;
+      }
+      .moat-head div {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.52);
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        padding: 0 2px;
+      }
+      .moat-input { height: 64px; }
+
+      .table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.08); }
+      .table th, .table td {
+        padding: 12px 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.78);
+        vertical-align: top;
+      }
+      .table th { color: rgba(255, 255, 255, 0.55); font-weight: 700; background: rgba(255, 255, 255, 0.03); }
+      .table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+      .toast {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        box-shadow: var(--shadow-2);
+        z-index: 50;
+        display: none;
+        max-width: 420px;
+      }
+      .toast.show { display: block; }
+
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.62);
+        backdrop-filter: blur(6px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        z-index: 60;
+      }
+      .modal-backdrop.show { display: flex; }
+      .modal {
+        width: min(860px, 100%);
+        border-radius: 22px;
+        background: radial-gradient(120% 90% at 18% 8%, rgba(52, 211, 153, 0.1) 0%, rgba(34, 211, 238, 0.06) 44%, rgba(0, 0, 0, 0) 76%),
+          rgba(16, 16, 16, 0.86);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: var(--shadow-2);
+        overflow: hidden;
+      }
+      .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+      .modal-title { font-weight: 850; letter-spacing: -0.02em; }
+      .modal-body { padding: 14px 16px 16px; }
+      .modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+
+      @media (max-width: 980px) { .grid-2 { grid-template-columns: 1fr; } .split { grid-template-columns: 1fr; } }
+      @media (max-width: 860px) {
+        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-102%); transition: transform 180ms ease; z-index: 70; }
+        .sidebar.open { transform: translateX(0); }
+        .menu-btn { display: inline-grid; place-items: center; }
+        .main { padding: 16px 14px 34px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true"></div>
+    <div class="app">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-left">
+            <div class="logo">B</div>
+            <div>
+              <div class="brand-title">商业模式生成 Agent</div>
+              <div class="brand-sub">知识 + 案例 + 反馈 · 三层驱动</div>
+            </div>
+          </div>
+          <span class="badge theme" id="dbStatus">本地原型</span>
+        </div>
+
+        <nav class="nav" aria-label="侧边栏导航">
+          <div class="nav-group-title">用户</div>
+          <a class="nav-item" href="#/workspace" data-nav="workspace"><span>开始生成</span><span class="badge cyan" id="navDraft">草稿</span></a>
+          <a class="nav-item" href="#/plans" data-nav="my_plans"><span>我的方案</span><span class="badge" id="cntPlans">0</span></a>
+          <a class="nav-item" href="#/feedback" data-nav="my_feedback"><span>我的反馈</span><span class="badge" id="cntFeedback">0</span></a>
+
+          <div id="devNav">
+            <div class="nav-group-title">开发者</div>
+            <a class="nav-item" href="#/data/patterns" data-nav="patterns"><span>商业结构知识</span><span class="badge" id="cntPatterns">0</span></a>
+            <a class="nav-item" href="#/data/priors" data-nav="priors"><span>行业先验</span><span class="badge" id="cntPriors">0</span></a>
+            <a class="nav-item" href="#/data/cases" data-nav="cases"><span>行业案例样本</span><span class="badge" id="cntCases">0</span></a>
+          </div>
+
+          <div class="nav-group-title">设置</div>
+          <a class="nav-item" href="#/settings" data-nav="settings"><span>设置</span><span class="badge">偏好</span></a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="menu-btn" id="menuBtn" type="button" aria-label="打开菜单">☰</button>
+            <div class="crumbs" id="crumbs">工作台</div>
+          </div>
+          <div class="topbar-right">
+            <button class="btn ghost small" type="button" data-action="resetDemo">重新开始</button>
+            <button class="btn primary small" type="button" data-action="newDraft">新建草稿</button>
+          </div>
+        </header>
+
+        <div id="routeRoot" class="stack" aria-live="polite"></div>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-label="对话框">
+      <div class="modal">
+        <div class="modal-head">
+          <div class="modal-title" id="modalTitle">编辑</div>
+          <button class="btn small ghost" type="button" data-action="closeModal">关闭</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-foot" id="modalFoot"></div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const LS_KEY = "bm_agent_db_v1";
+        const LS_UI_KEY = "bm_agent_ui_v1";
+
+        const nowISO = () => new Date().toISOString();
+        const uid = () => Math.random().toString(16).slice(2) + "-" + Math.random().toString(16).slice(2);
+
+        function safeJsonParse(text, fallback) {
+          try { return JSON.parse(text); } catch { return fallback; }
+        }
+
+        function normalizeList(value) {
+          if (Array.isArray(value)) return value.map((x) => String(x || "").trim()).filter(Boolean);
+          return String(value || "").split(/\n+/).map((s) => s.trim()).filter(Boolean);
+        }
+
+        function parseRiskLine(line) {
+          const raw = String(line || "").trim();
+          if (!raw) return { risk: "", metric: "", mitigation: "" };
+          if (!raw.includes("｜")) return { risk: raw, metric: "", mitigation: "" };
+          const parts = raw.split("｜");
+          return { risk: (parts[0] || "").trim(), metric: (parts[1] || "").trim(), mitigation: (parts[2] || "").trim() };
+        }
+
+        function formatRiskLine({ risk, metric, mitigation }) {
+          const a = String(risk || "").trim();
+          const b = String(metric || "").trim();
+          const c = String(mitigation || "").trim();
+          if (!a && !b && !c) return "";
+          return `${a}｜${b}｜${c}`;
+        }
+
+        function parseCostLine(line) {
+          const raw = String(line || "").trim();
+          if (!raw) return { item: "", amount: "", note: "" };
+          if (raw.includes("｜")) {
+            const parts = raw.split("｜");
+            return { item: (parts[0] || "").trim(), amount: (parts[1] || "").trim(), note: (parts[2] || "").trim() };
+          }
+          const m = raw.match(/^\s*([^（(]+)\s*[（(]([^）)]+)[）)]\s*$/);
+          if (m) return { item: String(m[1]).trim(), amount: "", note: String(m[2]).trim() };
+          return { item: raw, amount: "", note: "" };
+        }
+
+        function formatCostLine({ item, amount, note }) {
+          const a = String(item || "").trim();
+          const b = String(amount || "").trim();
+          const c = String(note || "").trim();
+          if (!a && !b && !c) return "";
+          return `${a}｜${b}｜${c}`;
+        }
+
+        function parseMoatLine(line) {
+          const raw = String(line || "").trim();
+          if (!raw) return { type: "", asset: "", build: "" };
+          if (!raw.includes("｜")) return { type: raw, asset: "", build: "" };
+          const parts = raw.split("｜");
+          return { type: (parts[0] || "").trim(), asset: (parts[1] || "").trim(), build: (parts[2] || "").trim() };
+        }
+
+        function formatMoatLine({ type, asset, build }) {
+          const a = String(type || "").trim();
+          const b = String(asset || "").trim();
+          const c = String(build || "").trim();
+          if (!a && !b && !c) return "";
+          return `${a}｜${b}｜${c}`;
+        }
+
+        function toast(message, ms = 1800) {
+          const el = document.getElementById("toast");
+          el.textContent = message;
+          el.classList.add("show");
+          window.clearTimeout(toast._t);
+          toast._t = window.setTimeout(() => el.classList.remove("show"), ms);
+        }
+
+        function loadDb() {
+          try {
+            const raw = localStorage.getItem(LS_KEY);
+            if (!raw) return null;
+            return JSON.parse(raw);
+          } catch {
+            return null;
+          }
+        }
+
+        function saveDb(db) {
+          try {
+            localStorage.setItem(LS_KEY, JSON.stringify(db));
+            return true;
+          } catch {
+            return false;
+          }
+        }
+
+        function seedDb() {
+          return {
+            meta: { version: 1, seeded_at: nowISO() },
+            business_model_patterns: [
+              {
+                id: "pat-saas",
+                model_type: "SaaS",
+                description: "用标准化软件交付确定性价值，靠续费与扩展实现增长。",
+                fit_conditions: ["高频使用", "ROI 可量化", "交付可标准化", "可持续迭代"],
+                bad_fit_conditions: ["强线下履约", "极端定制", "价值难以量化"],
+                revenue_options: ["月订阅", "年订阅", "席位计费", "企业版分层"],
+                control_points: ["产品体验", "数据与工作流", "集成生态"],
+                growth_engines: ["内容/SEO", "产品内增长", "渠道合作", "销售驱动（ToB）"],
+                risks: ["低留存", "同质化", "获客成本上升"]
+              },
+              {
+                id: "pat-market",
+                model_type: "Marketplace",
+                description: "撮合供需，靠抽佣/服务费/广告位变现，核心是供给质量与匹配效率。",
+                fit_conditions: ["供需分散", "交易频繁", "撮合可显著降摩擦", "可建立信任机制"],
+                bad_fit_conditions: ["供给高度集中", "难以标准化撮合", "履约不可控"],
+                revenue_options: ["抽佣", "上架费", "增值服务", "广告/竞价"],
+                control_points: ["供给准入", "评价体系", "交易规则", "履约保障"],
+                growth_engines: ["供给驱动", "需求驱动", "网络效应", "区域扩张"],
+                risks: ["履约波动", "劣币驱逐良币", "监管合规"]
+              },
+              {
+                id: "pat-ip",
+                model_type: "IP/品牌",
+                description: "用情绪价值与符号资产建立溢价，靠复购、联名与衍生扩张。",
+                fit_conditions: ["强情绪/审美价值", "可持续内容/世界观", "可扩展品类"],
+                bad_fit_conditions: ["高度功能性单品", "低可见度渠道", "缺乏持续创作供给"],
+                revenue_options: ["产品销售", "授权", "联名分成", "会员/订阅"],
+                control_points: ["IP资产", "渠道曝光", "供应链质量"],
+                growth_engines: ["圈层扩散", "内容运营", "联名破圈", "复购驱动"],
+                risks: ["审美变化", "生命周期短", "库存与现金流"]
+              },
+              {
+                id: "pat-service2prod",
+                model_type: "服务转产品",
+                description: "先用服务跑通交付，再产品化沉淀流程与工具，提高毛利与规模化能力。",
+                fit_conditions: ["需求明确但交付不标准", "愿意为结果付费", "可抽象出 SOP"],
+                bad_fit_conditions: ["高度非标且无法抽象", "客户极度分散且单客价值低"],
+                revenue_options: ["项目制", "包月顾问", "按效果分成", "工具订阅（产品化后）"],
+                control_points: ["交付方法论", "关键人才", "客户成功"],
+                growth_engines: ["口碑转介绍", "垂直行业深耕", "模板化交付"],
+                risks: ["人力瓶颈", "边际成本高", "难以产品化"]
+              }
+            ],
+            industry_priors: [
+              {
+                id: "ind-ai-tools",
+                industry: "AI 工具",
+                typical_users: ["运营/市场", "销售", "创作者", "中小团队"],
+                typical_channels: ["内容分发", "产品内分享", "应用商店/插件市场", "社群"],
+                typical_pricing_models: ["订阅分层", "按量计费", "团队席位"],
+                key_metrics: ["激活率", "7/30 日留存", "ARPA", "使用频次"],
+                common_risks: ["同质化", "成本不可控（推理/调用）", "需求变化快"]
+              },
+              {
+                id: "ind-edu",
+                industry: "教育/培训",
+                typical_users: ["家长", "学生", "在职人群", "机构老师"],
+                typical_channels: ["短视频/直播", "线下转介绍", "机构合作"],
+                typical_pricing_models: ["课包", "会员", "按结果付费（谨慎）"],
+                key_metrics: ["试听转化", "完课率", "续费率", "LTV/CAC"],
+                common_risks: ["政策合规", "交付质量波动", "获客成本高"]
+              },
+              {
+                id: "ind-local-life",
+                industry: "本地生活/餐饮",
+                typical_users: ["周边上班族", "家庭用户", "外卖用户"],
+                typical_channels: ["平台流量", "团购/券", "私域复购", "地推"],
+                typical_pricing_models: ["客单价优化", "套餐/会员", "团购引流+加价购"],
+                key_metrics: ["点击率", "转化率", "复购率", "履约时长"],
+                common_risks: ["履约波动", "平台规则变化", "补贴战"]
+              },
+              {
+                id: "ind-ecom",
+                industry: "电商/品牌",
+                typical_users: ["线上消费者", "经销商/渠道商"],
+                typical_channels: ["内容种草", "直播电商", "搜索/投放", "私域"],
+                typical_pricing_models: ["产品毛利", "会员/订阅", "联名溢价"],
+                key_metrics: ["转化率", "复购率", "客单价", "退货率"],
+                common_risks: ["库存与现金流", "渠道依赖", "品类竞争"]
+              }
+            ],
+            business_cases: [
+              {
+                id: "case-popmart",
+                case_name: "泡泡玛特",
+                industry: "消费/IP",
+                target_user: ["年轻消费者", "女性用户"],
+                value_type: ["情绪", "审美", "收集"],
+                revenue_streams: ["产品销售", "IP衍生"],
+                control_points: ["IP", "渠道", "供应链"],
+                growth_engine: ["圈层扩散", "IP复购"],
+                scaling_path: ["潮玩", "衍生品", "乐园", "全球化"],
+                risks: ["IP 生命周期", "审美变化"]
+              },
+              {
+                id: "case-shopify",
+                case_name: "Shopify",
+                industry: "SaaS/电商基础设施",
+                target_user: ["中小商家", "DTC 品牌"],
+                value_type: ["快速开店", "生态扩展", "降低技术门槛"],
+                revenue_streams: ["订阅", "支付/交易", "应用生态分成"],
+                control_points: ["生态", "支付", "平台能力"],
+                growth_engine: ["渠道合作", "生态网络效应"],
+                scaling_path: ["插件生态", "支付", "跨境"],
+                risks: ["平台竞争", "生态治理"]
+              },
+              {
+                id: "case-costco",
+                case_name: "Costco",
+                industry: "零售/会员",
+                target_user: ["家庭用户", "高频采购人群"],
+                value_type: ["低价高质", "精选 SKU", "信任"],
+                revenue_streams: ["会员费", "商品毛利"],
+                control_points: ["供应链", "选品", "规模效率"],
+                growth_engine: ["复购驱动", "口碑推荐"],
+                scaling_path: ["门店扩张", "自有品牌"],
+                risks: ["选品失误", "供应链波动"]
+              }
+            ],
+            generated_plans: [],
+            outcome_feedback: []
+          };
+        }
+
+        function loadUi() {
+          try { return JSON.parse(localStorage.getItem(LS_UI_KEY) || "{}"); } catch { return {}; }
+        }
+        function saveUi(ui) {
+          try { localStorage.setItem(LS_UI_KEY, JSON.stringify(ui)); } catch {}
+        }
+
+        let db = loadDb();
+        if (!db) { db = seedDb(); saveDb(db); }
+
+        let ui = loadUi();
+        if (!ui.draft) ui.draft = null;
+        if (!ui.workspaceStep) ui.workspaceStep = "input";
+        if (!ui.evidenceTab) ui.evidenceTab = "structure";
+        if (!ui.sidebarOpen) ui.sidebarOpen = false;
+        if (typeof ui.developerMode !== "boolean") ui.developerMode = false;
+
+        function dbCounts() {
+          return {
+            patterns: db.business_model_patterns.length,
+            priors: db.industry_priors.length,
+            cases: db.business_cases.length,
+            plans: db.generated_plans.length,
+            feedback: db.outcome_feedback.length
+          };
+        }
+
+        function updateSidebarCounts() {
+          const c = dbCounts();
+          document.getElementById("cntPatterns").textContent = c.patterns;
+          document.getElementById("cntPriors").textContent = c.priors;
+          document.getElementById("cntCases").textContent = c.cases;
+          document.getElementById("cntPlans").textContent = c.plans;
+          document.getElementById("cntFeedback").textContent = c.feedback;
+        }
+
+        function updateModeUi() {
+          const devNav = document.getElementById("devNav");
+          if (devNav) devNav.style.display = ui.developerMode ? "block" : "none";
+          const status = document.getElementById("dbStatus");
+          if (status) {
+            status.textContent = ui.developerMode ? "开发者模式" : "用户模式";
+            status.className = ui.developerMode ? "badge warn" : "badge theme";
+          }
+        }
+
+        function setSidebarOpen(open) {
+          ui.sidebarOpen = open;
+          saveUi(ui);
+          const el = document.getElementById("sidebar");
+          if (open) el.classList.add("open");
+          else el.classList.remove("open");
+        }
+
+        document.getElementById("menuBtn").addEventListener("click", () => setSidebarOpen(!ui.sidebarOpen));
+        document.addEventListener("click", (e) => {
+          const sidebar = document.getElementById("sidebar");
+          if (!sidebar.classList.contains("open")) return;
+          if (e.target.closest("#sidebar") || e.target.closest("#menuBtn")) return;
+          setSidebarOpen(false);
+        });
+
+        function route() {
+          const hash = location.hash || "#/workspace";
+          const parts = hash.replace(/^#\//, "").split("/");
+          return { root: parts[0] || "workspace", sub: parts[1] || null };
+        }
+
+        function setNavActive(key) {
+          document.querySelectorAll("[data-nav]").forEach((el) => el.classList.toggle("active", el.dataset.nav === key));
+        }
+
+        function setCrumbs(text) { document.getElementById("crumbs").textContent = text; }
+
+        function openModal({ title, bodyHtml, footHtml, onMount }) {
+          const backdrop = document.getElementById("modalBackdrop");
+          document.getElementById("modalTitle").textContent = title || "编辑";
+          document.getElementById("modalBody").innerHTML = bodyHtml || "";
+          document.getElementById("modalFoot").innerHTML = footHtml || "";
+          backdrop.classList.add("show");
+          if (typeof onMount === "function") onMount();
+        }
+
+        function closeModal() {
+          document.getElementById("modalBackdrop").classList.remove("show");
+          document.getElementById("modalBody").innerHTML = "";
+          document.getElementById("modalFoot").innerHTML = "";
+        }
+
+        function getPriorForIndustry(industry) {
+          return db.industry_priors.find((p) => p.industry === industry) || null;
+        }
+
+        function suggestPatterns({ industry, stage, idea }) {
+          const signals = (industry + " " + (idea || "")).toLowerCase();
+          function score(p) {
+            let s = 0;
+            if (industry.includes("AI") && p.model_type === "SaaS") s += 3;
+            if (industry.includes("电商") && p.model_type === "SaaS") s += 2;
+            if (industry.includes("本地生活") && p.model_type === "Marketplace") s += 2;
+            if (signals.includes("撮合") && p.model_type === "Marketplace") s += 2;
+            if (signals.includes("品牌") && p.model_type.includes("IP")) s += 2;
+            if (stage === "MVP" && p.model_type === "服务转产品") s += 2;
+            return s;
+          }
+          return db.business_model_patterns
+            .map((p) => ({ p, s: score(p) }))
+            .sort((a, b) => b.s - a.s)
+            .slice(0, 3)
+            .map((x) => x.p);
+        }
+
+        function findRelatedCases({ industry, keywords }) {
+          const kw = (keywords || "").toLowerCase().split(/\\s+/).filter(Boolean);
+          return db.business_cases
+            .map((c) => {
+              let score = 0;
+              if (industry && (c.industry || "").includes(industry.split("/")[0])) score += 2;
+              const hay = JSON.stringify(c).toLowerCase();
+              kw.forEach((k) => { if (hay.includes(k)) score += 1; });
+              return { c, score };
+            })
+            .filter((x) => x.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 6)
+            .map((x) => x.c);
+        }
+
+        function buildCanvas({ idea, industry, stage, constraints, variantLabel, riskPosture }) {
+          const prior = getPriorForIndustry(industry);
+          const patterns = suggestPatterns({ industry, stage, idea });
+          const relatedCases = findRelatedCases({ industry, keywords: idea });
+
+          const baseRevenue =
+            industry.includes("AI") ? ["订阅分层", "按量计费（Token/调用）", "团队席位"] :
+            industry.includes("教育") ? ["课包/会员", "高客单精品课", "机构合作分成（谨慎）"] :
+            industry.includes("本地生活") ? ["抽佣/服务费", "商家会员", "增值服务"] :
+            ["订阅", "交易抽佣", "增值服务"];
+
+          const postureTweaks = {
+            conservative: { pricing: "先做可控现金流（订阅/预付）", growth: "先做转介绍/渠道合作", risk: "严格控制履约与成本波动" },
+            balanced: { pricing: "订阅 + 增值模块", growth: "内容 + 产品内增长", risk: "验证核心指标后再扩张" },
+            aggressive: { pricing: "低门槛试用 + 按量上限", growth: "增长实验密度拉满", risk: "容忍早期波动换速度" }
+          };
+          const tweak = postureTweaks[riskPosture] || postureTweaks.balanced;
+
+          return {
+            idea,
+            industry,
+            stage,
+            constraints,
+            variant_label: variantLabel,
+            posture: riskPosture,
+            canvas: {
+              target_user: (prior?.typical_users || ["目标用户"]).slice(0, 3),
+              value_proposition: ["把“结果”产品化：可复制、可衡量、可解释", "把关键路径缩短：从输入 → 输出 → 反馈闭环", "把成本可控：先做高 ROI 场景再扩展"],
+              offering: ["核心功能 1：诊断/拆解", "核心功能 2：模式组合与推演", "核心功能 3：落地动作与复盘"],
+              channels: prior?.typical_channels || ["内容", "渠道合作", "社群"],
+              revenue_streams: baseRevenue,
+              cost_structure: ["获客（内容/投放/BD）", "履约/客户成功", "模型调用成本", "研发迭代"],
+              control_points: ["数据结构（Schema）", "关键指标口径", "反馈闭环", "可解释的证据链"],
+              moat: ["结构化数据资产", "行业先验+反馈经验", "工作流嵌入与切换成本"],
+              growth_engine: prior?.key_metrics ? ["围绕关键指标做增长飞轮", ...prior.key_metrics.slice(0, 2)] : ["内容驱动", "推荐驱动", "复购驱动"],
+              key_risks: prior?.common_risks ? [...prior.common_risks.slice(0, 2), tweak.risk] : ["同质化", "成本不可控", tweak.risk],
+              pricing_strategy: tweak.pricing,
+              go_to_market: tweak.growth,
+              metrics: prior?.key_metrics || ["激活率", "留存", "ARPA", "LTV/CAC"],
+              seven_day_actions: [
+                "Day1：锁定 1 个最强 ROI 场景，定义指标口径",
+                "Day2：做 10 个目标用户访谈/冷启动试用",
+                "Day3：做最小可交付版本（模板+工作流）",
+                "Day4：加入 3 个对比方案与证据引用",
+                "Day5：上线反馈表单与埋点（成交/续费/失败原因）",
+                "Day6：迭代定价与引导（减少泛化输出）",
+                "Day7：复盘：哪些建议有效？把有效项写入反馈库"
+              ]
+            },
+            evidence: { patterns: patterns.map((p) => p.id), priors: prior ? [prior.id] : [], cases: relatedCases.map((c) => c.id), feedback: [] }
+          };
+        }
+
+        function ensureDraft() {
+          if (ui.draft) return ui.draft;
+          ui.draft = {
+            id: "draft-" + uid(),
+            created_at: nowISO(),
+            stage: "MVP",
+            industry: "AI 工具",
+            idea: "我想做一个 AI 运营助手",
+            constraints: "预算有限；希望 2 周内能卖出第一单；不做重线下履约。",
+            variants: [],
+            selected_variant_id: null,
+            citations: { patterns: [], priors: [], cases: [], feedback: [] }
+          };
+          ui.workspaceStep = "input";
+          saveUi(ui);
+          return ui.draft;
+        }
+
+        function updateDraft(patch) { ui.draft = { ...(ui.draft || ensureDraft()), ...patch }; saveUi(ui); }
+
+        function escapeHtml(str) {
+          return String(str ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll("\"", "&quot;")
+            .replaceAll("'", "&#039;");
+        }
+
+        function renderWorkspace() {
+          const draft = ensureDraft();
+          const c = dbCounts();
+          const step = ui.workspaceStep;
+
+          const stepPills = [
+            { id: "input", label: "1 输入" },
+            { id: "compare", label: "2 对比" },
+            { id: "canvas", label: "3 画布" },
+            { id: "feedback", label: "4 反馈" }
+          ];
+
+          const coverage = c.cases < 30 ? `<span class="badge warn">案例偏少（适合 MVP）</span>` : `<span class="badge theme">案例覆盖良好</span>`;
+
+          const header = `
+            <section class="card">
+              <div class="row between">
+                <div>
+                  <div class="card-title">工作台：把 Idea 变成“可落地的商业画布”</div>
+                  <div class="card-sub">底层三层数据：商业结构知识（Schema）→ 行业案例样本（类比）→ 结果反馈数据（闭环）。</div>
+                  <div class="tabs" style="margin-top:10px;">
+                    ${stepPills.map((s) => `<button class="pill ${step === s.id ? "active" : ""}" type="button" data-action="setStep" data-step="${s.id}">${s.label}</button>`).join("")}
+                  </div>
+                </div>
+                <div class="pillbar">
+                  ${coverage}
+                  <span class="badge cyan">结构知识 ${c.patterns}</span>
+                  <span class="badge">行业先验 ${c.priors}</span>
+                  <span class="badge">反馈 ${c.feedback}</span>
+                </div>
+              </div>
+            </section>
+          `;
+
+          const inputPanel = `
+            <section class="card">
+              <div class="row between">
+                <div>
+                  <div class="card-title">输入：定义问题与约束</div>
+                  <div class="card-sub">早期不靠“海量案例”，先靠结构化 Schema 把模式推演出来。</div>
+                </div>
+                <div class="row">
+                  <button class="btn small" type="button" data-action="loadExample">换个示例</button>
+                  <button class="btn primary small" type="button" data-action="generateVariants">生成 3 个方案</button>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="grid-2">
+                <div class="stack">
+                  <div class="field">
+                    <label>一句话 Idea</label>
+                    <textarea class="textarea" data-bind="idea" placeholder="例如：我想做一个 AI 运营助手">${escapeHtml(draft.idea)}</textarea>
+                  </div>
+                  <div class="field">
+                    <label>约束条件（越具体越好）</label>
+                    <textarea class="textarea" data-bind="constraints" placeholder="例如：预算/周期/履约/团队能力/合规边界…">${escapeHtml(draft.constraints)}</textarea>
+                  </div>
+                </div>
+
+                <div class="stack">
+                  <div class="field">
+                    <label>行业（决定行业先验与案例召回）</label>
+                    <select class="select" data-bind="industry">
+                      ${db.industry_priors.map((p) => `<option value="${escapeHtml(p.industry)}" ${p.industry === draft.industry ? "selected" : ""}>${escapeHtml(p.industry)}</option>`).join("")}
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>阶段（影响“要不要更激进/更保守”）</label>
+                    <select class="select" data-bind="stage">
+                      ${["MVP", "增强", "闭环"].map((s) => `<option value="${s}" ${s === draft.stage ? "selected" : ""}>${s}</option>`).join("")}
+                    </select>
+                  </div>
+
+                  <div class="card soft" style="padding:14px;border-radius:18px;background:rgba(0,0,0,0.16);">
+                    <div class="li-title">你将得到</div>
+                    <div class="li-sub">
+                      - 3 个“多 Agent”方案（保守/均衡/增长）<br />
+                      - 每个方案的：变现路径、控制点、增长引擎、风险约束<br />
+                      - 可选：引用案例/先验，形成可解释的证据链
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          `;
+
+          const comparePanel = (() => {
+            const variants = draft.variants || [];
+            if (!variants.length) {
+              return `
+                <section class="card">
+                  <div class="card-title">对比：还没有可对比的方案</div>
+                  <div class="card-sub">先去“输入”点击生成。建议：MVP 先做 1 个高 ROI 场景，少量案例也能跑。</div>
+                  <div class="divider"></div>
+                  <button class="btn primary small" type="button" data-action="setStep" data-step="input">回到输入</button>
+                </section>
+              `;
+            }
+            return `
+              <section class="card">
+                <div class="row between">
+                  <div>
+                    <div class="card-title">对比：选择你的“风险姿态”</div>
+                    <div class="card-sub">同一个 Idea，用不同姿态（现金流/增长/履约）会得到不同商业路径。</div>
+                  </div>
+                  <div class="row">
+                    <button class="btn small" type="button" data-action="generateVariants">重新生成</button>
+                    <button class="btn primary small" type="button" data-action="setStep" data-step="canvas" ${draft.selected_variant_id ? "" : "disabled"}>进入画布</button>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div class="grid-3">
+                  ${variants
+                    .map((v) => {
+                      const active = draft.selected_variant_id === v.id;
+                      const postureBadge = v.posture === "conservative" ? "warn" : v.posture === "aggressive" ? "danger" : "theme";
+                      const postureText = v.posture === "conservative" ? "保守" : v.posture === "aggressive" ? "增长" : "均衡";
+                      return `
+                        <div class="list-item" style="padding:14px;${active ? "border-color: rgba(52,211,153,0.28); box-shadow: 0 0 0 1px rgba(52,211,153,0.06);" : ""}">
+                          <div class="li-top">
+                            <div>
+                              <div class="li-title">${escapeHtml(v.label)}</div>
+                              <div class="li-sub">${escapeHtml(v.summary)}</div>
+                            </div>
+                            <span class="badge ${postureBadge}">${postureText}</span>
+                          </div>
+                          <div class="kvs">
+                            <div class="kv"><div class="k">变现</div><div class="v">${escapeHtml(v.canvas.revenue_streams[0] || "-")}</div></div>
+                            <div class="kv"><div class="k">控制点</div><div class="v">${escapeHtml(v.canvas.control_points[0] || "-")}</div></div>
+                            <div class="kv"><div class="k">增长</div><div class="v">${escapeHtml(v.canvas.go_to_market || "-")}</div></div>
+                            <div class="kv"><div class="k">最大风险</div><div class="v">${escapeHtml(v.canvas.key_risks[0] || "-")}</div></div>
+                          </div>
+                          <div class="row" style="margin-top:12px; justify-content: flex-end;">
+                            <button class="btn small ${active ? "primary" : ""}" type="button" data-action="selectVariant" data-vid="${escapeHtml(v.id)}">${active ? "已选择" : "选择此方案"}</button>
+                            <button class="btn small" type="button" data-action="viewEvidence" data-vid="${escapeHtml(v.id)}">看证据</button>
+                          </div>
+                        </div>
+                      `;
+                    })
+                    .join("")}
+                </div>
+              </section>
+            `;
+          })();
+
+          const canvasPanel = (() => {
+            const variants = draft.variants || [];
+            const selected = variants.find((v) => v.id === draft.selected_variant_id) || null;
+            if (!selected) {
+              return `
+                <section class="card">
+                  <div class="card-title">画布：还没有选定方案</div>
+                  <div class="card-sub">先去“对比”选择一个方案。</div>
+                  <div class="divider"></div>
+                  <button class="btn primary small" type="button" data-action="setStep" data-step="compare">去对比</button>
+                </section>
+              `;
+            }
+
+            const ev = selected.evidence || { patterns: [], cases: [], priors: [], feedback: [] };
+            const evidenceTab = ui.evidenceTab;
+            const prior = getPriorForIndustry(selected.industry);
+            const patterns = db.business_model_patterns.filter((p) => ev.patterns.includes(p.id));
+            const cases = db.business_cases.filter((c) => ev.cases.includes(c.id));
+            const feedback = (ev.feedback && ev.feedback.length)
+              ? db.outcome_feedback.filter((f) => ev.feedback.includes(f.id))
+              : db.outcome_feedback.slice(0, 6);
+
+            function citeToggle(type, id, label) {
+              const list = (draft.citations && draft.citations[type]) || [];
+              const active = list.includes(id);
+              return `<span class="pill ${active ? "active" : ""}" data-action="toggleCite" data-ctype="${type}" data-cid="${escapeHtml(id)}">${escapeHtml(label)}</span>`;
+            }
+
+            const evidencePanel = (() => {
+              const tabBtns = `
+                <div class="tabs">
+                  ${[
+                    { id: "structure", label: "商业结构" },
+                    { id: "cases", label: "案例参照" },
+                    { id: "feedback", label: "反馈经验" }
+                  ]
+                    .map((t) => `<button class="tab ${evidenceTab === t.id ? "active" : ""}" type="button" data-action="setEvidenceTab" data-etab="${t.id}">${t.label}</button>`)
+                    .join("")}
+                </div>
+              `;
+
+              const structureHtml = `
+                <div class="list">
+                  ${
+                    prior
+                      ? `
+                    <div class="list-item">
+                      <div class="li-top">
+                        <div>
+                          <div class="li-title">行业先验：${escapeHtml(prior.industry)}</div>
+                          <div class="li-sub">补齐渠道、定价、关键指标与常见风险。</div>
+                        </div>
+                        ${citeToggle("priors", prior.id, "引用先验")}
+                      </div>
+                      <div class="kvs">
+                        <div class="kv"><div class="k">渠道</div><div class="v">${escapeHtml((prior.typical_channels || []).slice(0, 2).join(" / ") || "-")}</div></div>
+                        <div class="kv"><div class="k">定价</div><div class="v">${escapeHtml((prior.typical_pricing_models || []).slice(0, 2).join(" / ") || "-")}</div></div>
+                        <div class="kv"><div class="k">指标</div><div class="v">${escapeHtml((prior.key_metrics || []).slice(0, 2).join(" / ") || "-")}</div></div>
+                        <div class="kv"><div class="k">风险</div><div class="v">${escapeHtml((prior.common_risks || []).slice(0, 2).join(" / ") || "-")}</div></div>
+                      </div>
+                    </div>
+                  `
+                      : ""
+                  }
+                  ${patterns
+                    .map(
+                      (p) => `
+                    <div class="list-item">
+                      <div class="li-top">
+                        <div>
+                          <div class="li-title">${escapeHtml(p.model_type)} Schema</div>
+                          <div class="li-sub">${escapeHtml(p.description)}</div>
+                        </div>
+                        ${citeToggle("patterns", p.id, "引用")}
+                      </div>
+                      <div class="li-sub"><b style="color:rgba(255,255,255,0.8)">适配条件：</b>${escapeHtml((p.fit_conditions || []).slice(0, 3).join("；"))}</div>
+                      <div class="li-sub"><b style="color:rgba(255,255,255,0.8)">风险：</b>${escapeHtml((p.risks || []).slice(0, 2).join("；"))}</div>
+                    </div>
+                  `
+                    )
+                    .join("")}
+                </div>
+              `;
+
+              const casesHtml = `
+                <div class="list">
+                  ${
+                    cases.length
+                      ? cases
+                          .map(
+                            (c) => `
+                    <div class="list-item">
+                      <div class="li-top">
+                        <div>
+                          <div class="li-title">${escapeHtml(c.case_name)}</div>
+                          <div class="li-sub">${escapeHtml(c.industry || "")} · ${escapeHtml((c.revenue_streams || []).slice(0, 2).join(" / ") || "")}</div>
+                        </div>
+                        ${citeToggle("cases", c.id, "引用")}
+                      </div>
+                      <div class="li-sub"><b style="color:rgba(255,255,255,0.8)">控制点：</b>${escapeHtml((c.control_points || []).slice(0, 3).join(" / ") || "-")}</div>
+                      <div class="li-sub"><b style="color:rgba(255,255,255,0.8)">增长：</b>${escapeHtml((c.growth_engine || []).slice(0, 2).join(" / ") || "-")}</div>
+                      <div class="li-sub"><b style="color:rgba(255,255,255,0.8)">风险：</b>${escapeHtml((c.risks || []).slice(0, 2).join(" / ") || "-")}</div>
+                    </div>
+                  `
+                          )
+                          .join("")
+                      : `
+                    <div class="list-item">
+                      <div class="li-title">暂无可用案例</div>
+                      <div class="li-sub">MVP 阶段允许案例稀疏，但建议每个行业先补 10–30 个典型案例（结构化字段）。</div>
+                      <div class="row" style="margin-top:10px;"><button class="btn small" type="button" data-action="goCases">去案例库</button></div>
+                    </div>
+                  `
+                  }
+                </div>
+              `;
+
+              const feedbackHtml = `
+                <div class="list">
+                  ${
+                    feedback.length
+                      ? feedback
+                          .map(
+                            (f) => `
+                    <div class="list-item">
+                      <div class="li-top">
+                        <div>
+                          <div class="li-title">反馈：${escapeHtml(f.status || "未知")}</div>
+                          <div class="li-sub">${escapeHtml(new Date(f.created_at).toLocaleString())}</div>
+                        </div>
+                        ${citeToggle("feedback", f.id, "引用")}
+                      </div>
+                      <div class="li-sub">${escapeHtml(f.notes || "")}</div>
+                    </div>
+                  `
+                          )
+                          .join("")
+                      : `
+                    <div class="list-item">
+                      <div class="li-title">还没有反馈经验</div>
+                      <div class="li-sub">后期壁垒来自你自己的“跑通/失败”记录。现在先把反馈埋点留好。</div>
+                      <div class="row" style="margin-top:10px;"><button class="btn small" type="button" data-action="setStep" data-step="feedback">去填反馈</button></div>
+                    </div>
+                  `
+                  }
+                </div>
+              `;
+
+              const citeSummary = (() => {
+                const p = (draft.citations.patterns || []).length;
+                const pr = (draft.citations.priors || []).length;
+                const c2 = (draft.citations.cases || []).length;
+                const f2 = (draft.citations.feedback || []).length;
+                return `<span class="badge">已引用：结构 ${p} · 先验 ${pr} · 案例 ${c2} · 反馈 ${f2}</span>`;
+              })();
+
+              const body = evidenceTab === "structure" ? structureHtml : evidenceTab === "cases" ? casesHtml : feedbackHtml;
+
+              return `
+                <div class="card soft" style="padding:14px;">
+                  <div class="row between">
+                    <div>
+                      <div class="li-title">证据面板</div>
+                      <div class="li-sub">让生成从“会写”升级成“会类比、可解释”。</div>
+                    </div>
+                    ${citeSummary}
+                  </div>
+                  ${tabBtns}
+                  <div class="divider"></div>
+                  ${body}
+                </div>
+              `;
+            })();
+
+            function canvasField(label, key, value, hint) {
+              const val = Array.isArray(value) ? value.join("\\n") : value || "";
+              return `
+                <div class="list-item">
+                  <div class="li-top">
+                    <div>
+                      <div class="li-title">${escapeHtml(label)}</div>
+                      <div class="li-sub">${escapeHtml(hint || "")}</div>
+                    </div>
+                    <span class="badge">${escapeHtml(key)}</span>
+                  </div>
+                  <div style="margin-top:10px;">
+                    <textarea class="textarea" style="height:96px" data-canvas-key="${escapeHtml(key)}">${escapeHtml(val)}</textarea>
+                  </div>
+                </div>
+              `;
+            }
+
+            function normalizeList(value) {
+              if (Array.isArray(value)) return value.map((x) => String(x || "").trim()).filter(Boolean);
+              return String(value || "").split(/\\n+/).map((s) => s.trim()).filter(Boolean);
+            }
+
+            function renderListField({ label, key, value, hint, placeholder, suggestions }) {
+              const list = normalizeList(value);
+              const rows = (list.length ? list : [""]).map((text, idx) => `
+                <div class="list-row">
+                  <input class="input list-input" data-list-key="${escapeHtml(key)}" data-list-idx="${idx}" value="${escapeHtml(text)}" placeholder="${escapeHtml(placeholder || "输入…")}" />
+                  <button class="icon-btn" type="button" title="删除" data-action="removeListItem" data-list-key="${escapeHtml(key)}" data-list-idx="${idx}">×</button>
+                </div>
+              `).join("");
+
+              const sug = (suggestions || []).map((s) => `
+                <span class="pill" data-action="addSuggestion" data-list-key="${escapeHtml(key)}" data-suggest="${escapeHtml(s)}">+ ${escapeHtml(s)}</span>
+              `).join("");
+
+              return `
+                <div class="list-item">
+                  <div class="li-top">
+                    <div>
+                      <div class="li-title">${escapeHtml(label)}</div>
+                      <div class="li-sub">${escapeHtml(hint || "")}</div>
+                    </div>
+                    <div class="row" style="justify-content:flex-end">
+                      <span class="badge">${escapeHtml(key)}</span>
+                      <button class="btn small" type="button" data-action="addListItem" data-list-key="${escapeHtml(key)}">新增一行</button>
+                    </div>
+                  </div>
+                  <div class="list-editor">${rows}</div>
+                  ${sug ? `<div class="suggestions">${sug}</div>` : ""}
+                </div>
+              `;
+            }
+
+            function parseRiskLine(line) {
+              const raw = String(line || "").trim();
+              if (!raw) return { risk: "", metric: "", mitigation: "" };
+              const parts = raw.split("｜");
+              return { risk: (parts[0] || "").trim(), metric: (parts[1] || "").trim(), mitigation: (parts[2] || "").trim() };
+            }
+
+            function formatRiskLine({ risk, metric, mitigation }) {
+              const a = String(risk || "").trim();
+              const b = String(metric || "").trim();
+              const c = String(mitigation || "").trim();
+              if (!a && !b && !c) return "";
+              return `${a}｜${b}｜${c}`;
+            }
+
+            function parseCostLine(line) {
+              const raw = String(line || "").trim();
+              if (!raw) return { item: "", amount: "", note: "" };
+              if (raw.includes("｜")) {
+                const parts = raw.split("｜");
+                return { item: (parts[0] || "").trim(), amount: (parts[1] || "").trim(), note: (parts[2] || "").trim() };
+              }
+              const m = raw.match(/^\s*([^（(]+)\s*[（(]([^）)]+)[）)]\s*$/);
+              if (m) return { item: String(m[1]).trim(), amount: "", note: String(m[2]).trim() };
+              return { item: raw, amount: "", note: "" };
+            }
+
+            function formatCostLine({ item, amount, note }) {
+              const a = String(item || "").trim();
+              const b = String(amount || "").trim();
+              const c = String(note || "").trim();
+              if (!a && !b && !c) return "";
+              return `${a}｜${b}｜${c}`;
+            }
+
+            function sumCost(list) {
+              const rows = normalizeList(list).map(parseCostLine);
+              const total = rows.reduce((acc, r) => {
+                const n = Number(String(r.amount || "").replaceAll(",", "").trim());
+                return acc + (Number.isFinite(n) ? n : 0);
+              }, 0);
+              return { total, rows };
+            }
+
+            function renderCostField(value) {
+              const list = normalizeList(value);
+              const parsed = (list.length ? list : ["获客｜｜", "履约｜｜", "模型调用｜｜", "人工/客户成功｜｜", "基础设施｜｜"]).map(parseCostLine);
+              const { total } = sumCost(list);
+              const totalText = total > 0 ? `估算合计：${total.toLocaleString()}/月` : "估算合计：—";
+
+              const rows = parsed.map((r, idx) => `
+                <div class="cost-row">
+                  <input class="input cost-input" data-cost-idx="${idx}" data-cost-field="item" value="${escapeHtml(r.item)}" placeholder="例如：模型调用" />
+                  <input class="input cost-input" data-cost-idx="${idx}" data-cost-field="amount" inputmode="decimal" placeholder="金额/月" value="${escapeHtml(r.amount)}" />
+                  <textarea class="textarea cost-note" data-cost-idx="${idx}" data-cost-field="note" placeholder="说明（计算口径/上限/假设）">${escapeHtml(r.note)}</textarea>
+                  <button class="icon-btn" type="button" title="删除" data-action="removeCostRow" data-cost-idx="${idx}">×</button>
+                </div>
+              `).join("");
+
+              return `
+                <div class="list-item">
+                  <div class="li-top">
+                    <div>
+                      <div class="li-title">成本结构（结构化）</div>
+                      <div class="li-sub">把成本拆成可控项：项目 / 金额（每月）/ 口径与上限。金额可留空，但建议至少写清“模型调用/履约/获客”。</div>
+                    </div>
+                    <div class="row" style="justify-content:flex-end">
+                      <span class="badge cyan" id="costTotal">${escapeHtml(totalText)}</span>
+                      <span class="badge">cost_structure</span>
+                      <button class="btn small" type="button" data-action="addCostRow">新增成本项</button>
+                    </div>
+                  </div>
+                  <div class="divider"></div>
+                  <div class="cost-table">
+                    <div class="cost-head">
+                      <div>项目</div>
+                      <div>金额/月</div>
+                      <div>说明</div>
+                      <div></div>
+                    </div>
+                    ${rows}
+                  </div>
+                </div>
+              `;
+            }
+
+            function renderMoatField(value) {
+              const list = normalizeList(value);
+              const parsed = (list.length ? list : ["数据资产｜｜", "工作流嵌入｜｜", "网络效应｜｜", "渠道/分发｜｜"]).map(parseMoatLine);
+              const rows = parsed.map((m, idx) => `
+                <div class="moat-row">
+                  <textarea class="textarea moat-input" data-moat-idx="${idx}" data-moat-field="type" placeholder="类型（数据/品牌/网络效应…）">${escapeHtml(m.type)}</textarea>
+                  <textarea class="textarea moat-input" data-moat-idx="${idx}" data-moat-field="asset" placeholder="资产/抓手（你真正掌控的东西）">${escapeHtml(m.asset)}</textarea>
+                  <textarea class="textarea moat-input" data-moat-idx="${idx}" data-moat-field="build" placeholder="形成路径（怎么做出来/多久/依赖）">${escapeHtml(m.build)}</textarea>
+                  <button class="icon-btn" type="button" title="删除" data-action="removeMoatRow" data-moat-idx="${idx}">×</button>
+                </div>
+              `).join("");
+
+              return `
+                <div class="list-item">
+                  <div class="li-top">
+                    <div>
+                      <div class="li-title">护城河（结构化）</div>
+                      <div class="li-sub">把护城河写成“类型 / 资产 / 形成路径”，避免只写抽象词（比如“数据沉淀”）。</div>
+                    </div>
+                    <div class="row" style="justify-content:flex-end">
+                      <span class="badge">moat</span>
+                      <button class="btn small" type="button" data-action="addMoatRow">新增一行</button>
+                    </div>
+                  </div>
+                  <div class="divider"></div>
+                  <div class="moat-table">
+                    <div class="moat-head">
+                      <div>类型</div>
+                      <div>资产/抓手</div>
+                      <div>形成路径</div>
+                      <div></div>
+                    </div>
+                    ${rows}
+                  </div>
+                  <div class="divider"></div>
+                  <div class="suggestions">
+                    ${["数据资产", "工作流嵌入", "网络效应", "渠道控制", "供给控制", "品牌", "IP"].map((s) => `
+                      <span class="pill" data-action="addMoatSuggestion" data-suggest="${escapeHtml(s)}">+ ${escapeHtml(s)}</span>
+                    `).join("")}
+                  </div>
+                </div>
+              `;
+            }
+
+            function renderRiskField(value) {
+              const list = normalizeList(value);
+              const rowsData = (list.length ? list : ["", "", ""]).map(parseRiskLine);
+              const rows = rowsData.map((r, idx) => `
+                <div class="risk-row">
+                  <textarea class="textarea risk-input" data-risk-idx="${idx}" data-risk-field="risk" placeholder="风险（是什么）">${escapeHtml(r.risk)}</textarea>
+                  <textarea class="textarea risk-input" data-risk-idx="${idx}" data-risk-field="metric" placeholder="监控指标/信号（怎么发现）">${escapeHtml(r.metric)}</textarea>
+                  <textarea class="textarea risk-input" data-risk-idx="${idx}" data-risk-field="mitigation" placeholder="约束/止损动作（怎么控）">${escapeHtml(r.mitigation)}</textarea>
+                  <button class="icon-btn" type="button" title="删除" data-action="removeRiskRow" data-risk-idx="${idx}">×</button>
+                </div>
+              `).join("");
+
+              return `
+                <div class="list-item">
+                  <div class="li-top">
+                    <div>
+                      <div class="li-title">关键风险（结构化）</div>
+                      <div class="li-sub">把风险写成“可监控 + 可止损”的格式：风险｜信号/指标｜约束动作。</div>
+                    </div>
+                    <div class="row" style="justify-content:flex-end">
+                      <span class="badge">key_risks</span>
+                      <button class="btn small" type="button" data-action="addRiskRow">新增风险</button>
+                    </div>
+                  </div>
+                  <div class="divider"></div>
+                  <div class="risk-table">
+                    <div class="risk-head">
+                      <div>风险</div>
+                      <div>监控</div>
+                      <div>止损/约束</div>
+                      <div></div>
+                    </div>
+                    ${rows}
+                  </div>
+                </div>
+              `;
+            }
+
+            function stripDayPrefix(line) {
+              const m = String(line || "").match(/^\\s*Day\\s*(\\d+)\\s*[：:]\\s*(.*)$/i);
+              if (!m) return { day: null, text: String(line || "").trim() };
+              return { day: Number(m[1]), text: String(m[2] || "").trim() };
+            }
+
+            function renderSevenDayActionsField(list) {
+              const raw = normalizeList(list);
+              const parsed = raw.map(stripDayPrefix);
+              const maxDay = Math.max(0, ...parsed.map((x) => (Number.isFinite(x.day) ? x.day : 0)));
+              const count = Math.max(7, maxDay, parsed.length || 0);
+
+              const rows = Array.from({ length: count }).map((_, i) => {
+                const day = i + 1;
+                const existing = parsed.find((x) => x.day === day) || parsed[i] || { text: "" };
+                return `
+                  <div class="action-row">
+                    <div class="action-day">Day ${day}</div>
+                    <textarea class="textarea action-input" data-seven-action-idx="${i}" placeholder="写清楚：动作 + 目标指标 + 验证方式">${escapeHtml(existing.text || "")}</textarea>
+                  </div>
+                `;
+              }).join("");
+
+              return `
+                <div class="list-item">
+                  <div class="li-top">
+                    <div>
+                      <div class="li-title">7 天落地动作（结构化）</div>
+                      <div class="li-sub">每一天只写 1 个最小动作：<b style="color:rgba(255,255,255,0.84)">做什么 / 为了什么指标 / 怎么验证</b>。</div>
+                    </div>
+                    <span class="badge">seven_day_actions</span>
+                  </div>
+                  <div class="divider"></div>
+                  <div class="action-list">${rows}</div>
+                </div>
+              `;
+            }
+
+            return `
+              <section class="card">
+                <div class="row between">
+                  <div>
+                    <div class="card-title">画布：${escapeHtml(selected.label)}（可编辑）</div>
+                    <div class="card-sub">改任意字段后，可重新推演/保存版本；并把“引用证据”带进最终方案里。</div>
+                  </div>
+                  <div class="row">
+                    <button class="btn small" type="button" data-action="recomputeSelected">局部改写后联动重算</button>
+                    <button class="btn small" type="button" data-action="saveAsPlan">保存为方案</button>
+                    <button class="btn primary small" type="button" data-action="setStep" data-step="feedback">去反馈闭环</button>
+                  </div>
+                </div>
+                <div class="divider"></div>
+
+                <div class="split">
+                  <div class="stack">
+                    ${renderListField({
+                      label: "目标用户",
+                      key: "target_user",
+                      value: selected.canvas.target_user,
+                      hint: "写具体人群与场景；越聚焦越好。",
+                      placeholder: "例如：中小团队运营负责人（需要快速产出活动与复盘）"
+                    })}
+                    ${renderListField({
+                      label: "价值主张",
+                      key: "value_proposition",
+                      value: selected.canvas.value_proposition,
+                      hint: "每条只写 1 个“可衡量结果”。",
+                      placeholder: "例如：把活动从 3 天缩到 3 小时，并能解释原因"
+                    })}
+                    ${renderListField({
+                      label: "交付/产品形态",
+                      key: "offering",
+                      value: selected.canvas.offering,
+                      hint: "从模板/SOP 起步，逐步产品化。",
+                      placeholder: "例如：诊断模板 + 方案生成 + 7 天动作清单"
+                    })}
+                    ${renderListField({
+                      label: "渠道",
+                      key: "channels",
+                      value: selected.canvas.channels,
+                      hint: "建议至少写 1 个冷启动渠道 + 1 个可复制渠道。",
+                      placeholder: "例如：内容分发（SEO/短内容）",
+                      suggestions: (getPriorForIndustry(selected.industry)?.typical_channels || [])
+                    })}
+                    ${renderListField({
+                      label: "变现方式",
+                      key: "revenue_streams",
+                      value: selected.canvas.revenue_streams,
+                      hint: "MVP 阶段先保留 1–2 条现金流路径。",
+                      placeholder: "例如：订阅分层（基础/专业/企业）",
+                      suggestions: Array.from(new Set([
+                        ...(getPriorForIndustry(selected.industry)?.typical_pricing_models || []),
+                        ...(patterns.flatMap((p) => p.revenue_options || []).slice(0, 10))
+                      ]))
+                    })}
+                    ${renderCostField(selected.canvas.cost_structure)}
+                    ${renderListField({
+                      label: "控制点",
+                      key: "control_points",
+                      value: selected.canvas.control_points,
+                      hint: "控制点决定你能否把质量/成本/增长握在手里。",
+                      placeholder: "例如：成本上限与止损策略（推理/调用）",
+                      suggestions: Array.from(new Set(patterns.flatMap((p) => p.control_points || []).slice(0, 10)))
+                    })}
+                    ${renderMoatField(selected.canvas.moat)}
+                    ${canvasField("增长引擎", "growth_engine", selected.canvas.growth_engine, "把增长写成可迭代的飞轮。")}
+                    ${renderRiskField(selected.canvas.key_risks)}
+                    ${canvasField("定价策略", "pricing_strategy", selected.canvas.pricing_strategy, "订阅/按量/分层/上限与止损。")}
+                    ${canvasField("GTM 路径", "go_to_market", selected.canvas.go_to_market, "先冷启动，再可复制。")}
+                    ${renderListField({
+                      label: "关键指标",
+                      key: "metrics",
+                      value: selected.canvas.metrics,
+                      hint: "指标=反馈闭环的语言：写 1 个北极星 + 2 个领先指标 + 1 个护栏指标。",
+                      placeholder: "例如：7 日留存（领先）",
+                      suggestions: Array.from(new Set([
+                        "北极星指标：________",
+                        ...(getPriorForIndustry(selected.industry)?.key_metrics || [])
+                      ]))
+                    })}
+                    ${renderSevenDayActionsField(selected.canvas.seven_day_actions)}
+                  </div>
+                  ${evidencePanel}
+                </div>
+              </section>
+            `;
+          })();
+
+          const feedbackPanel = `
+            <section class="card">
+              <div class="row between">
+                <div>
+                  <div class="card-title">反馈：从第一天开始留“战绩数据”</div>
+                  <div class="card-sub">这层长期比案例库更重要：你生成过什么、哪些跑通了、为什么失败。</div>
+                </div>
+                <div class="row">
+                  <button class="btn small" type="button" data-action="openFeedbackLog">记录一次反馈</button>
+                  <button class="btn primary small" type="button" data-action="goFeedback">查看反馈库</button>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="grid-2">
+                <div class="list-item">
+                  <div class="li-title">推荐埋点字段（MVP 够用）</div>
+                  <div class="li-sub">
+                    - 行业、方案类型、定价、渠道<br />
+                    - 是否成交/续费、ROI/留存变化<br />
+                    - 失败原因（行业/模型/执行/履约）<br />
+                    - 复盘结论（写入反馈库）
+                  </div>
+                </div>
+                <div class="list-item">
+                  <div class="li-title">把反馈变成壁垒</div>
+                  <div class="li-sub">
+                    同一行业/同一模式下：哪些判断有效？哪些假设经常错？<br />
+                    下一次生成时，Agent 会优先推荐“有战绩”的路径。
+                  </div>
+                </div>
+              </div>
+            </section>
+          `;
+
+          const body = step === "input" ? inputPanel : step === "compare" ? comparePanel : step === "canvas" ? canvasPanel : feedbackPanel;
+          return header + body;
+        }
+
+        function renderDataPage(tableKey, title, subtitle, opts = {}) {
+          const items = db[tableKey] || [];
+          const uiSearch = ui[tableKey + "_search"] || "";
+          const canOpen = typeof opts.canOpen === "boolean" ? opts.canOpen : tableKey === "generated_plans";
+          const canEdit = typeof opts.canEdit === "boolean" ? opts.canEdit : true;
+          const canDelete = typeof opts.canDelete === "boolean" ? opts.canDelete : true;
+
+          function rowPreview(item) {
+            if (tableKey === "business_model_patterns") return `${item.model_type || ""} · ${((item.fit_conditions || []).slice(0, 2)).join(" / ")}`;
+            if (tableKey === "industry_priors") return `${item.industry || ""} · 渠道：${((item.typical_channels || []).slice(0, 2)).join(" / ")}`;
+            if (tableKey === "business_cases") return `${item.industry || ""} · 变现：${((item.revenue_streams || []).slice(0, 2)).join(" / ")}`;
+            if (tableKey === "generated_plans") return `${item.industry || ""} · ${item.stage || ""} · ${new Date(item.created_at).toLocaleDateString()}`;
+            if (tableKey === "outcome_feedback") return `${item.status || ""} · ${new Date(item.created_at).toLocaleDateString()}`;
+            return "";
+          }
+
+          const filtered = (() => {
+            if (!opts.search || !uiSearch.trim()) return items;
+            const q = uiSearch.trim().toLowerCase();
+            return items.filter((it) => JSON.stringify(it).toLowerCase().includes(q));
+          })();
+
+          const head = `
+            <section class="card">
+              <div class="row between">
+                <div>
+                  <div class="card-title">${escapeHtml(title)}</div>
+                  <div class="card-sub">${escapeHtml(subtitle)}</div>
+                </div>
+                <div class="row">
+                  ${opts.search ? `<input class="input" style="width:260px" placeholder="搜索…" value="${escapeHtml(uiSearch)}" data-action="setSearch" data-table="${escapeHtml(tableKey)}" />` : ""}
+                  ${opts.hideAdd ? "" : `<button class="btn small" type="button" data-action="addItem" data-table="${escapeHtml(tableKey)}">新增</button>`}
+                </div>
+              </div>
+            </section>
+          `;
+
+          const body = `
+            <section class="card">
+              <table class="table" aria-label="${escapeHtml(title)}">
+                <thead>
+                  <tr>
+                    <th style="width: 220px">名称</th>
+                    <th>摘要</th>
+                    <th style="width: 220px">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${
+                    filtered.length
+                      ? filtered
+                          .map((it) => {
+                            const name = it.case_name || it.model_type || it.industry || it.id || "未命名";
+                            return `
+                      <tr>
+                        <td><span style="font-weight:800;color:rgba(255,255,255,0.86)">${escapeHtml(name)}</span><div style="margin-top:6px;color:rgba(255,255,255,0.45);font-size:12px">${escapeHtml(it.id || "")}</div></td>
+                        <td>${escapeHtml(rowPreview(it))}</td>
+                        <td>
+                          <div class="row" style="justify-content:flex-end">
+                            ${canOpen ? `<button class="btn small" type="button" data-action="openPlan" data-id="${escapeHtml(it.id)}">打开</button>` : ""}
+                            ${canEdit ? `<button class="btn small" type="button" data-action="editItem" data-table="${escapeHtml(tableKey)}" data-id="${escapeHtml(it.id)}">编辑</button>` : ""}
+                            ${canDelete ? `<button class="btn small" type="button" data-action="deleteItem" data-table="${escapeHtml(tableKey)}" data-id="${escapeHtml(it.id)}">删除</button>` : ""}
+                          </div>
+                        </td>
+                      </tr>
+                    `;
+                          })
+                          .join("")
+                      : `<tr><td colspan="3" style="color:rgba(255,255,255,0.55)">暂无数据</td></tr>`
+                  }
+                </tbody>
+              </table>
+            </section>
+          `;
+
+          const hint =
+            tableKey === "business_cases"
+              ? `
+            <section class="card soft" style="padding:14px;">
+              <div class="li-title">字段建议（统一结构化）</div>
+              <div class="li-sub">行业 / 用户 / 价值主张 / 供给方式 / 变现方式 / 渠道 / 护城河 / 增长路径 / 风险 / 关键拐点</div>
+            </section>
+          `
+              : "";
+
+          return head + body + hint;
+        }
+
+        function renderSettings() {
+          return `
+            <section class="card">
+              <div class="row between">
+                <div>
+                  <div class="card-title">设置</div>
+                  <div class="card-sub">你的数据仅保存在本地浏览器，用于保存草稿、方案与反馈。</div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="grid-2">
+                <div class="list-item">
+                  <div class="li-title">隐私</div>
+                  <div class="li-sub">此原型不上传数据；你保存的方案与反馈仅在本地浏览器存储。</div>
+                </div>
+                <div class="list-item">
+                  <div class="li-top">
+                    <div>
+                      <div class="li-title">清除数据</div>
+                      <div class="li-sub">清空本地草稿、方案、反馈，回到初始演示状态。</div>
+                    </div>
+                    <button class="btn small" type="button" data-action="resetDemo">清除并重置</button>
+                  </div>
+                </div>
+              </div>
+              ${ui.developerMode ? `
+                <div class="divider"></div>
+                <div class="list-item">
+                  <div class="li-top">
+                    <div>
+                      <div class="li-title">开发者模式</div>
+                      <div class="li-sub">已开启（用于维护 Schema/先验/案例库）。</div>
+                    </div>
+                    <button class="btn small" type="button" data-action="toggleDevMode">关闭</button>
+                  </div>
+                </div>
+              ` : ""}
+            </section>
+          `;
+        }
+
+        function render() {
+          updateSidebarCounts();
+          document.getElementById("navDraft").textContent = ui.draft ? "草稿" : "无";
+          updateModeUi();
+
+          const r = route();
+          const routeRoot = document.getElementById("routeRoot");
+
+          if (r.root === "workspace") {
+            setNavActive("workspace");
+            setCrumbs("工作台 / 生成与推演");
+            routeRoot.innerHTML = renderWorkspace();
+          } else if (r.root === "plans") {
+            setNavActive("my_plans");
+            setCrumbs("我的 / 方案");
+            routeRoot.innerHTML = renderDataPage("generated_plans", "我的方案", "你保存过的商业画布版本（可加载回工作台继续迭代）。", { search: true, hideAdd: true, canEdit: false, canDelete: true, canOpen: true });
+          } else if (r.root === "feedback") {
+            setNavActive("my_feedback");
+            setCrumbs("我的 / 反馈");
+            routeRoot.innerHTML = renderDataPage("outcome_feedback", "我的反馈", "跑通/失败的真实记录，会反哺下一次生成。", { search: true, hideAdd: true, canEdit: false, canDelete: true, canOpen: false });
+          } else if (r.root === "data") {
+            if (!ui.developerMode) {
+              setNavActive("settings");
+              setCrumbs("设置");
+              routeRoot.innerHTML = `
+                <section class="card">
+                  <div class="card-title">仅开发者可用</div>
+                  <div class="card-sub">Schema / 行业先验 / 案例库属于数据维护能力，默认对普通用户隐藏。</div>
+                  <div class="divider"></div>
+                  <div class="list-item">
+                    <div class="li-title">如何开启？</div>
+                    <div class="li-sub">在页面按下：Ctrl + Shift + D（Mac 用 Cmd + Shift + D）。</div>
+                  </div>
+                </section>
+              `;
+              return;
+            }
+            if (r.sub === "patterns") { setNavActive("patterns"); setCrumbs("数据层 / 商业结构知识"); routeRoot.innerHTML = renderDataPage("business_model_patterns", "商业结构知识（Schema）", "早期 MVP 的核心底座：决定 Agent 是否像商业分析师。"); }
+            else if (r.sub === "priors") { setNavActive("priors"); setCrumbs("数据层 / 行业先验"); routeRoot.innerHTML = renderDataPage("industry_priors", "行业先验（Priors）", "补齐行业感：渠道、定价、指标、风险与常见坑。"); }
+            else if (r.sub === "cases") { setNavActive("cases"); setCrumbs("数据层 / 行业案例样本"); routeRoot.innerHTML = renderDataPage("business_cases", "行业案例样本（Cases）", "案例不替代思考，用来类比、增强说服力、避免拍脑袋。", { search: true }); }
+            else if (r.sub === "plans") { setNavActive("plans"); setCrumbs("数据层 / 生成方案库"); routeRoot.innerHTML = renderDataPage("generated_plans", "生成方案库（Plans）", "把生成结果存下来：版本、引用、修改历史与最终采用路径。"); }
+            else if (r.sub === "feedback") { setNavActive("feedback"); setCrumbs("数据层 / 结果反馈数据"); routeRoot.innerHTML = renderDataPage("outcome_feedback", "结果反馈数据（Feedback）", "长期壁垒：你自己的跑通/失败记录，会反哺下一次生成。"); }
+            else { setNavActive("workspace"); setCrumbs("工作台"); routeRoot.innerHTML = renderWorkspace(); }
+          } else if (r.root === "settings") {
+            setNavActive("settings");
+            setCrumbs("设置");
+            routeRoot.innerHTML = renderSettings();
+          } else {
+            setNavActive("workspace");
+            setCrumbs("工作台 / 生成与推演");
+            routeRoot.innerHTML = renderWorkspace();
+          }
+
+          if (window.innerWidth <= 860) setSidebarOpen(false);
+        }
+
+        function generateVariantsFromDraft() {
+          const draft = ensureDraft();
+          const base = { idea: draft.idea, industry: draft.industry, stage: draft.stage, constraints: draft.constraints };
+          const variants = [
+            buildCanvas({ ...base, variantLabel: "保守型（现金流优先）", riskPosture: "conservative" }),
+            buildCanvas({ ...base, variantLabel: "均衡型（验证→扩张）", riskPosture: "balanced" }),
+            buildCanvas({ ...base, variantLabel: "增长型（速度优先）", riskPosture: "aggressive" })
+          ].map((v) => ({
+            id: "var-" + uid(),
+            label: v.variant_label,
+            summary: `行业：${v.industry} · 变现：${(v.canvas.revenue_streams || [])[0] || "-"} · 控制点：${(v.canvas.control_points || [])[0] || "-"}`,
+            posture: v.posture,
+            ...v
+          }));
+
+          updateDraft({ variants, selected_variant_id: variants[1].id });
+          ui.workspaceStep = "compare";
+          saveUi(ui);
+          toast("已生成 3 个方案（可对比）");
+        }
+
+        function updateSelectedVariantCanvasFromInputs() {
+          const draft = ensureDraft();
+          const variants = draft.variants || [];
+          const selected = variants.find((v) => v.id === draft.selected_variant_id);
+          if (!selected) return;
+          const sevenInputs = Array.from(document.querySelectorAll("[data-seven-action-idx]"));
+          if (sevenInputs.length) {
+            const list = sevenInputs
+              .sort((a, b) => Number(a.dataset.sevenActionIdx) - Number(b.dataset.sevenActionIdx))
+              .map((el, i) => {
+                const text = String(el.value || "").trim();
+                if (!text) return "";
+                return `Day${i + 1}：${text}`;
+              })
+              .filter(Boolean);
+            selected.canvas.seven_day_actions = list;
+          }
+
+          // Structured list fields
+          const listKeys = ["target_user", "value_proposition", "offering", "channels", "revenue_streams", "control_points", "metrics"];
+          listKeys.forEach((k) => {
+            const inputs = Array.from(document.querySelectorAll(`[data-list-key="${k}"][data-list-idx]`));
+            if (!inputs.length) return;
+            const list = inputs
+              .sort((a, b) => Number(a.dataset.listIdx) - Number(b.dataset.listIdx))
+              .map((el) => String(el.value || "").trim())
+              .filter(Boolean);
+            selected.canvas[k] = list;
+          });
+
+          // Structured risks -> store as "风险｜监控｜止损" strings
+          const riskEls = Array.from(document.querySelectorAll("[data-risk-idx][data-risk-field]"));
+          if (riskEls.length) {
+            const rows = new Map();
+            riskEls.forEach((el) => {
+              const idx = Number(el.dataset.riskIdx);
+              const field = el.dataset.riskField;
+              if (!rows.has(idx)) rows.set(idx, { risk: "", metric: "", mitigation: "" });
+              rows.get(idx)[field] = String(el.value || "").trim();
+            });
+            const list = Array.from(rows.entries())
+              .sort((a, b) => a[0] - b[0])
+              .map(([, r]) => formatRiskLine(r))
+              .filter(Boolean);
+            selected.canvas.key_risks = list;
+          }
+
+          // Structured costs -> store as "项目｜金额｜说明" strings
+          const costEls = Array.from(document.querySelectorAll("[data-cost-idx][data-cost-field]"));
+          if (costEls.length) {
+            const rows = new Map();
+            costEls.forEach((el) => {
+              const idx = Number(el.dataset.costIdx);
+              const field = el.dataset.costField;
+              if (!rows.has(idx)) rows.set(idx, { item: "", amount: "", note: "" });
+              rows.get(idx)[field] = String(el.value || "").trim();
+            });
+            const list = Array.from(rows.entries())
+              .sort((a, b) => a[0] - b[0])
+              .map(([, r]) => formatCostLine(r))
+              .filter(Boolean);
+            selected.canvas.cost_structure = list;
+          }
+
+          // Structured moat -> store as "类型｜资产｜路径" strings
+          const moatEls = Array.from(document.querySelectorAll("[data-moat-idx][data-moat-field]"));
+          if (moatEls.length) {
+            const rows = new Map();
+            moatEls.forEach((el) => {
+              const idx = Number(el.dataset.moatIdx);
+              const field = el.dataset.moatField;
+              if (!rows.has(idx)) rows.set(idx, { type: "", asset: "", build: "" });
+              rows.get(idx)[field] = String(el.value || "").trim();
+            });
+            const list = Array.from(rows.entries())
+              .sort((a, b) => a[0] - b[0])
+              .map(([, r]) => formatMoatLine(r))
+              .filter(Boolean);
+            selected.canvas.moat = list;
+          }
+
+          document.querySelectorAll("[data-canvas-key]").forEach((ta) => {
+            const key = ta.dataset.canvasKey;
+            const raw = ta.value || "";
+            if (key === "seven_day_actions") return; // handled by structured editor
+            selected.canvas[key] = raw.includes("\\n") ? raw.split(/\\n+/).map((s) => s.trim()).filter(Boolean) : raw.trim();
+          });
+          saveUi(ui);
+        }
+
+        function recomputeSelectedVariant() {
+          const draft = ensureDraft();
+          const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+          if (!selected) return null;
+
+          const canvas = selected.canvas || {};
+          const stage = selected.stage || draft.stage || "MVP";
+          const industry = selected.industry || draft.industry || "";
+          const citations = draft.citations || { patterns: [], priors: [], cases: [], feedback: [] };
+
+          const warnings = [];
+          const suggestions = [];
+
+          const revenueList = Array.isArray(canvas.revenue_streams) ? canvas.revenue_streams : String(canvas.revenue_streams || "").split(/\\n+/).filter(Boolean);
+          const controlList = Array.isArray(canvas.control_points) ? canvas.control_points : String(canvas.control_points || "").split(/\\n+/).filter(Boolean);
+          const channelList = Array.isArray(canvas.channels) ? canvas.channels : String(canvas.channels || "").split(/\\n+/).filter(Boolean);
+          const costList = Array.isArray(canvas.cost_structure) ? canvas.cost_structure : String(canvas.cost_structure || "").split(/\\n+/).filter(Boolean);
+          const moatList = Array.isArray(canvas.moat) ? canvas.moat : String(canvas.moat || "").split(/\\n+/).filter(Boolean);
+
+          if (stage === "MVP" && revenueList.length > 2) warnings.push("MVP 阶段变现方式过多：建议先保留 1–2 条现金流路径，避免分散。");
+          if (revenueList.join(" ").includes("抽佣") && !controlList.join(" ").includes("供给")) warnings.push("抽佣/撮合类变现需要“供给准入/履约/评价”的控制点，否则交易质量难控。");
+          if (industry.includes("AI") && revenueList.join(" ").includes("按量") && !controlList.join(" ").includes("成本")) suggestions.push("按量计费建议加一条“成本上限/计费透明/止损策略”的控制点，避免毛利波动。");
+          if (channelList.length === 0) warnings.push("渠道为空：至少写 1 个冷启动渠道（内容/BD/社群/合作）。");
+          if (industry.includes("AI") && !costList.join(" ").includes("模型")) suggestions.push("AI 类产品建议在成本结构里明确“模型调用成本”：口径（每次/每千 token）、上限与止损策略。");
+          if (moatList.length === 0) suggestions.push("护城河为空：建议至少写 1 条“类型/资产/形成路径”，让长期优势可落地。");
+
+          if ((citations.patterns || []).length === 0) suggestions.push("建议至少引用 1 个 Schema（结构知识），让方案更可解释。");
+          if ((citations.priors || []).length === 0) suggestions.push("建议引用行业先验（渠道/定价/指标），提升行业感。");
+          if ((citations.cases || []).length === 0 && db.business_cases.length > 0) suggestions.push("建议引用 1–2 个案例做类比，增强可信度。");
+          if ((citations.feedback || []).length === 0) suggestions.push("建议从第一天开始记录反馈：成交/续费/失败原因，形成后期壁垒。");
+
+          // Prototype "联动重算"：刷新证据召回与关键执行动作（保留用户已编辑的画布文本）
+          const fresh = buildCanvas({
+            idea: selected.idea,
+            industry: selected.industry,
+            stage: selected.stage,
+            constraints: selected.constraints,
+            variantLabel: selected.variant_label || selected.label,
+            riskPosture: selected.posture || "balanced"
+          });
+          selected.evidence = fresh.evidence;
+          selected.canvas.metrics = fresh.canvas.metrics;
+          selected.canvas.seven_day_actions = fresh.canvas.seven_day_actions;
+
+          saveUi(ui);
+          return { warnings, suggestions, updated: ["evidence", "metrics", "seven_day_actions"] };
+        }
+
+        function saveSelectedAsPlan() {
+          const draft = ensureDraft();
+          const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+          if (!selected) { toast("请先选择一个方案"); return; }
+
+          const version = {
+            id: "ver-" + uid(),
+            created_at: nowISO(),
+            canvas: JSON.parse(JSON.stringify(selected.canvas)),
+            citations: JSON.parse(JSON.stringify(draft.citations || { patterns: [], priors: [], cases: [], feedback: [] }))
+          };
+
+          const plan = {
+            id: "plan-" + uid(),
+            created_at: nowISO(),
+            idea: selected.idea,
+            industry: selected.industry,
+            stage: selected.stage,
+            constraints: selected.constraints,
+            selected_variant_label: selected.label,
+            canvas: selected.canvas,
+            evidence: selected.evidence,
+            citations: version.citations,
+            versions: [version]
+          };
+
+          db.generated_plans.unshift(plan);
+          saveDb(db);
+          toast("已保存到方案库");
+          location.hash = "#/plans";
+        }
+
+        function openFeedbackModal({ planId } = {}) {
+          const statuses = ["已成交", "已续费", "未成交", "试用中", "已放弃"];
+          openModal({
+            title: "记录结果反馈",
+            bodyHtml: `
+              <div class="grid-2">
+                <div class="stack">
+                  <div class="field">
+                    <label>关联方案（可选）</label>
+                    <select class="select" id="fbPlan">
+                      <option value="">不关联</option>
+                      ${db.generated_plans.map((p) => `<option value="${escapeHtml(p.id)}" ${p.id === planId ? "selected" : ""}>${escapeHtml((p.idea || "").slice(0, 26) || p.id)} · ${escapeHtml(p.industry || "")}</option>`).join("")}
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>状态</label>
+                    <select class="select" id="fbStatus">
+                      ${statuses.map((s) => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join("")}
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>关键结果（可选）</label>
+                    <input class="input" id="fbMetric" placeholder="例如：成交 1 单；7 日留存 +5%；ROI 1.8…" />
+                  </div>
+                </div>
+                <div class="stack">
+                  <div class="field">
+                    <label>复盘备注（写“为什么”）</label>
+                    <textarea class="textarea" id="fbNotes" placeholder="例如：订阅比抽佣更容易成交；失败原因是履约不稳定；用户更在意可解释性…"></textarea>
+                  </div>
+                  <div class="field">
+                    <label>失败原因（可选）</label>
+                    <input class="input" id="fbFail" placeholder="行业问题 / 模型问题 / 执行问题 / 履约问题…" />
+                  </div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="list-item">
+                <div class="li-title">提示</div>
+                <div class="li-sub">把“可复用的结论”写清楚，下一次生成时就能以反馈库为先验，减少泛化输出。</div>
+              </div>
+            `,
+            footHtml: `
+              <button class="btn small" type="button" data-action="closeModal">取消</button>
+              <button class="btn primary small" type="button" data-action="saveFeedback">保存反馈</button>
+            `
+          });
+        }
+
+        function openJsonEditor({ title, initialObject, onSave }) {
+          const initialText = JSON.stringify(initialObject, null, 2);
+          openModal({
+            title,
+            bodyHtml: `
+              <div class="field">
+                <label>JSON（结构化字段）</label>
+                <textarea class="textarea" id="jsonEditor" style="height:420px">${escapeHtml(initialText)}</textarea>
+              </div>
+              <div class="list-item">
+                <div class="li-title">建议</div>
+                <div class="li-sub">字段越结构化，Agent 越能“拆解/组合/类比/约束推演”。</div>
+              </div>
+            `,
+            footHtml: `
+              <button class="btn small" type="button" data-action="closeModal">取消</button>
+              <button class="btn primary small" type="button" data-action="saveJsonEditor">保存</button>
+            `,
+            onMount: () => { openJsonEditor._onSave = onSave; }
+          });
+        }
+
+        document.addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-action]");
+          if (!btn) return;
+          const action = btn.dataset.action;
+
+          if (action === "closeModal") { closeModal(); return; }
+          if (action === "resetDemo") {
+            db = seedDb();
+            saveDb(db);
+            ui = loadUi();
+            ui.draft = null;
+            ui.workspaceStep = "input";
+            ui.evidenceTab = "structure";
+            if (typeof ui.developerMode !== "boolean") ui.developerMode = false;
+            saveUi(ui);
+            toast("已清除并重置");
+            render();
+            return;
+          }
+          if (action === "newDraft") {
+            ui.draft = null;
+            ui.workspaceStep = "input";
+            ui.evidenceTab = "structure";
+            saveUi(ui);
+            toast("已新建草稿");
+            location.hash = "#/workspace";
+            render();
+            return;
+          }
+          if (action === "setStep") { ui.workspaceStep = btn.dataset.step || "input"; saveUi(ui); render(); return; }
+          if (action === "setEvidenceTab") { ui.evidenceTab = btn.dataset.etab || "structure"; saveUi(ui); render(); return; }
+
+          if (action === "loadExample") {
+            const examples = [
+              { industry: "AI 工具", idea: "我想做一个 AI 运营助手", constraints: "预算有限；希望 2 周内能卖出第一单；不做重线下履约。" },
+              { industry: "教育/培训", idea: "我想做一个 AI 作业批改 + 学习规划工具", constraints: "必须合规；希望先做 ToB（学校/机构）；不做短视频投放。" },
+              { industry: "本地生活/餐饮", idea: "我想做一个帮餐饮商家做外卖运营的 AI 助手", constraints: "不碰平台违规；先从 1 个城市试点；要可复制 SOP。" },
+              { industry: "电商/品牌", idea: "我想做一个帮助 DTC 品牌提升复购的 AI CRM 助手", constraints: "不做自建商城；先打通主流平台；强调可解释与归因。" }
+            ];
+            const pick = examples[Math.floor(Math.random() * examples.length)];
+            updateDraft({ ...pick, stage: "MVP", variants: [], selected_variant_id: null, citations: { patterns: [], priors: [], cases: [], feedback: [] } });
+            ui.workspaceStep = "input";
+            saveUi(ui);
+            toast("已载入示例");
+            render();
+            return;
+          }
+
+          if (action === "generateVariants") { generateVariantsFromDraft(); render(); return; }
+          if (action === "selectVariant") { updateDraft({ selected_variant_id: btn.dataset.vid }); toast("已选择方案"); render(); return; }
+          if (action === "viewEvidence") { ui.workspaceStep = "canvas"; ui.evidenceTab = "cases"; updateDraft({ selected_variant_id: btn.dataset.vid }); saveUi(ui); render(); return; }
+          if (action === "goCases") {
+            if (ui.developerMode) { location.hash = "#/data/cases"; return; }
+            openModal({
+              title: "案例库（用户模式）",
+              bodyHtml: `
+                <div class="list-item">
+                  <div class="li-title">当前用户版不提供案例库编辑</div>
+                  <div class="li-sub">你仍然可以在“证据面板”里引用系统召回到的案例。若需要维护案例字段，请在设置里开启开发者模式。</div>
+                </div>
+              `,
+              footHtml: `
+                <button class="btn small" type="button" data-action="closeModal">关闭</button>
+                <button class="btn primary small" type="button" data-action="toggleDevMode">开启开发者模式</button>
+              `
+            });
+            return;
+          }
+          if (action === "goFeedback") { location.hash = "#/feedback"; return; }
+          if (action === "toggleDevMode") {
+            ui.developerMode = !ui.developerMode;
+            saveUi(ui);
+            toast(ui.developerMode ? "已开启开发者模式" : "已切回用户模式");
+            render();
+            return;
+          }
+
+          if (action === "toggleCite") {
+            const type = btn.dataset.ctype;
+            const id = btn.dataset.cid;
+            const draft = ensureDraft();
+            if (!draft.citations) draft.citations = { patterns: [], priors: [], cases: [], feedback: [] };
+            const list = draft.citations[type] || [];
+            draft.citations[type] = list.includes(id) ? list.filter((x) => x !== id) : list.concat([id]);
+            updateDraft({ citations: draft.citations });
+            render();
+            return;
+          }
+
+          if (action === "addListItem") {
+            updateSelectedVariantCanvasFromInputs();
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) { toast("请先选择一个方案"); return; }
+            const key = btn.dataset.listKey;
+            if (!key) return;
+            if (!Array.isArray(selected.canvas[key])) selected.canvas[key] = [];
+            selected.canvas[key].push("");
+            saveUi(ui);
+            render();
+            return;
+          }
+
+          if (action === "removeListItem") {
+            updateSelectedVariantCanvasFromInputs();
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const key = btn.dataset.listKey;
+            const idx = Number(btn.dataset.listIdx);
+            const arr = Array.isArray(selected.canvas[key]) ? selected.canvas[key] : [];
+            if (Number.isFinite(idx) && idx >= 0 && idx < arr.length) arr.splice(idx, 1);
+            selected.canvas[key] = arr;
+            saveUi(ui);
+            render();
+            return;
+          }
+
+          if (action === "addSuggestion") {
+            updateSelectedVariantCanvasFromInputs();
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const key = btn.dataset.listKey;
+            const text = String(btn.dataset.suggest || "").trim();
+            if (!key || !text) return;
+            if (!Array.isArray(selected.canvas[key])) selected.canvas[key] = [];
+            if (!selected.canvas[key].includes(text)) selected.canvas[key].push(text);
+            saveUi(ui);
+            render();
+            return;
+          }
+
+          if (action === "addRiskRow") {
+            updateSelectedVariantCanvasFromInputs();
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            if (!Array.isArray(selected.canvas.key_risks)) selected.canvas.key_risks = [];
+            selected.canvas.key_risks.push("");
+            saveUi(ui);
+            render();
+            return;
+          }
+
+          if (action === "removeRiskRow") {
+            updateSelectedVariantCanvasFromInputs();
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const idx = Number(btn.dataset.riskIdx);
+            const arr = Array.isArray(selected.canvas.key_risks) ? selected.canvas.key_risks : [];
+            if (Number.isFinite(idx) && idx >= 0 && idx < arr.length) arr.splice(idx, 1);
+            selected.canvas.key_risks = arr;
+            saveUi(ui);
+            render();
+            return;
+          }
+
+          if (action === "addCostRow") {
+            updateSelectedVariantCanvasFromInputs();
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            if (!Array.isArray(selected.canvas.cost_structure)) selected.canvas.cost_structure = [];
+            selected.canvas.cost_structure.push("其他｜｜");
+            saveUi(ui);
+            render();
+            return;
+          }
+
+          if (action === "removeCostRow") {
+            updateSelectedVariantCanvasFromInputs();
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const idx = Number(btn.dataset.costIdx);
+            const arr = Array.isArray(selected.canvas.cost_structure) ? selected.canvas.cost_structure : [];
+            if (Number.isFinite(idx) && idx >= 0 && idx < arr.length) arr.splice(idx, 1);
+            selected.canvas.cost_structure = arr;
+            saveUi(ui);
+            render();
+            return;
+          }
+
+          if (action === "addMoatRow") {
+            updateSelectedVariantCanvasFromInputs();
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            if (!Array.isArray(selected.canvas.moat)) selected.canvas.moat = [];
+            selected.canvas.moat.push("｜｜");
+            saveUi(ui);
+            render();
+            return;
+          }
+
+          if (action === "removeMoatRow") {
+            updateSelectedVariantCanvasFromInputs();
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const idx = Number(btn.dataset.moatIdx);
+            const arr = Array.isArray(selected.canvas.moat) ? selected.canvas.moat : [];
+            if (Number.isFinite(idx) && idx >= 0 && idx < arr.length) arr.splice(idx, 1);
+            selected.canvas.moat = arr;
+            saveUi(ui);
+            render();
+            return;
+          }
+
+          if (action === "addMoatSuggestion") {
+            updateSelectedVariantCanvasFromInputs();
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const text = String(btn.dataset.suggest || "").trim();
+            if (!text) return;
+            if (!Array.isArray(selected.canvas.moat)) selected.canvas.moat = [];
+            selected.canvas.moat.push(`${text}｜｜`);
+            saveUi(ui);
+            render();
+            return;
+          }
+
+          if (action === "recomputeSelected") {
+            updateSelectedVariantCanvasFromInputs();
+            const res = recomputeSelectedVariant();
+            if (!res) { toast("请先选择一个方案"); return; }
+
+            const warnHtml = (res.warnings || []).length
+              ? `<div class="list-item"><div class="li-title">一致性警告</div><div class="li-sub">${res.warnings.map((w) => "• " + escapeHtml(w)).join("<br/>")}</div></div>`
+              : `<div class="list-item"><div class="li-title">一致性警告</div><div class="li-sub">暂无明显冲突（原型规则较简化）。</div></div>`;
+
+            const sugHtml = (res.suggestions || []).length
+              ? `<div class="list-item"><div class="li-title">联动建议</div><div class="li-sub">${res.suggestions.map((s) => "• " + escapeHtml(s)).join("<br/>")}</div></div>`
+              : `<div class="list-item"><div class="li-title">联动建议</div><div class="li-sub">暂无新增建议。</div></div>`;
+
+            openModal({
+              title: "联动重算（原型）",
+              bodyHtml: `
+                <div class="list-item">
+                  <div class="li-title">已刷新</div>
+                  <div class="li-sub">${escapeHtml((res.updated || []).join(", "))}</div>
+                </div>
+                <div class="divider"></div>
+                ${warnHtml}
+                <div class="divider"></div>
+                ${sugHtml}
+                <div class="divider"></div>
+                <div class="list-item">
+                  <div class="li-title">下一步</div>
+                  <div class="li-sub">去“证据面板”补引用，或保存为方案进入反馈闭环。</div>
+                </div>
+              `,
+              footHtml: `<button class="btn small" type="button" data-action="closeModal">关闭</button>`
+            });
+            render();
+            return;
+          }
+          if (action === "saveAsPlan") { updateSelectedVariantCanvasFromInputs(); saveSelectedAsPlan(); return; }
+          if (action === "openFeedbackLog") { openFeedbackModal({}); return; }
+
+          if (action === "saveFeedback") {
+            const planId = document.getElementById("fbPlan")?.value || "";
+            const status = document.getElementById("fbStatus")?.value || "";
+            const metric = document.getElementById("fbMetric")?.value || "";
+            const notes = document.getElementById("fbNotes")?.value || "";
+            const fail = document.getElementById("fbFail")?.value || "";
+            const entry = { id: "fb-" + uid(), created_at: nowISO(), plan_id: planId || null, status, metric_summary: metric, notes, failure_reason: fail };
+            db.outcome_feedback.unshift(entry);
+            saveDb(db);
+            closeModal();
+            toast("反馈已保存");
+            render();
+            return;
+          }
+
+          if (action === "setSearch") return; // input handler drives this; avoid rerender-on-click
+
+          if (action === "addItem" || action === "editItem") {
+            const table = btn.dataset.table;
+            const template = (() => {
+              if (table === "business_model_patterns") return { id: "pat-" + uid(), model_type: "New Pattern", description: "", fit_conditions: [], bad_fit_conditions: [], revenue_options: [], control_points: [], growth_engines: [], risks: [] };
+              if (table === "industry_priors") return { id: "ind-" + uid(), industry: "新行业", typical_users: [], typical_channels: [], typical_pricing_models: [], key_metrics: [], common_risks: [] };
+              if (table === "business_cases") return { id: "case-" + uid(), case_name: "新案例", industry: "", target_user: [], value_type: [], revenue_streams: [], control_points: [], growth_engine: [], scaling_path: [], risks: [] };
+              if (table === "generated_plans") return { id: "plan-" + uid(), created_at: nowISO(), idea: "", industry: "", stage: "MVP", canvas: {}, versions: [] };
+              if (table === "outcome_feedback") return { id: "fb-" + uid(), created_at: nowISO(), plan_id: null, status: "试用中", metric_summary: "", notes: "", failure_reason: "" };
+              return { id: uid() };
+            })();
+
+            if (action === "addItem") {
+              openJsonEditor({
+                title: "新增",
+                initialObject: template,
+                onSave: (obj) => { db[table] = [obj, ...(db[table] || [])]; saveDb(db); toast("已新增"); render(); }
+              });
+              return;
+            }
+
+            const id = btn.dataset.id;
+            const item = (db[table] || []).find((x) => x.id === id);
+            if (!item) { toast("未找到"); return; }
+            openJsonEditor({
+              title: "编辑",
+              initialObject: item,
+              onSave: (obj) => { db[table] = (db[table] || []).map((x) => (x.id === id ? obj : x)); saveDb(db); toast("已保存"); render(); }
+            });
+            return;
+          }
+
+          if (action === "deleteItem") {
+            const table = btn.dataset.table;
+            const id = btn.dataset.id;
+            if (!confirm("确认删除？")) return;
+            db[table] = (db[table] || []).filter((x) => x.id !== id);
+            saveDb(db);
+            toast("已删除");
+            render();
+            return;
+          }
+
+          if (action === "openPlan") {
+            const id = btn.dataset.id;
+            const plan = db.generated_plans.find((p) => p.id === id);
+            if (!plan) { toast("未找到方案"); return; }
+            const fmt = (v) => Array.isArray(v) ? v.join("\n") : String(v || "");
+            const seven = (() => {
+              const raw = Array.isArray(plan.canvas?.seven_day_actions) ? plan.canvas.seven_day_actions : [];
+              const strip = (line) => {
+                const m = String(line || "").match(/^\s*Day\s*(\d+)\s*[：:]\s*(.*)$/i);
+                return m ? { day: Number(m[1]), text: String(m[2] || "").trim() } : { day: null, text: String(line || "").trim() };
+              };
+              const parsed = raw.map(strip);
+              const items = Array.from({ length: Math.max(7, parsed.length || 0) }).map((_, i) => {
+                const day = i + 1;
+                const x = parsed.find((p) => p.day === day) || parsed[i] || { text: "" };
+                return { day, text: x.text || "" };
+              });
+              return items;
+            })();
+            openModal({
+              title: "方案详情",
+              bodyHtml: `
+                <div class="row between">
+                  <div>
+                    <div class="li-title">${escapeHtml(plan.idea || "方案")}</div>
+                    <div class="li-sub">${escapeHtml(plan.industry || "")} · ${escapeHtml(plan.stage || "")} · ${escapeHtml(plan.selected_variant_label || "")}</div>
+                  </div>
+                  <span class="badge">${escapeHtml(plan.id)}</span>
+                </div>
+                <div class="divider"></div>
+                <div class="grid-2">
+                  <div class="list-item">
+                    <div class="li-title">画布（摘要）</div>
+                    <div class="li-sub"><b style="color:rgba(255,255,255,0.8)">变现：</b>${escapeHtml((plan.canvas?.revenue_streams || []).slice(0, 3).join(" / ") || "-")}</div>
+                    <div class="li-sub"><b style="color:rgba(255,255,255,0.8)">渠道：</b>${escapeHtml((plan.canvas?.channels || []).slice(0, 3).join(" / ") || "-")}</div>
+                    <div class="li-sub"><b style="color:rgba(255,255,255,0.8)">控制点：</b>${escapeHtml((plan.canvas?.control_points || []).slice(0, 3).join(" / ") || "-")}</div>
+                    <div class="li-sub"><b style="color:rgba(255,255,255,0.8)">风险：</b>${escapeHtml((plan.canvas?.key_risks || []).slice(0, 3).join(" / ") || "-")}</div>
+                  </div>
+                  <div class="list-item">
+                    <div class="li-title">引用证据</div>
+                    <div class="li-sub">结构：${escapeHtml((plan.citations?.patterns || []).length)} · 先验：${escapeHtml((plan.citations?.priors || []).length)} · 案例：${escapeHtml((plan.citations?.cases || []).length)} · 反馈：${escapeHtml((plan.citations?.feedback || []).length)}</div>
+                    <div class="divider"></div>
+                    <button class="btn small" type="button" data-action="openFeedbackFromPlan" data-plan="${escapeHtml(plan.id)}">为该方案记录反馈</button>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                ${ui.developerMode ? `
+                  <div class="field">
+                    <label>完整 JSON（只读）</label>
+                    <textarea class="textarea" style="height:260px" readonly>${escapeHtml(JSON.stringify(plan, null, 2))}</textarea>
+                  </div>
+                ` : `
+                  <div class="list-item">
+                    <div class="li-title">画布详情（只读）</div>
+                    <div class="li-sub">想继续改动？点“加载到工作台”。</div>
+                  </div>
+                  <div class="divider"></div>
+                  <div class="grid-2">
+                    <div class="list-item">
+                      <div class="li-title">价值主张</div>
+                      <textarea class="textarea" style="height:180px" readonly>${escapeHtml(fmt(plan.canvas?.value_proposition))}</textarea>
+                    </div>
+                    <div class="list-item">
+                      <div class="li-title">7 天落地动作</div>
+                      <div class="action-list" style="margin-top:10px;">
+                        ${seven.map((it) => `
+                          <div class="action-row">
+                            <div class="action-day">Day ${it.day}</div>
+                            <textarea class="textarea action-input" readonly>${escapeHtml(it.text)}</textarea>
+                          </div>
+                        `).join("")}
+                      </div>
+                    </div>
+                  </div>
+                `}
+              `,
+              footHtml: `
+                <button class="btn small" type="button" data-action="loadPlanToWorkspace" data-plan="${escapeHtml(plan.id)}">加载到工作台</button>
+                <button class="btn small" type="button" data-action="closeModal">关闭</button>
+              `
+            });
+            return;
+          }
+
+          if (action === "openFeedbackFromPlan") { closeModal(); openFeedbackModal({ planId: btn.dataset.plan }); return; }
+          if (action === "loadPlanToWorkspace") {
+            const planId = btn.dataset.plan;
+            const plan = db.generated_plans.find((p) => p.id === planId);
+            if (!plan) { toast("未找到方案"); return; }
+
+            const variantId = "var-" + uid();
+            const variant = {
+              id: variantId,
+              label: plan.selected_variant_label || "导入方案",
+              summary: `行业：${plan.industry || "-"} · 变现：${(plan.canvas?.revenue_streams || [])[0] || "-"}`,
+              posture: "balanced",
+              idea: plan.idea,
+              industry: plan.industry,
+              stage: plan.stage,
+              constraints: plan.constraints,
+              variant_label: plan.selected_variant_label || "导入方案",
+              canvas: JSON.parse(JSON.stringify(plan.canvas || {})),
+              evidence: JSON.parse(JSON.stringify(plan.evidence || { patterns: [], priors: [], cases: [], feedback: [] }))
+            };
+
+            ui.draft = {
+              id: "draft-" + uid(),
+              created_at: nowISO(),
+              stage: plan.stage || "MVP",
+              industry: plan.industry || "AI 工具",
+              idea: plan.idea || "",
+              constraints: plan.constraints || "",
+              variants: [variant],
+              selected_variant_id: variantId,
+              citations: JSON.parse(JSON.stringify(plan.citations || { patterns: [], priors: [], cases: [], feedback: [] }))
+            };
+            ui.workspaceStep = "canvas";
+            ui.evidenceTab = "structure";
+            saveUi(ui);
+            closeModal();
+            toast("已加载到工作台");
+            location.hash = "#/workspace";
+            render();
+            return;
+          }
+
+          if (action === "saveJsonEditor") {
+            const raw = document.getElementById("jsonEditor")?.value || "";
+            const obj = safeJsonParse(raw, null);
+            if (!obj) { toast("JSON 无效"); return; }
+            if (typeof openJsonEditor._onSave === "function") openJsonEditor._onSave(obj);
+            closeModal();
+            openJsonEditor._onSave = null;
+            return;
+          }
+        });
+
+        document.addEventListener("input", (e) => {
+          const search = e.target.closest('[data-action="setSearch"][data-table]');
+          if (search) {
+            const table = search.dataset.table;
+            const start = search.selectionStart;
+            const end = search.selectionEnd;
+            ui[table + "_search"] = search.value || "";
+            saveUi(ui);
+            render();
+            const escaped = (window.CSS && typeof CSS.escape === "function") ? CSS.escape(table) : table;
+            const next = document.querySelector(`[data-action="setSearch"][data-table="${escaped}"]`);
+            if (next && typeof next.focus === "function") {
+              next.focus();
+              if (typeof start === "number" && typeof end === "number" && typeof next.setSelectionRange === "function") {
+                try { next.setSelectionRange(start, end); } catch {}
+              }
+            }
+            return;
+          }
+
+          const seven = e.target.closest("[data-seven-action-idx]");
+          if (seven) {
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const inputs = Array.from(document.querySelectorAll("[data-seven-action-idx]"))
+              .sort((a, b) => Number(a.dataset.sevenActionIdx) - Number(b.dataset.sevenActionIdx));
+            const list = inputs
+              .map((el, i) => {
+                const text = String(el.value || "").trim();
+                if (!text) return "";
+                return `Day${i + 1}：${text}`;
+              })
+              .filter(Boolean);
+            selected.canvas.seven_day_actions = list;
+            saveUi(ui);
+            return;
+          }
+
+          const listInput = e.target.closest("[data-list-key][data-list-idx]");
+          if (listInput) {
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const key = listInput.dataset.listKey;
+            const inputs = Array.from(document.querySelectorAll(`[data-list-key="${key}"][data-list-idx]`))
+              .sort((a, b) => Number(a.dataset.listIdx) - Number(b.dataset.listIdx));
+            const list = inputs.map((el) => String(el.value || "").trim()).filter(Boolean);
+            selected.canvas[key] = list;
+            saveUi(ui);
+            return;
+          }
+
+          const riskInput = e.target.closest("[data-risk-idx][data-risk-field]");
+          if (riskInput) {
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const riskEls = Array.from(document.querySelectorAll("[data-risk-idx][data-risk-field]"));
+            const rows = new Map();
+            riskEls.forEach((el) => {
+              const idx = Number(el.dataset.riskIdx);
+              const field = el.dataset.riskField;
+              if (!rows.has(idx)) rows.set(idx, { risk: "", metric: "", mitigation: "" });
+              rows.get(idx)[field] = String(el.value || "").trim();
+            });
+            const list = Array.from(rows.entries())
+              .sort((a, b) => a[0] - b[0])
+              .map(([, r]) => formatRiskLine(r))
+              .filter(Boolean);
+            selected.canvas.key_risks = list;
+            saveUi(ui);
+            return;
+          }
+
+          const costInput = e.target.closest("[data-cost-idx][data-cost-field]");
+          if (costInput) {
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const costEls = Array.from(document.querySelectorAll("[data-cost-idx][data-cost-field]"));
+            const rows = new Map();
+            costEls.forEach((el) => {
+              const idx = Number(el.dataset.costIdx);
+              const field = el.dataset.costField;
+              if (!rows.has(idx)) rows.set(idx, { item: "", amount: "", note: "" });
+              rows.get(idx)[field] = String(el.value || "").trim();
+            });
+            const list = Array.from(rows.entries())
+              .sort((a, b) => a[0] - b[0])
+              .map(([, r]) => formatCostLine(r))
+              .filter(Boolean);
+            selected.canvas.cost_structure = list;
+            saveUi(ui);
+
+            // Update total label without full rerender
+            const totalEl = document.getElementById("costTotal");
+            if (totalEl) {
+              const total = list.map(parseCostLine).reduce((acc, r) => {
+                const n = Number(String(r.amount || "").replaceAll(",", "").trim());
+                return acc + (Number.isFinite(n) ? n : 0);
+              }, 0);
+              totalEl.textContent = total > 0 ? `估算合计：${total.toLocaleString()}/月` : "估算合计：—";
+            }
+            return;
+          }
+
+          const moatInput = e.target.closest("[data-moat-idx][data-moat-field]");
+          if (moatInput) {
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const moatEls = Array.from(document.querySelectorAll("[data-moat-idx][data-moat-field]"));
+            const rows = new Map();
+            moatEls.forEach((el) => {
+              const idx = Number(el.dataset.moatIdx);
+              const field = el.dataset.moatField;
+              if (!rows.has(idx)) rows.set(idx, { type: "", asset: "", build: "" });
+              rows.get(idx)[field] = String(el.value || "").trim();
+            });
+            const list = Array.from(rows.entries())
+              .sort((a, b) => a[0] - b[0])
+              .map(([, r]) => formatMoatLine(r))
+              .filter(Boolean);
+            selected.canvas.moat = list;
+            saveUi(ui);
+            return;
+          }
+
+          const canvasInput = e.target.closest("[data-canvas-key]");
+          if (canvasInput) {
+            const draft = ensureDraft();
+            const selected = (draft.variants || []).find((v) => v.id === draft.selected_variant_id);
+            if (!selected) return;
+            const key = canvasInput.dataset.canvasKey;
+            if (key === "seven_day_actions") return;
+            const raw = canvasInput.value || "";
+            selected.canvas[key] = raw.includes("\\n") ? raw.split(/\\n+/).map((s) => s.trim()).filter(Boolean) : raw.trim();
+            saveUi(ui);
+            return;
+          }
+
+          const bind = e.target.closest("[data-bind]");
+          if (!bind) return;
+          const key = bind.dataset.bind;
+          updateDraft({ [key]: bind.value, variants: [], selected_variant_id: null, citations: { patterns: [], priors: [], cases: [], feedback: [] } });
+        });
+
+        window.addEventListener("hashchange", render);
+        window.addEventListener("resize", () => { if (window.innerWidth > 860) setSidebarOpen(false); });
+        document.addEventListener("keydown", (e) => {
+          const key = String(e.key || "").toLowerCase();
+          if (!e.shiftKey) return;
+          if (!(e.ctrlKey || e.metaKey)) return;
+          if (key !== "d") return;
+          e.preventDefault();
+          ui.developerMode = !ui.developerMode;
+          saveUi(ui);
+          toast(ui.developerMode ? "已开启开发者模式" : "已关闭开发者模式");
+          render();
+        });
+
+        setSidebarOpen(!!ui.sidebarOpen);
+        updateSidebarCounts();
+        render();
+      })();
+    </script>
+  </body>
+</html>
