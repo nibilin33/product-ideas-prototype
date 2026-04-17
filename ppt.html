@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background: #050809;
+        color: #f4f4f5;
+        font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .bg-shell {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse 1200px 600px at 50% 50%, rgba(16,185,129,0.04), transparent 70%),
+          radial-gradient(circle 800px at 80% 20%, rgba(34,211,238,0.07), transparent 60%),
+          radial-gradient(circle 600px at 20% 80%, rgba(16,185,129,0.05), transparent 50%),
+          linear-gradient(180deg, #0a0f14 0%, #050809 50%, #020304 100%);
+        z-index: 0;
+      }
+      .bg-shell::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          radial-gradient(circle, rgba(52,211,153,0.8) 1px, transparent 1px),
+          radial-gradient(circle, rgba(34,211,238,0.6) 1px, transparent 1px),
+          radial-gradient(circle, rgba(255,255,255,0.9) 1.5px, transparent 1.5px),
+          radial-gradient(circle, rgba(52,211,153,0.4) 0.5px, transparent 0.5px);
+        background-size: 550px 550px, 350px 350px, 450px 450px, 250px 250px;
+        background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+        animation: cosmicDrift 180s linear infinite;
+        pointer-events: none;
+      }
+      .bg-shell::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px),
+          radial-gradient(circle, rgba(52,211,153,0.8) 1px, transparent 1px);
+        background-size: 800px 800px, 600px 600px;
+        background-position: 50px 50px, 250px 150px;
+        animation: starTwinkle 3s ease-in-out infinite;
+        pointer-events: none;
+      }
+      @keyframes cosmicDrift {
+        0%   { transform: translate(0,0) scale(1); opacity: 0.6; }
+        100% { transform: translate(-200px,-100px) scale(1.05); opacity: 0.6; }
+      }
+      @keyframes starTwinkle {
+        0%,100% { opacity: 0.3; }
+        50%      { opacity: 0.8; }
+      }
+      #deck {
+        position: relative;
+        z-index: 10;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .slide {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 32px;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(60px);
+        transition: opacity 0.45s cubic-bezier(0.4,0,0.2,1), transform 0.45s cubic-bezier(0.4,0,0.2,1);
+      }
+      .slide.active {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateX(0);
+      }
+      .slide.exit-left {
+        opacity: 0;
+        transform: translateX(-60px);
+        pointer-events: none;
+      }
+      .gcard {
+        position: relative;
+        border-radius: 20px;
+        background: radial-gradient(120% 85% at 18% 8%, rgba(52,211,153,0.09) 0%, rgba(34,211,238,0.04) 42%, transparent 72%),
+          rgba(255,255,255,0.03);
+        backdrop-filter: blur(14px);
+        padding: 32px 28px;
+        width: 100%;
+        max-width: 640px;
+      }
+      .gcard::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(135deg, rgba(52,211,153,0.22) 0%, rgba(34,211,238,0.12) 45%, rgba(16,185,129,0.05) 100%);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+      .label-act { font-size:11px; font-weight:900; letter-spacing:0.12em; text-transform:uppercase; color:rgba(52,211,153,0.7); margin-bottom:6px; }
+      .scene-num { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:9999px; font-weight:900; font-size:14px; flex-shrink:0; }
+      .time-badge { display:inline-flex; align-items:center; height:24px; padding:0 10px; border-radius:9999px; font-size:11px; font-weight:700; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); color:rgba(244,244,245,0.65); margin-left:4px; }
+      .tag-badge { display:inline-flex; align-items:center; height:22px; padding:0 10px; border-radius:6px; font-size:11px; font-weight:900; margin-left:8px; }
+      .scene-title { font-size:22px; font-weight:900; line-height:1.3; margin:16px 0 10px; color:rgba(244,244,245,0.97); }
+      .scene-body { font-size:14px; line-height:1.8; color:rgba(244,244,245,0.72); }
+      .highlight-box { margin-top:16px; border-radius:10px; padding:12px 16px; font-size:13px; line-height:1.7; font-weight:600; }
+      .highlight-amber { background:rgba(251,191,36,0.08); border-left:3px solid rgba(251,191,36,0.6); color:rgba(251,191,36,0.9); }
+      .highlight-emerald { background:rgba(52,211,153,0.08); border-left:3px solid rgba(52,211,153,0.5); color:rgba(52,211,153,0.9); }
+      #progress-bar { position:fixed; bottom:0; left:0; height:3px; background:linear-gradient(90deg,#34d399,#22d3ee); transition:width 0.45s cubic-bezier(0.4,0,0.2,1); z-index:100; border-radius:0 2px 2px 0; }
+      #slide-counter { position:fixed; bottom:20px; right:24px; font-size:11px; font-weight:700; color:rgba(244,244,245,0.35); z-index:100; letter-spacing:0.06em; }
+      #header { position:fixed; top:16px; left:20px; z-index:100; display:flex; align-items:center; gap:8px; }
+      #header .logo { width:24px; height:24px; border-radius:6px; background:rgba(52,211,153,0.15); border:1px solid rgba(52,211,153,0.35); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; color:rgba(52,211,153,0.9); }
+      #header .brand { font-size:13px; font-weight:700; color:rgba(52,211,153,0.8); }
+      #dot-nav { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); display:flex; gap:6px; z-index:100; }
+      .dot { width:6px; height:6px; border-radius:9999px; background:rgba(255,255,255,0.2); transition:all 0.3s ease; cursor:pointer; }
+      .dot.active { width:20px; background:rgba(52,211,153,0.8); }
+      .act-num { font-size:96px; font-weight:900; line-height:1; background:linear-gradient(135deg,rgba(52,211,153,0.9),rgba(34,211,238,0.5)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-align:center; }
+      .act-label { font-size:18px; font-weight:900; color:rgba(244,244,245,0.9); text-align:center; margin-top:4px; }
+      .act-range { font-size:12px; color:rgba(244,244,245,0.4); text-align:center; margin-top:8px; letter-spacing:0.08em; }
+      .change-item { display:flex; gap:12px; align-items:flex-start; padding:12px 16px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); margin-bottom:10px; }
+      .change-dot { width:8px; height:8px; border-radius:9999px; background:rgba(52,211,153,0.8); flex-shrink:0; margin-top:5px; }
+      .change-text { font-size:13px; line-height:1.6; color:rgba(244,244,245,0.75); }
+      .change-text strong { color:rgba(244,244,245,0.95); font-weight:900; }
+      .cover-typewrap {
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      .type-block {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      .type-line {
+        display: inline-block;
+        white-space: nowrap;
+        font-size: 36px;
+        font-weight: 900;
+        line-height: 1.2;
+        color: rgba(244,244,245,0.98);
+        min-height: 1.25em;
+        position: relative;
+      }
+
+      .type-seg {
+        color: rgba(244,244,245,0.98);
+      }
+
+      .type-seg--accent {
+        color: #34d399;
+        text-shadow: 0 0 18px rgba(52,211,153,0.18);
+      }
+
+      .type-seg--warn {
+        color: #fbbf24;
+        text-shadow: 0 0 18px rgba(251,191,36,0.16);
+      }
+
+      .type-seg--danger {
+        color: #fb7185;
+        text-shadow: 0 0 18px rgba(251,113,133,0.16);
+      }
+
+      .type-line::after {
+        content: "";
+        display: inline-block;
+        width: 3px;
+        height: 0.95em;
+        margin-left: 3px;
+        vertical-align: -0.08em;
+        background: rgba(52,211,153,0.9);
+        opacity: 0;
+      }
+
+      .type-line.center {
+        text-align: center;
+      }
+
+      .type-line.is-typing::after {
+        opacity: 1;
+        animation: caret 0.8s step-end infinite;
+      }
+
+      .type-line.is-done::after {
+        opacity: 0;
+      }
+
+      .demo-zoom-slide {
+        overflow: hidden;
+      }
+
+      .demo-zoom-copy {
+        position: relative;
+        z-index: 3;
+      }
+
+      .demo-zoom-stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .demo-zoom-image {
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        border-radius: 28px;
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+        transform: translateY(90px) scale(0.16);
+        opacity: 0;
+        transform-origin: center center;
+      }
+
+      .demo-zoom-slide.play-demo .demo-zoom-image {
+        animation: demoZoomGrow 2.6s cubic-bezier(0.2, 0.8, 0.18, 1) 1.15s forwards;
+      }
+
+      @keyframes demoZoomGrow {
+        0% {
+          transform: translateY(90px) scale(0.16);
+          opacity: 0;
+          border-radius: 28px;
+          filter: saturate(0.95);
+        }
+        12% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+          border-radius: 0;
+          filter: saturate(1);
+        }
+      }
+
+      @keyframes caret {
+        0%, 49% { opacity: 1; }
+        50%, 100% { opacity: 0; }
+      }
+
+      @media (max-width: 640px) {
+        .type-line {
+          font-size: 28px;
+          line-height: 1.25;
+        }
+        .cover-typewrap {
+          max-width: 320px;
+        }
+
+        .type-block {
+          max-width: 320px;
+          align-items: flex-start;
+        }
+      }
+      @keyframes coverFadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-shell"></div>
+    <div id="dot-nav"></div>
+    <div id="progress-bar"></div>
+    <div id="slide-counter"></div>
+
+    <div id="deck">
+
+      <!-- SLIDE 0 COVER -->
+      <div class="slide active" data-index="0">
+        <div class="gcard" style="text-align:center;padding:40px 28px;max-width:680px;">
+          <div class="cover-typewrap" style="margin-bottom:16px;">
+            <div class="type-block">
+              <div class="type-line" style="--typing-duration:0.7s; --delay:0.15s;"><span class="type-seg">我朋友开</span><span class="type-seg type-seg--accent">餐饮店</span><span class="type-seg">，</span></div>
+              <div class="type-line" style="--typing-duration:0.9s; --delay:0.95s;"><span class="type-seg">花了</span><span class="type-seg type-seg--warn">一万多</span><span class="type-seg">学</span><span class="type-seg type-seg--accent">短视频</span><span class="type-seg">，</span></div>
+              <div class="type-line done-caret" style="--typing-duration:0.45s; --delay:1.95s;"><span class="type-seg">想</span><span class="type-seg type-seg--accent">引流</span></div>
+              <div class="type-line" style="--typing-duration:0.65s; --delay:2.7s;"><span class="type-seg">做完</span><span class="type-seg type-seg--danger">没流量</span><span class="type-seg">，</span></div>
+              <div class="type-line done-caret" style="--typing-duration:0.55s; --delay:3.45s;"><span class="type-seg">也</span><span class="type-seg type-seg--danger">没生意</span></div>
+              <div class="type-line" style="--typing-duration:0.9s; --delay:4.25s;"><span class="type-seg">他以为是</span><span class="type-seg type-seg--warn">流量问题</span><span class="type-seg">，</span></div>
+              <div class="type-line" style="--typing-duration:1.15s; --delay:5.3s;"><span class="type-seg">其实连</span><span class="type-seg type-seg--warn">店出了什么问题</span><span class="type-seg">，</span></div>
+              <div class="type-line done-caret" style="--typing-duration:0.6s; --delay:6.65s;"><span class="type-seg type-seg--danger">都不清楚</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 1 INSERTED -->
+      <div class="slide demo-zoom-slide" data-index="1">
+        <div class="demo-zoom-stage">
+          <img class="demo-zoom-image" src="./demo.png" alt="demo" />
+        </div>
+        <div class="gcard demo-zoom-copy" style="text-align:center;padding:40px 28px;max-width:680px;">
+          <div class="cover-typewrap" style="margin-bottom:16px;">
+            <div class="type-block" style="align-items:center;">
+              <div class="type-line done-caret" style="--typing-duration:1.2s; --delay:0.25s;"><span class="type-seg">我给他看了</span><span class="type-seg type-seg--accent">这个</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 2 END CARD -->
+      <div class="slide" data-index="2">
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center;">
+          <div style="font-size:80px;font-weight:900;line-height:1;color:rgba(244,244,245,0.97);">完</div>
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+      const TOTAL = 3;
+      let current = 0;
+      let isAnimating = false;
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const progressBar = document.getElementById('progress-bar');
+      const counter = document.getElementById('slide-counter');
+      const dotNav = document.getElementById('dot-nav');
+      const typingTimers = new Set();
+
+      function parseTimeValue(value) {
+        const raw = (value || '').trim();
+        if (!raw) return 0;
+        if (raw.endsWith('ms')) return Number.parseFloat(raw);
+        if (raw.endsWith('s')) return Number.parseFloat(raw) * 1000;
+        const num = Number.parseFloat(raw);
+        return Number.isFinite(num) ? num : 0;
+      }
+
+      function clearTypingTimers() {
+        typingTimers.forEach(id => clearTimeout(id));
+        typingTimers.clear();
+      }
+
+      function prepareTypeLines() {
+        document.querySelectorAll('.type-line').forEach(line => {
+          const segments = Array.from(line.querySelectorAll('.type-seg'));
+
+          if (!segments.length) {
+            const text = line.textContent;
+            line.innerHTML = '<span class="type-seg"></span>';
+            line.querySelector('.type-seg').textContent = text;
+          }
+
+          if (!line._segments) {
+            line._segments = Array.from(line.querySelectorAll('.type-seg')).map(seg => ({
+              text: seg.textContent,
+              className: seg.className
+            }));
+          }
+        });
+      }
+
+      function resetTypeLines(scope = document) {
+        scope.querySelectorAll('.type-line').forEach(line => {
+          const segments = line._segments || [];
+          line.innerHTML = segments.map(seg => '<span class="' + seg.className + '"></span>').join('');
+          line.classList.remove('is-typing', 'is-done');
+        });
+      }
+
+      function resetDemoZoom(scope = document) {
+        scope.querySelectorAll('.demo-zoom-slide').forEach(slide => {
+          slide.classList.remove('play-demo');
+          const image = slide.querySelector('.demo-zoom-image');
+          if (image) {
+            image.style.animation = 'none';
+            image.getBoundingClientRect();
+            image.style.animation = '';
+          }
+        });
+      }
+
+      function runTypewriterForSlide(slide) {
+        resetTypeLines(slide);
+        slide.querySelectorAll('.type-line').forEach(line => {
+          const segments = line._segments || [];
+          const fullText = segments.map(seg => seg.text).join('');
+          const segmentNodes = Array.from(line.querySelectorAll('.type-seg'));
+          const styles = getComputedStyle(line);
+          const delay = parseTimeValue(styles.getPropertyValue('--delay'));
+          const duration = parseTimeValue(styles.getPropertyValue('--typing-duration')) || 1200;
+          const stepTime = fullText.length ? Math.max(40, Math.floor(duration / fullText.length)) : duration;
+
+          const startTimer = setTimeout(() => {
+            line.classList.add('is-typing');
+            let index = 0;
+
+            const tick = () => {
+              index += 1;
+              let remaining = index;
+              segments.forEach((seg, segIndex) => {
+                const count = Math.max(0, Math.min(seg.text.length, remaining));
+                segmentNodes[segIndex].textContent = seg.text.slice(0, count);
+                remaining -= count;
+              });
+
+              if (index < fullText.length) {
+                const nextTimer = setTimeout(tick, stepTime);
+                typingTimers.add(nextTimer);
+              } else {
+                line.classList.remove('is-typing');
+                line.classList.add('is-done');
+              }
+            };
+
+            tick();
+          }, delay);
+
+          typingTimers.add(startTimer);
+        });
+      }
+
+      function runSlideEffects(slide) {
+        runTypewriterForSlide(slide);
+        if (slide.classList.contains('demo-zoom-slide')) {
+          slide.classList.add('play-demo');
+        }
+      }
+
+      slides.forEach((_, i) => {
+        const d = document.createElement('div');
+        d.className = 'dot' + (i === 0 ? ' active' : '');
+        d.addEventListener('click', () => goTo(i));
+        dotNav.appendChild(d);
+      });
+
+      function updateUI() {
+        const pct = TOTAL > 1 ? (current / (TOTAL - 1)) * 100 : 100;
+        progressBar.style.width = pct + '%';
+        counter.textContent = (current + 1) + ' / ' + TOTAL;
+        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+      }
+
+      function goTo(idx) {
+        if (idx === current || isAnimating) return;
+        if (idx < 0 || idx >= TOTAL) return;
+        isAnimating = true;
+        clearTypingTimers();
+        resetDemoZoom();
+        const oldSlide = slides[current];
+        const newSlide = slides[idx];
+        const dir = idx > current ? 1 : -1;
+        oldSlide.classList.remove('active');
+        oldSlide.classList.add('exit-left');
+        if (dir < 0) oldSlide.style.transform = 'translateX(60px)';
+        newSlide.style.transform = dir > 0 ? 'translateX(60px)' : 'translateX(-60px)';
+        newSlide.style.opacity = '0';
+        newSlide.classList.remove('exit-left');
+        newSlide.getBoundingClientRect();
+        newSlide.classList.add('active');
+        newSlide.style.transform = '';
+        newSlide.style.opacity = '';
+        current = idx;
+        updateUI();
+        runSlideEffects(newSlide);
+        setTimeout(() => {
+          oldSlide.classList.remove('exit-left');
+          oldSlide.style.transform = '';
+          isAnimating = false;
+        }, 460);
+      }
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(current - 1); }
+      });
+      let touchStartX = 0;
+      document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+      document.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dx) > 50) dx < 0 ? goTo(current + 1) : goTo(current - 1);
+      }, { passive: true });
+      prepareTypeLines();
+      resetDemoZoom();
+      runSlideEffects(slides[current]);
+      updateUI();
+    </script>
+  </body>
+</html>
