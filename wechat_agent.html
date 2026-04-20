@@ -1,0 +1,2281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>微信成交助手 · 餐饮私域版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      /* 参考 demo/AI工作台.html：深邃太空 + 星光 */
+      .bg-shell {
+        position: relative;
+        background: radial-gradient(ellipse 1200px 600px at 50% 50%, rgba(16, 185, 129, 0.03), transparent 70%),
+          radial-gradient(circle 800px at 80% 20%, rgba(34, 211, 238, 0.08), transparent 60%),
+          radial-gradient(circle 600px at 20% 80%, rgba(16, 185, 129, 0.06), transparent 50%),
+          linear-gradient(180deg, #0a0f14 0%, #050809 50%, #020304 100%);
+        overflow-x: hidden;
+      }
+
+      .bg-shell::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(circle, rgba(52, 211, 153, 0.8) 1px, transparent 1px),
+          radial-gradient(circle, rgba(34, 211, 238, 0.6) 1px, transparent 1px),
+          radial-gradient(circle, rgba(255, 255, 255, 0.9) 1.5px, transparent 1.5px),
+          radial-gradient(circle, rgba(52, 211, 153, 0.4) 0.5px, transparent 0.5px),
+          radial-gradient(circle, rgba(34, 211, 238, 0.3) 0.5px, transparent 0.5px);
+        background-size: 550px 550px, 350px 350px, 450px 450px, 250px 250px, 200px 200px;
+        background-position: 0 0, 40px 60px, 130px 270px, 70px 100px, 150px 200px;
+        animation: cosmicDrift 180s linear infinite;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      @keyframes cosmicDrift {
+        0% {
+          transform: translate(0, 0) scale(1);
+          opacity: 0.6;
+        }
+        33% {
+          opacity: 0.8;
+        }
+        66% {
+          opacity: 0.7;
+        }
+        100% {
+          transform: translate(-200px, -100px) scale(1.05);
+          opacity: 0.6;
+        }
+      }
+
+      .bg-shell::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(circle, rgba(255, 255, 255, 0.9) 1px, transparent 1px),
+          radial-gradient(circle, rgba(52, 211, 153, 0.8) 1px, transparent 1px),
+          radial-gradient(circle, rgba(34, 211, 238, 0.7) 1px, transparent 1px);
+        background-size: 800px 800px, 600px 600px, 700px 700px;
+        background-position: 50px 50px, 250px 150px, 400px 300px;
+        animation: starTwinkle 3s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      @keyframes starTwinkle {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.8;
+        }
+      }
+
+      /* 参考 demo/AI工作台.html：玻璃描边卡片 */
+      .gstroke {
+        position: relative;
+        border-radius: 18px;
+        background: radial-gradient(120% 85% at 18% 8%, rgba(52, 211, 153, 0.1) 0%, rgba(34, 211, 238, 0.05) 42%, rgba(0, 0, 0, 0) 72%),
+          rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+      }
+
+      .gstroke::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(135deg, rgba(52, 211, 153, 0.22) 0%, rgba(34, 211, 238, 0.14) 45%, rgba(16, 185, 129, 0.06) 100%);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+        opacity: 0.55;
+        filter: blur(0.2px);
+      }
+
+      /* 主 Tab 下划线（与 demo/AI工作台.html 一致） */
+      .main-tab.active {
+        position: relative;
+        color: rgba(52, 211, 153, 0.95);
+      }
+
+      .main-tab.active::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -10px;
+        width: 84px;
+        height: 4px;
+        border-radius: 9999px;
+        background: linear-gradient(90deg, rgba(52, 211, 153, 0.95), rgba(34, 211, 238, 0.25));
+        box-shadow: 0 0 18px rgba(52, 211, 153, 0.18);
+      }
+
+      /* ===== Buttons (aligned with demo/AI工作台.html) ===== */
+      .btn-primary {
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 12px;
+        font-weight: 900;
+        color: #fff;
+        background: linear-gradient(135deg, #34d399, #34d399);
+        box-shadow: 0 4px 16px rgba(52, 211, 153, 0.3);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 15px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(52, 211, 153, 0.5), 0 0 40px rgba(52, 211, 153, 0.3);
+      }
+
+      .btn-primary:hover:not(:disabled)::before {
+        opacity: 1;
+      }
+
+      .btn-primary:active:not(:disabled) {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(52, 211, 153, 0.4);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .btn-secondary {
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 12px;
+        font-weight: 700;
+        color: rgba(244, 244, 245, 0.9);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 15px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(52, 211, 153, 0.4);
+        box-shadow: 0 0 16px rgba(52, 211, 153, 0.2);
+      }
+
+      .btn-secondary:active:not(:disabled) {
+        transform: scale(0.98);
+      }
+
+      .btn-primary:focus-visible,
+      .btn-secondary:focus-visible {
+        outline: 3px solid rgba(52, 211, 153, 0.16);
+        outline-offset: 2px;
+      }
+
+      .btn-sm {
+        height: 40px;
+        padding: 0 14px;
+        font-size: 14px;
+      }
+
+      .btn-pill {
+        height: 34px;
+        padding: 0 12px;
+        border-radius: 9999px;
+        font-weight: 900;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        color: rgba(244, 244, 245, 0.9);
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      }
+
+      .btn-pill:hover:not(:disabled) {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.07);
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.6);
+      }
+
+      .btn-pill:focus-visible {
+        outline: 3px solid rgba(52, 211, 153, 0.12);
+        outline-offset: 2px;
+      }
+
+      .btn-pill--cyan {
+        background: rgba(34, 211, 238, 0.10);
+        border-color: rgba(34, 211, 238, 0.30);
+        color: rgba(34, 211, 238, 0.95);
+      }
+
+      .feedback-toast {
+        position: fixed;
+        left: 50%;
+        bottom: 28px;
+        transform: translateX(-50%) translateY(16px);
+        z-index: 80;
+        min-width: 240px;
+        max-width: calc(100vw - 32px);
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: rgba(5, 8, 9, 0.86);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(52, 211, 153, 0.24);
+        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
+        color: rgba(244, 244, 245, 0.94);
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.5;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.28s ease, transform 0.28s ease;
+      }
+
+      .feedback-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .sim-loading-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 9999px;
+        background: rgba(34, 211, 238, 0.95);
+        box-shadow: 0 0 18px rgba(34, 211, 238, 0.45);
+        animation: simPulse 1s ease-in-out infinite;
+      }
+
+      .sim-loading-bar {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .sim-loading-bar::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg, transparent 0%, rgba(34, 211, 238, 0.55) 50%, transparent 100%);
+        animation: simSweep 1.1s ease-in-out infinite;
+      }
+
+      @keyframes simPulse {
+        0%, 100% { transform: scale(0.9); opacity: 0.65; }
+        50% { transform: scale(1.1); opacity: 1; }
+      }
+
+      @keyframes simSweep {
+        100% { transform: translateX(100%); }
+      }
+
+      /* ===== Segmented tabs (focus core, reduce density) ===== */
+      .seg-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+      }
+
+      .seg {
+        display: inline-flex;
+        gap: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .seg::-webkit-scrollbar {
+        height: 0;
+        display: none;
+      }
+
+      .seg-btn {
+        height: 34px;
+        padding: 0 12px;
+        border-radius: 12px;
+        font-weight: 900;
+        font-size: 12px;
+        color: rgba(244, 244, 245, 0.78);
+        white-space: nowrap;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .seg-btn svg {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        opacity: 0.92;
+      }
+
+      .seg-btn:hover {
+        transform: translateY(-1px);
+        border-color: rgba(52, 211, 153, 0.25);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      .seg-btn.active {
+        color: rgba(10, 20, 18, 0.98);
+        background: rgba(52, 211, 153, 0.95);
+        border-color: rgba(52, 211, 153, 0.65);
+        box-shadow: 0 18px 38px rgba(0, 0, 0, 0.55);
+      }
+
+      .seg-btn:focus-visible {
+        outline: 3px solid rgba(52, 211, 153, 0.14);
+        outline-offset: 2px;
+      }
+
+      .panel[hidden] {
+        display: none;
+      }
+
+      /* ===== Guided stepper (make intent obvious) ===== */
+      .howto {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .stepper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .step {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.22);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.10);
+      }
+
+      .step .n {
+        width: 28px;
+        height: 28px;
+        border-radius: 9999px;
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        font-size: 12px;
+        color: rgba(244, 244, 245, 0.82);
+        background: rgba(255, 255, 255, 0.06);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.10);
+        flex-shrink: 0;
+      }
+
+      .step .t {
+        font-weight: 900;
+        font-size: 12px;
+        color: rgba(244, 244, 245, 0.92);
+        line-height: 1.1;
+      }
+
+      .step .d {
+        margin-top: 2px;
+        font-size: 11px;
+        color: rgba(244, 244, 245, 0.55);
+        line-height: 1.2;
+      }
+
+      .step.active {
+        background: radial-gradient(120% 85% at 18% 8%, rgba(52, 211, 153, 0.16) 0%, rgba(34, 211, 238, 0.08) 42%, rgba(0, 0, 0, 0) 72%),
+          rgba(255, 255, 255, 0.03);
+        box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.22), 0 18px 40px rgba(0, 0, 0, 0.55);
+      }
+
+      .step.active .n {
+        color: rgba(10, 20, 18, 0.98);
+        background: rgba(52, 211, 153, 0.95);
+        box-shadow: 0 0 18px rgba(52, 211, 153, 0.18);
+      }
+
+      .helper {
+        max-width: 260px;
+        font-size: 12px;
+        line-height: 1.6;
+        color: rgba(244, 244, 245, 0.62);
+      }
+
+      .helper b {
+        color: rgba(244, 244, 245, 0.92);
+        font-weight: 900;
+      }
+
+      /* ===== Deal assistant UI (keep existing layout) ===== */
+      .wda-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 900;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(244, 244, 245, 0.78);
+        white-space: nowrap;
+      }
+
+      .wda-chip--ok {
+        border-color: rgba(52, 211, 153, 0.22);
+        background: rgba(52, 211, 153, 0.10);
+        color: rgba(190, 255, 232, 0.95);
+      }
+
+      .wda-chip--cyan {
+        border-color: rgba(34, 211, 238, 0.22);
+        background: rgba(34, 211, 238, 0.10);
+        color: rgba(190, 248, 255, 0.92);
+      }
+
+      .wda-chip--warn {
+        border-color: rgba(240, 179, 72, 0.22);
+        background: rgba(240, 179, 72, 0.10);
+        color: rgba(255, 228, 175, 0.92);
+      }
+
+      .wda-chip--danger {
+        border-color: rgba(222, 79, 133, 0.20);
+        background: rgba(222, 79, 133, 0.10);
+        color: rgba(255, 199, 220, 0.92);
+      }
+
+      .wda-item {
+        border-radius: 18px;
+        padding: 12px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.03);
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      }
+
+      .wda-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(52, 211, 153, 0.22);
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.6);
+      }
+
+      .wda-input,
+      .wda-select,
+      .wda-textarea {
+        width: 100%;
+        border-radius: 16px;
+        padding: 10px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(0, 0, 0, 0.22);
+        color: rgba(244, 244, 245, 0.88);
+        outline: none;
+      }
+
+      .wda-input:focus,
+      .wda-select:focus,
+      .wda-textarea:focus {
+        border-color: rgba(52, 211, 153, 0.35);
+        box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.10);
+      }
+
+      .wda-textarea {
+        min-height: 112px;
+        resize: vertical;
+        line-height: 1.6;
+      }
+
+      .wda-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 90;
+        background: rgba(0, 0, 0, 0.62);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s ease;
+      }
+
+      .wda-overlay.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .wda-drawer {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -110%;
+        z-index: 100;
+        width: min(580px, calc(100vw - 32px));
+        max-height: 84vh;
+        overflow: auto;
+        border-radius: 22px 22px 0 0;
+        background: rgba(5, 8, 9, 0.92);
+        backdrop-filter: blur(18px);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.78);
+        transition: bottom 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .wda-drawer.show {
+        bottom: 0;
+      }
+
+      .wda-handle {
+        height: 5px;
+        width: 46px;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.14);
+        margin: 10px auto 6px;
+      }
+
+      .wda-modal-wrap {
+        position: fixed;
+        inset: 0;
+        z-index: 110;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.68);
+      }
+
+      .wda-modal-wrap.show {
+        display: flex;
+      }
+
+      .wda-modal {
+        width: min(560px, 100%);
+        border-radius: 22px;
+        background: rgba(5, 8, 9, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.78);
+        overflow: hidden;
+      }
+
+      .wda-modal-head {
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .wda-modal-body { padding: 14px 16px; }
+      .wda-modal-foot { padding: 12px 16px 16px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+      .wda-spin {
+        width: 16px;
+        height: 16px;
+        border-radius: 9999px;
+        border: 2px solid rgba(244, 244, 245, 0.18);
+        border-top-color: rgba(34, 211, 238, 0.95);
+        box-shadow: 0 0 18px rgba(34, 211, 238, 0.22);
+        animation: wdaSpin 0.9s linear infinite;
+      }
+
+      @keyframes wdaSpin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-black text-white">
+    <div class="min-h-screen bg-shell">
+      <div class="mx-auto w-full max-w-[580px] px-4 pt-4 pb-10">
+
+        <!-- 主 tabs -->
+        <div class="mt-2 flex items-end justify-center gap-12">
+          <button type="button" class="main-tab text-2xl font-black text-zinc-200/85">AI工作台</button>
+          <button type="button" class="main-tab active text-2xl font-black text-zinc-200/85">成交助手</button>
+        </div>
+
+        <!-- Header / KPIs -->
+        <div class="mt-5 gstroke p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-lg font-black tracking-tight text-zinc-100">微信成交助手</div>
+              <div class="mt-1 text-xs leading-5 text-zinc-200/60">
+                <span class="text-emerald-200/90 font-black">多订座 · 少跑单 · 促复购</span>
+                <span class="text-zinc-200/55">（不代发）</span>
+              </div>
+            </div>
+            <button class="btn-secondary btn-sm" type="button" data-action="openSettings">设置</button>
+          </div>
+
+          <div class="mt-4 grid grid-cols-3 gap-2">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+              <div class="text-[11px] font-black tracking-wide text-zinc-200/55">机会金额</div>
+              <div class="mt-1 text-[18px] font-black text-zinc-100" id="wdaKpiPotential">—</div>
+              <div class="mt-1 text-[11px] text-zinc-200/55">Top3 预估</div>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+              <div class="text-[11px] font-black tracking-wide text-zinc-200/55">跟进</div>
+              <div class="mt-1 text-[18px] font-black text-zinc-100" id="wdaKpiDue">—</div>
+              <div class="mt-1 text-[11px] text-zinc-200/55">今天/逾期</div>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+              <div class="text-[11px] font-black tracking-wide text-zinc-200/55">老客激活</div>
+              <div class="mt-1 text-[18px] font-black text-zinc-100" id="wdaKpiRebuy">—</div>
+              <div class="mt-1 text-[11px] text-zinc-200/55">沉默≥30天</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Segmented navigation (keep your existing layout) -->
+        <div class="mt-4 flex justify-center">
+          <div class="seg-wrap">
+            <div class="seg" id="wdaSeg">
+              <button class="seg-btn active" type="button" data-sec="radar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M2.25 18.75h19.5" />
+                  <path d="M2.25 14.25h19.5" opacity="0.65" />
+                  <path d="M2.25 9.75h19.5" opacity="0.4" />
+                  <path d="M6 18.75V6.75a.75.75 0 0 1 1.5 0v12" />
+                  <path d="M11.25 18.75V3.75a.75.75 0 0 1 1.5 0v15" />
+                  <path d="M16.5 18.75V10.5a.75.75 0 0 1 1.5 0v8.25" />
+                </svg>
+                雷达
+              </button>
+              <button class="seg-btn" type="button" data-sec="customers">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M15 19.128a9.38 9.38 0 0 0 2.625.372c1.716 0 3.344-.46 4.5-1.257a2.25 2.25 0 0 0 0-3.686c-1.156-.797-2.784-1.257-4.5-1.257-.961 0-1.89.144-2.738.41" opacity="0.65" />
+                  <path d="M16.5 7.125a3.375 3.375 0 1 1-6.75 0a3.375 3.375 0 0 1 6.75 0Z" />
+                  <path d="M4.5 20.25a6.75 6.75 0 0 1 13.5 0v.75H4.5v-.75Z" />
+                </svg>
+                客户
+              </button>
+              <button class="seg-btn" type="button" data-sec="tasks">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M9 12.75l2.25 2.25L15 11.25" />
+                  <path d="M9 6.75h10.5" opacity="0.65" />
+                  <path d="M9 9.75h10.5" opacity="0.4" />
+                  <path d="M4.5 19.5V4.5A2.25 2.25 0 0 1 6.75 2.25h10.5A2.25 2.25 0 0 1 19.5 4.5v15a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5Z" />
+                </svg>
+                待办
+              </button>
+              <button class="seg-btn" type="button" data-sec="copilot">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+                  <path d="M18.259 8.715 18 9.75l-.259-1.035a2.25 2.25 0 0 0-1.591-1.591L15.115 6.75 16.15 6.49a2.25 2.25 0 0 0 1.591-1.591L18 3.864l.259 1.035a2.25 2.25 0 0 0 1.591 1.591L20.885 6.75l-1.035.259a2.25 2.25 0 0 0-1.591 1.591Z" opacity="0.7" />
+                  <path d="M16.894 20.25 16.5 21.75l-.394-1.5a2.25 2.25 0 0 0-1.5-1.5l-1.5-.394 1.5-.394a2.25 2.25 0 0 0 1.5-1.5l.394-1.5.394 1.5a2.25 2.25 0 0 0 1.5 1.5l1.5.394-1.5.394a2.25 2.25 0 0 0-1.5 1.5Z" opacity="0.55" />
+                </svg>
+                自动跟进
+              </button>
+              <button class="seg-btn" type="button" data-sec="safety">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M9 12.75 11.25 15 15 9.75" />
+                  <path d="M12 2.25 4.5 5.625V12c0 5.25 3.75 9.75 7.5 9.75s7.5-4.5 7.5-9.75V5.625L12 2.25Z" />
+                </svg>
+                风控
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="mt-4 space-y-3 pb-16" id="wdaPanelRoot"></div>
+
+      </div>
+    </div>
+
+    <div class="feedback-toast" id="wdaToast" role="status" aria-live="polite"></div>
+
+    <div class="wda-overlay" id="wdaOverlay" data-action="closeDrawer"></div>
+    <div class="wda-drawer" id="wdaDrawer" aria-label="客户详情抽屉">
+      <div class="wda-handle"></div>
+      <div class="px-4 pb-6" id="wdaDrawerBody"></div>
+    </div>
+
+    <div class="wda-modal-wrap" id="wdaModalWrap" role="dialog" aria-modal="true">
+      <div class="wda-modal">
+        <div class="wda-modal-head">
+          <div class="text-base font-black" id="wdaModalTitle">设置</div>
+          <button class="btn-secondary btn-sm" type="button" data-action="closeModal">关闭</button>
+        </div>
+        <div class="wda-modal-body" id="wdaModalBody"></div>
+        <div class="wda-modal-foot" id="wdaModalFoot"></div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const LS_KEY = "wechat_agent_deal_assistant_v2";
+        const now = () => new Date();
+        const uid = () => Math.random().toString(16).slice(2) + "-" + Math.random().toString(16).slice(2);
+        const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+        const fmtMoney = (n) => "¥" + Number(n || 0).toLocaleString("zh-CN");
+
+        function safeJsonParse(text, fallback) {
+          try { return JSON.parse(text); } catch { return fallback; }
+        }
+
+        function toast(message, ms = 1700) {
+          const el = document.getElementById("wdaToast");
+          el.textContent = message;
+          el.classList.add("show");
+          window.clearTimeout(toast._t);
+          toast._t = window.setTimeout(() => el.classList.remove("show"), ms);
+        }
+
+        function escapeHtml(str) {
+          return String(str ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll("\"", "&quot;")
+            .replaceAll("'", "&#39;");
+        }
+
+        function loadState() {
+          const raw = localStorage.getItem(LS_KEY);
+          if (!raw) return null;
+          return safeJsonParse(raw, null);
+        }
+
+        function saveState(s) {
+          try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch {}
+        }
+
+        function seedState() {
+          const base = now();
+          const hoursAgo = (h) => new Date(base.getTime() - h * 3600 * 1000).toISOString();
+          const daysAgo = (d) => new Date(base.getTime() - d * 24 * 3600 * 1000).toISOString();
+          const daysFromNow = (d) => new Date(base.getTime() + d * 24 * 3600 * 1000).toISOString();
+
+          const leads = [
+            {
+              id: "l1",
+              name: "李女士",
+              alias: "包间预订",
+              stage: "预订待定金",
+              tags: ["包间", "周末", "多人"],
+              value_estimate: 3200,
+              last_touch_at: hoursAgo(52),
+              channel: "好友",
+              signals: [
+                { k: "问包间/档期", w: 3 },
+                { k: "问套餐/人均", w: 2 },
+                { k: "已确认人数区间", w: 1 }
+              ],
+              notes: "纠结包间费/最低消费；希望上菜快、口味稳定。",
+              chat_evidence: [
+                "对方问：周六晚上还有包间吗？",
+                "对方问：人均大概多少？有推荐套餐吗？",
+                "你已发：2套菜单截图（未确认是否看完）"
+              ],
+              last_summary: "包间预订高意向；关键是档期确认 + 套餐/最低消费讲清楚。",
+              next_best_action: "确认档期 + 发2档套餐对比 + 收定金",
+              risk: "未收定金，容易被其他店抢走"
+            },
+            {
+              id: "l2",
+              name: "王先生",
+              alias: "生日宴",
+              stage: "菜单确认",
+              tags: ["生日", "蛋糕", "布置"],
+              value_estimate: 5800,
+              last_touch_at: daysAgo(4),
+              channel: "好友",
+              signals: [
+                { k: "问可否自带蛋糕", w: 2 },
+                { k: "问包间/布置", w: 2 },
+                { k: "问定金规则", w: 2 }
+              ],
+              notes: "需要一点仪式感；更在意服务态度与流程清晰。",
+              chat_evidence: [
+                "对方问：可以自带蛋糕吗？要收开台费吗？",
+                "对方问：能不能简单布置一下？",
+                "你承诺：发菜单与定金说明（未发）"
+              ],
+              last_summary: "需要明确规则与菜单选择，降低决策成本。",
+              next_best_action: "发菜单 + 定金/布置规则 + 确认到店时间",
+              risk: "规则不清晰会导致反复沟通或流失"
+            },
+            {
+              id: "l3",
+              name: "陈小姐",
+              alias: "工作日聚餐",
+              stage: "到店意向",
+              tags: ["工作日", "同事聚餐", "开票"],
+              value_estimate: 1800,
+              last_touch_at: hoursAgo(28),
+              channel: "群聊",
+              signals: [
+                { k: "问位置/停车", w: 2 },
+                { k: "问能否开票", w: 2 },
+                { k: "问是否需要预订", w: 1 }
+              ],
+              notes: "担心排队；需要停车/路线信息。",
+              chat_evidence: [
+                "对方问：你们这边停车方便吗？",
+                "对方问：可以开专票吗？",
+                "对方说：我们大概 8-10 人"
+              ],
+              last_summary: "到店意向明确；关键是路线/停车/预订方式一次讲清。",
+              next_best_action: "发定位/停车指引 + 建议提前预订",
+              risk: "临时来店排队会放弃"
+            },
+            {
+              id: "l4",
+              name: "赵女士",
+              alias: "外卖复购",
+              stage: "复购机会",
+              tags: ["已消费", "口味偏好", "外卖"],
+              value_estimate: 260,
+              last_touch_at: daysAgo(9),
+              channel: "好友",
+              signals: [
+                { k: "上次评价不错", w: 2 },
+                { k: "有浏览菜单", w: 2 },
+                { k: "沉默中", w: 1 }
+              ],
+              notes: "偏清淡/微辣；可推新品与组合套餐。",
+              chat_evidence: [
+                "对方说：上次那份还不错，下次想换个口味",
+                "你回复：可以推荐新品（未跟进）"
+              ],
+              last_summary: "已消费用户；用“口味偏好 + 新品组合”促二次下单。",
+              next_best_action: "发新品/组合推荐 + 轻提示优惠券",
+              risk: "不触达容易被其它店替代"
+            },
+            {
+              id: "l5",
+              name: "张总",
+              alias: "企业团建",
+              stage: "复购机会",
+              tags: ["已消费", "可转介绍", "大单"],
+              value_estimate: 8800,
+              last_touch_at: daysAgo(35),
+              channel: "好友",
+              signals: [
+                { k: "上次反馈满意", w: 3 },
+                { k: "近期活动季", w: 2 },
+                { k: "沉默>30天", w: 2 }
+              ],
+              notes: "更在意上菜效率与发票/结算方式。",
+              chat_evidence: [
+                "上次消费：包间 + 团餐套餐，反馈很好",
+                "对方朋友圈：最近在组织活动/聚餐"
+              ],
+              last_summary: "老客大单潜力；用“活动档期 + 套餐升级”重启对话。",
+              next_best_action: "问活动时间 + 给团建套餐升级点",
+              risk: "不维护会丢掉复购与转介绍"
+            }
+          ];
+
+          const tasks = [
+            { id: uid(), lead_id: "l1", title: "确认包间档期 + 发套餐对比 + 收定金", due_at: daysFromNow(0), status: "due" },
+            { id: uid(), lead_id: "l2", title: "发送菜单 + 定金/布置规则 + 确认到店时间", due_at: daysAgo(1), status: "overdue" },
+            { id: uid(), lead_id: "l3", title: "发送定位/停车指引 + 建议提前预订", due_at: daysFromNow(0), status: "due" },
+            { id: uid(), lead_id: "l5", title: "老客激活：活动时间 + 团建套餐升级点", due_at: daysFromNow(2), status: "planned" }
+          ];
+
+          return {
+            ui: { sec: "radar", drawer_open: false, selected_lead_id: null, customer_q: "", customer_stage: "全部", followup_lead_id: "l1", followup_inbound: "", followup_plan: null },
+            prefs: {
+              persona: "私域商家",
+              followup: { enabled: true, auto_queue: true, demo_send: false },
+              safety: { never_auto_send: true, never_mass_message: true, never_auto_add: true, require_confirm: true, local_first: true }
+            },
+            db: { leads, tasks, outbox: [] }
+          };
+        }
+
+        function normalizeState(s) {
+          if (!s || typeof s !== "object") return seedState();
+          s.ui = s.ui && typeof s.ui === "object" ? s.ui : {};
+          s.prefs = s.prefs && typeof s.prefs === "object" ? s.prefs : {};
+          s.prefs.safety = s.prefs.safety && typeof s.prefs.safety === "object" ? s.prefs.safety : {};
+          s.prefs.followup = s.prefs.followup && typeof s.prefs.followup === "object" ? s.prefs.followup : { enabled: true, auto_queue: true, demo_send: false };
+
+          s.db = s.db && typeof s.db === "object" ? s.db : {};
+          s.db.leads = Array.isArray(s.db.leads) ? s.db.leads : [];
+          s.db.tasks = Array.isArray(s.db.tasks) ? s.db.tasks : [];
+          s.db.outbox = Array.isArray(s.db.outbox) ? s.db.outbox : [];
+
+          // migrate older "copilot" fields (if any)
+          if (!("followup_lead_id" in s.ui) && "copilot_lead_id" in s.ui) s.ui.followup_lead_id = s.ui.copilot_lead_id;
+          if (!("followup_inbound" in s.ui) && "copilot_input" in s.ui) s.ui.followup_inbound = s.ui.copilot_input;
+          if (!("followup_plan" in s.ui)) s.ui.followup_plan = null;
+
+          if (!s.ui.followup_lead_id) s.ui.followup_lead_id = (s.db.leads[0] && s.db.leads[0].id) || "l1";
+          if (typeof s.ui.followup_inbound !== "string") s.ui.followup_inbound = "";
+
+          if (typeof s.prefs.followup.enabled !== "boolean") s.prefs.followup.enabled = true;
+          if (typeof s.prefs.followup.auto_queue !== "boolean") s.prefs.followup.auto_queue = true;
+          if (typeof s.prefs.followup.demo_send !== "boolean") s.prefs.followup.demo_send = false;
+
+          return s;
+        }
+
+        function getLead(id) {
+          return state.db.leads.find((l) => l.id === id) || null;
+        }
+
+        function computeScore(lead) {
+          const ageH = (now().getTime() - new Date(lead.last_touch_at).getTime()) / 3600 / 1000;
+          const stage = String(lead.stage || "");
+          const stageBoost =
+            stage.includes("预订待定金") ? 34 :
+            stage.includes("菜单确认") ? 28 :
+            stage.includes("预订") ? 24 :
+            stage.includes("到店意向") ? 20 :
+            stage.includes("到店") ? 18 :
+            stage.includes("复购") ? 14 :
+            stage.includes("新客") ? 12 : 10;
+          const valueBoost = clamp(Math.log10((lead.value_estimate || 0) + 10) * 10, 6, 28);
+          const signalBoost = (lead.signals || []).reduce((s, x) => s + (Number(x.w) || 0) * 3, 0);
+          const urgency = clamp(ageH / 6, 0, 18);
+          return Math.round(stageBoost + valueBoost + signalBoost + urgency);
+        }
+
+        function scoreLabel(score) {
+          if (score >= 88) return { text: "高意向", cls: "wda-chip--ok" };
+          if (score >= 72) return { text: "需要推进", cls: "wda-chip--cyan" };
+          if (score >= 58) return { text: "别漏掉", cls: "wda-chip--warn" };
+          return { text: "可稍后", cls: "" };
+        }
+
+        function fmtRelTime(iso) {
+          const ms = now().getTime() - new Date(iso).getTime();
+          const h = Math.max(0, Math.round(ms / 3600 / 1000));
+          if (h < 24) return `${h}小时`;
+          const d = Math.round(h / 24);
+          return `${d}天`;
+        }
+
+        function renderKpis() {
+          const leads = state.db.leads;
+          const top3 = [...leads].sort((a, b) => computeScore(b) - computeScore(a)).slice(0, 3);
+          const potential = top3.reduce((s, l) => s + (Number(l.value_estimate) || 0), 0);
+          const overdue = state.db.tasks.filter((t) => t.status === "overdue").length;
+          const due = state.db.tasks.filter((t) => t.status === "due").length;
+          const rebuy = leads
+            .filter((l) => String(l.stage || "").includes("复购") || (l.tags || []).includes("已消费"))
+            .filter((l) => (now().getTime() - new Date(l.last_touch_at).getTime()) / 86400000 >= 30).length;
+          document.getElementById("wdaKpiPotential").textContent = fmtMoney(potential);
+          document.getElementById("wdaKpiDue").textContent = `${due}/${overdue}`;
+          document.getElementById("wdaKpiRebuy").textContent = String(rebuy);
+        }
+
+        function setSec(sec) {
+          const allowedSecs = new Set(["radar", "customers", "tasks", "copilot", "safety"]);
+          state.ui.sec = allowedSecs.has(sec) ? sec : "radar";
+          saveState(state);
+          document.querySelectorAll("#wdaSeg [data-sec]").forEach((b) => b.classList.toggle("active", b.dataset.sec === state.ui.sec));
+          render();
+        }
+
+        function renderRadar() {
+          const daysSince = (iso) => (now().getTime() - new Date(iso).getTime()) / 86400000;
+          const isActivation = (l) => (String(l.stage || "").includes("复购") || (l.tags || []).includes("已消费")) && daysSince(l.last_touch_at) >= 30;
+
+          const ranked = [...state.db.leads].map((l) => ({ l, s: computeScore(l) })).sort((a, b) => b.s - a.s);
+          const dealLeads = ranked.filter(({ l }) => !isActivation(l));
+          const activationLeads = ranked
+            .filter(({ l }) => isActivation(l))
+            .map(({ l, s }) => ({ l, s, silent: Math.round(daysSince(l.last_touch_at)) }));
+
+          return `
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">今日雷达</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">按“意向 + 客单 + 漏单风险”排序。</div>
+                </div>
+                <button class="btn-secondary btn-sm" type="button" data-action="explainRadar">规则</button>
+              </div>
+              <div class="mt-3 grid gap-2">
+                ${dealLeads.map(({ l, s }) => {
+                  const lb = scoreLabel(s);
+                  const risk = String(l.risk || "").includes("当天") ? `<span class="wda-chip wda-chip--danger">窗口期</span>` : `<span class="wda-chip wda-chip--warn">易漏</span>`;
+                  return `
+                    <div class="wda-item" data-action="openLead" data-id="${escapeHtml(l.id)}">
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                          <div class="font-black text-zinc-100 truncate">${escapeHtml(l.name)} <span class="text-zinc-200/55 font-black">· ${escapeHtml(l.alias)}</span></div>
+                          <div class="mt-1 text-xs text-zinc-200/60">
+                            上次触达：${escapeHtml(fmtRelTime(l.last_touch_at))}前 · 阶段：<span class="text-zinc-100/85 font-black">${escapeHtml(l.stage)}</span>
+                          </div>
+                          <div class="mt-2 flex flex-wrap gap-2">
+                            <span class="wda-chip ${escapeHtml(lb.cls)}">${escapeHtml(lb.text)} · ${escapeHtml(s)}分</span>
+                            ${risk}
+                            <span class="wda-chip">${escapeHtml(fmtMoney(l.value_estimate))}</span>
+                            <span class="wda-chip wda-chip--cyan">下一步：${escapeHtml(l.next_best_action)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            </div>
+
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">老客激活</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">沉默≥30天的已消费客户，给开场话术并加入跟进清单。</div>
+                </div>
+                <button class="btn-secondary btn-sm" type="button" data-action="rebuyPlaybook">怎么做</button>
+              </div>
+
+              <div class="mt-3 grid gap-2">
+                ${activationLeads.length ? activationLeads.map(({ l, silent }) => `
+                  <div class="wda-item" data-action="openLead" data-id="${escapeHtml(l.id)}">
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <div class="font-black text-zinc-100 truncate">${escapeHtml(l.name)} <span class="text-zinc-200/55 font-black">· ${escapeHtml(l.alias)}</span></div>
+                        <div class="mt-1 text-xs text-zinc-200/60">沉默：${escapeHtml(String(silent))}天 · 预估：${escapeHtml(fmtMoney(l.value_estimate))}</div>
+                        <div class="mt-2 flex flex-wrap gap-2">
+                          <span class="wda-chip wda-chip--warn">沉默</span>
+                          <span class="wda-chip">${escapeHtml(l.stage)}</span>
+                          <span class="wda-chip wda-chip--cyan">开场话术</span>
+                        </div>
+                      </div>
+                      <div class="shrink-0">
+                        <button class="btn-primary btn-sm" type="button" data-action="rebuyNudge" data-id="${escapeHtml(l.id)}">生成开场</button>
+                      </div>
+                    </div>
+                  </div>
+                `).join("") : `
+                  <div class="rounded-2xl border border-white/10 bg-white/5 p-3 text-xs text-zinc-200/60">
+                    暂无可激活客户。
+                  </div>
+                `}
+              </div>
+            </div>
+          `;
+        }
+
+        function renderCustomers() {
+          const q = String(state.ui.customer_q || "").trim().toLowerCase();
+          const stage = state.ui.customer_stage || "全部";
+          const stages = ["全部", ...Array.from(new Set(state.db.leads.map((l) => l.stage).filter(Boolean)))];
+          const leads = state.db.leads
+            .filter((l) => {
+              const hay = (l.name + " " + l.alias + " " + (l.tags || []).join(" ")).toLowerCase();
+              if (q && !hay.includes(q)) return false;
+              if (stage !== "全部" && l.stage !== stage) return false;
+              return true;
+            })
+            .map((l) => ({ l, s: computeScore(l) }))
+            .sort((a, b) => b.s - a.s);
+
+          return `
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">客户库</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">阶段 · 标签 · 备注</div>
+                </div>
+                <button class="btn-secondary btn-sm" type="button" data-action="newLead">新增客户</button>
+              </div>
+
+              <div class="mt-3 grid gap-2">
+                <input class="wda-input" placeholder="搜索客户 / 标签" value="${escapeHtml(state.ui.customer_q || "")}" data-action="customerSearch" />
+                <div class="flex flex-wrap gap-2">
+                  ${stages.map((s) => `<button class="btn-pill ${s === stage ? "btn-pill--cyan" : ""}" type="button" data-action="customerStage" data-stage="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join("")}
+                </div>
+              </div>
+
+              <div class="mt-3 grid gap-2">
+                ${leads.map(({ l, s }) => {
+                  const lb = scoreLabel(s);
+                  return `
+                    <div class="wda-item" data-action="openLead" data-id="${escapeHtml(l.id)}">
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                          <div class="font-black text-zinc-100 truncate">${escapeHtml(l.name)} <span class="text-zinc-200/55 font-black">· ${escapeHtml(l.alias)}</span></div>
+                          <div class="mt-1 text-xs text-zinc-200/60">阶段：<span class="text-zinc-100/85 font-black">${escapeHtml(l.stage)}</span> · 上次：${escapeHtml(fmtRelTime(l.last_touch_at))}前</div>
+                          <div class="mt-2 flex flex-wrap gap-2">
+                            <span class="wda-chip ${escapeHtml(lb.cls)}">${escapeHtml(lb.text)} · ${escapeHtml(s)}分</span>
+                            <span class="wda-chip">${escapeHtml(fmtMoney(l.value_estimate))}</span>
+                            ${(l.tags || []).slice(0, 2).map((t) => `<span class="wda-chip">${escapeHtml(t)}</span>`).join("")}
+                            ${(l.tags || []).length > 2 ? `<span class="wda-chip">+${(l.tags || []).length - 2}</span>` : ``}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            </div>
+          `;
+        }
+
+        function renderTasks() {
+          const tasks = [...state.db.tasks].sort((a, b) => new Date(a.due_at) - new Date(b.due_at));
+          const counts = {
+            overdue: tasks.filter((t) => t.status === "overdue").length,
+            due: tasks.filter((t) => t.status === "due").length,
+            planned: tasks.filter((t) => t.status === "planned").length
+          };
+
+          return `
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">跟进清单</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">把下一步写成待办。</div>
+                </div>
+                <button class="btn-primary btn-sm" type="button" data-action="quickTask">添加待办</button>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <span class="wda-chip wda-chip--danger">逾期 ${escapeHtml(counts.overdue)}</span>
+                <span class="wda-chip wda-chip--warn">今天 ${escapeHtml(counts.due)}</span>
+                <span class="wda-chip">计划 ${escapeHtml(counts.planned)}</span>
+              </div>
+
+              <div class="mt-3 grid gap-2">
+                ${tasks.map((t) => {
+                  const lead = getLead(t.lead_id);
+                  const chip =
+                    t.status === "overdue" ? `<span class="wda-chip wda-chip--danger">逾期</span>` :
+                    t.status === "due" ? `<span class="wda-chip wda-chip--warn">今天</span>` :
+                    t.status === "done" ? `<span class="wda-chip wda-chip--ok">完成</span>` : `<span class="wda-chip">计划</span>`;
+                  return `
+                    <div class="wda-item" data-action="openLead" data-id="${escapeHtml(t.lead_id)}">
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                          <div class="font-black text-zinc-100 truncate">${escapeHtml(lead ? (lead.name + " · " + lead.alias) : "未知客户")}</div>
+                          <div class="mt-1 text-sm text-zinc-100/80 leading-6">${escapeHtml(t.title)}</div>
+                          <div class="mt-2 flex flex-wrap gap-2">
+                            ${chip}
+                            <span class="wda-chip wda-chip--cyan">到期：${escapeHtml(new Date(t.due_at).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }))}</span>
+                          </div>
+                        </div>
+                        <div class="shrink-0 flex flex-col gap-2">
+                          <button class="btn-secondary btn-sm" type="button" data-action="taskDone" data-task="${escapeHtml(t.id)}">完成</button>
+                          <button class="btn-secondary btn-sm" type="button" data-action="taskSnooze" data-task="${escapeHtml(t.id)}">延后</button>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            </div>
+          `;
+        }
+
+        function renderCopilot() {
+          const lead = getLead(state.ui.followup_lead_id) || state.db.leads[0];
+          const inbound = String(state.ui.followup_inbound || "");
+          const plan = state.ui.followup_plan && state.ui.followup_plan.lead_id === lead.id ? state.ui.followup_plan : null;
+          const follow = state.prefs.followup || { enabled: true, auto_queue: true, demo_send: false };
+          const demoSendAllowed = !state.prefs.safety.never_auto_send;
+          const demoSend = !!follow.demo_send && demoSendAllowed;
+
+          const outbox = outboxItems()
+            .filter((m) => m.status === "queued" || m.status === "sent")
+            .sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
+
+          const renderOutbox = () => {
+            if (!outbox.length) {
+              return `<div class="text-xs text-zinc-200/55">暂无队列。</div>`;
+            }
+            return outbox.slice(0, 10).map((m) => {
+              const leadName = (getLead(m.lead_id)?.name || "客户");
+              const timeText = new Date(m.scheduled_at).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+              const statusChip = m.status === "sent" ? `<span class="wda-chip wda-chip--ok">已发送</span>` : `<span class="wda-chip wda-chip--warn">待发送</span>`;
+              return `
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <div class="text-sm font-black text-zinc-100/85">${escapeHtml(leadName)} · ${escapeHtml(m.label || "跟进")}</div>
+                      <div class="mt-1 text-xs text-zinc-200/60">时间：${escapeHtml(timeText)}</div>
+                      <div class="mt-2 text-sm text-zinc-100/80 leading-6 whitespace-pre-wrap">${escapeHtml(m.text || "")}</div>
+                      <div class="mt-2 flex flex-wrap gap-2">
+                        ${statusChip}
+                        <button class="btn-secondary btn-sm" type="button" data-action="copyText" data-text="${escapeHtml(m.text || "")}">复制</button>
+                        ${m.status === "queued" ? `<button class="btn-secondary btn-sm" type="button" data-action="outboxCancel" data-msg="${escapeHtml(m.id)}">取消</button>` : ``}
+                        ${m.status === "queued" ? `<button class="btn-primary btn-sm" type="button" data-action="outboxMarkSent" data-msg="${escapeHtml(m.id)}">${demoSend ? "发送(演示)" : "标记已发"}</button>` : ``}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join("");
+          };
+
+          return `
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">自动回复</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">收到消息后自动回复，并安排 2 次跟进（进入队列）。</div>
+                </div>
+                <div class="flex flex-wrap gap-2 justify-end">
+                  <span class="wda-chip ${follow.enabled ? "wda-chip--ok" : "wda-chip--warn"}">${follow.enabled ? "已开启" : "已关闭"}</span>
+                  <button class="btn-secondary btn-sm" type="button" data-action="toggleFollowupEnabled">${follow.enabled ? "关闭" : "开启"}</button>
+                  <button class="btn-secondary btn-sm" type="button" data-action="followupReset">清空</button>
+                </div>
+              </div>
+
+              <div class="mt-3 grid gap-2">
+                <div class="grid gap-1">
+                  <div class="text-xs font-black text-zinc-200/60">跟进对象</div>
+                  <select class="wda-select" data-action="followupLead">
+                    ${state.db.leads.map((l) => `<option value="${escapeHtml(l.id)}"${l.id === lead.id ? " selected" : ""}>${escapeHtml(l.name)} · ${escapeHtml(l.alias)}（${escapeHtml(l.stage)}）</option>`).join("")}
+                  </select>
+                </div>
+
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div class="text-xs font-black text-zinc-200/60">线索摘要</div>
+                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">${escapeHtml(lead.last_summary)}</div>
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    ${(lead.tags || []).slice(0, 3).map((t) => `<span class="wda-chip">${escapeHtml(t)}</span>`).join("")}
+                    <span class="wda-chip wda-chip--cyan">下一步：${escapeHtml(lead.next_best_action)}</span>
+                  </div>
+                </div>
+
+                <textarea class="wda-textarea" placeholder="对方发来的一句话（用于自动回复）" data-action="followupInbound">${escapeHtml(inbound)}</textarea>
+
+                <div class="flex flex-wrap gap-2">
+                  <button class="btn-secondary btn-sm" type="button" data-action="followupSimInbound">模拟收到</button>
+                  <button class="btn-secondary btn-sm" type="button" data-action="toggleFollowupAutoQueue">${follow.auto_queue ? "自动入队：开" : "自动入队：关"}</button>
+                  <button class="btn-secondary btn-sm" type="button" data-action="toggleFollowupDemoSend" ${demoSendAllowed ? "" : "disabled"}>${demoSendAllowed ? (demoSend ? "自动发送(演示)：开" : "自动发送(演示)：关") : "自动发送：已禁用"}</button>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                  <button class="btn-primary btn-sm" type="button" data-action="followupGenerate">生成回复+跟进</button>
+                  <button class="btn-primary btn-sm" type="button" data-action="followupEnqueue">加入队列</button>
+                  <button class="btn-secondary btn-sm" type="button" data-action="outboxClear">清空待发送</button>
+                </div>
+
+                ${plan ? `
+                  <div class="gstroke p-3">
+                    <div class="text-xs font-black text-zinc-200/60">跟进计划</div>
+                    <div class="mt-2 grid gap-2">
+                      ${plan.items.map((it) => `
+                        <div class="wda-item" data-action="copyText" data-text="${escapeHtml(it.text)}">
+                          <div class="text-xs font-black text-zinc-200/55">${escapeHtml(it.label)}</div>
+                          <div class="mt-1 text-sm text-zinc-100/85 leading-6 whitespace-pre-wrap">${escapeHtml(it.text)}</div>
+                          <div class="mt-2 flex flex-wrap gap-2">
+                            <span class="wda-chip wda-chip--ok">点击复制</span>
+                            <span class="wda-chip">${escapeHtml(it.delay_h === 0 ? "现在" : `+${it.delay_h}h`)}</span>
+                          </div>
+                        </div>
+                      `).join("")}
+                    </div>
+                    <div class="mt-2 text-xs text-zinc-200/55">入队后会出现在下面的“发送队列”。</div>
+                  </div>
+                ` : `
+                  <div class="text-xs text-zinc-200/55 leading-5">用法：粘贴一句对方消息 → 生成 → 入队（自动回复 + 2 次跟进）。</div>
+                `}
+
+                <div class="gstroke p-3">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="text-xs font-black text-zinc-200/60">发送队列</div>
+                      <div class="mt-1 text-xs text-zinc-200/55">默认不代发；可在安全边界里关闭“不自动发送”后开启演示自动发送。</div>
+                    </div>
+                  </div>
+                  <div class="mt-2 grid gap-2">
+                    ${renderOutbox()}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        function renderSafety() {
+          const s = state.prefs.safety;
+          const row = (key, title, desc) => `
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="font-black text-zinc-100">${escapeHtml(title)}</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">${escapeHtml(desc)}</div>
+                </div>
+                <button class="btn-secondary btn-sm" type="button" data-action="toggleSafety" data-key="${escapeHtml(key)}">${s[key] ? "已开启" : "已关闭"}</button>
+              </div>
+            </div>
+          `;
+          return `
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">安全边界</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">只提醒/总结/复制，不代发。</div>
+                </div>
+                <button class="btn-secondary btn-sm" type="button" data-action="resetAll">恢复示例</button>
+              </div>
+              <div class="mt-3 grid gap-2">
+                ${row("never_auto_send", "不自动发送消息", "只生成与复制。")}
+                ${row("never_mass_message", "禁止群发/刷屏", "不做群发动作。")}
+                ${row("never_auto_add", "禁止自动加好友", "不做自动加人。")}
+                ${row("require_confirm", "每条建议都需确认", "默认需要确认。")}
+                ${row("local_first", "本地优先（可选）", "优先本地存储/计算。")}
+              </div>
+            </div>
+          `;
+        }
+
+        function render() {
+          const root = document.getElementById("wdaPanelRoot");
+          const sec = state.ui.sec || "radar";
+          const html =
+            sec === "radar" ? renderRadar() :
+            sec === "customers" ? renderCustomers() :
+            sec === "tasks" ? renderTasks() :
+            sec === "copilot" ? renderCopilot() :
+            sec === "safety" ? renderSafety() : renderRadar();
+          root.innerHTML = html;
+          renderKpis();
+        }
+
+        function openDrawer(html) {
+          state.ui.drawer_open = true;
+          saveState(state);
+          document.getElementById("wdaDrawerBody").innerHTML = html;
+          document.getElementById("wdaOverlay").classList.add("show");
+          document.getElementById("wdaDrawer").classList.add("show");
+        }
+
+        function closeDrawer() {
+          state.ui.drawer_open = false;
+          state.ui.selected_lead_id = null;
+          saveState(state);
+          document.getElementById("wdaOverlay").classList.remove("show");
+          document.getElementById("wdaDrawer").classList.remove("show");
+          document.getElementById("wdaDrawerBody").innerHTML = "";
+        }
+
+        function openModal({ title, bodyHtml, footHtml, onMount }) {
+          document.getElementById("wdaModalTitle").textContent = title || "设置";
+          document.getElementById("wdaModalBody").innerHTML = bodyHtml || "";
+          document.getElementById("wdaModalFoot").innerHTML = footHtml || "";
+          document.getElementById("wdaModalWrap").classList.add("show");
+          if (typeof onMount === "function") onMount();
+        }
+
+        function closeModal() {
+          document.getElementById("wdaModalWrap").classList.remove("show");
+          document.getElementById("wdaModalBody").innerHTML = "";
+          document.getElementById("wdaModalFoot").innerHTML = "";
+        }
+
+        function buildAdvice(lead) {
+          const name = lead.name;
+          const action = lead.next_best_action;
+          const value = fmtMoney(lead.value_estimate);
+          const isRebuy = String(lead.stage || "").includes("复购") || (lead.tags || []).includes("已消费");
+          if (isRebuy) {
+            const r1 = `${name}，最近还会来吃吗？上次你点的那几道大家反馈挺好。\n这周我们出了个更适合你口味的搭配，我给你发一份推荐，你看要不要安排一下？`;
+            const r2 = `${name}，我记得你上次是（包间/外卖/聚餐）场景。\n如果你最近有聚餐/活动，我可以按人数给你 2 套更稳的菜单，省你来回选。\n你大概几个人、哪天方便？`;
+            const r3 = `${name}，问你个小事：你身边有没有同事/朋友也在找聚餐的地方？\n我可以先给他一份“菜单+档期”信息，你转过去也不尴尬。\n（你这边如果要订包间，我也可以帮你优先留位。）`;
+            return [r1, r2, r3];
+          }
+          const a = `${name}，我把你关心的点整理好了：\n1）${action}\n2）我按人数给你 2 档套餐对比，口味/分量都写清楚。\n你更倾向哪一档？`;
+          const b = `${name}，我建议我们先把关键项定下来：\n- 时间/人数\n- 是否包间\n确认后我就帮你把 ${action} 安排好，避免临时没位置。`;
+          const c = `${name}，为了不耽误你安排，我给你两个选择：\nA）我按人数直接给你一套菜单 + 预订方式\nB）你告诉我偏好（清淡/微辣/海鲜/不吃辣），我给你更贴合的一套\n（预估：${value}）`;
+          return [a, b, c];
+        }
+
+        function nowISO() {
+          return now().toISOString();
+        }
+
+        function outboxItems() {
+          state.db.outbox = Array.isArray(state.db.outbox) ? state.db.outbox : [];
+          return state.db.outbox;
+        }
+
+        function defaultInboundForLead(lead) {
+          const stage = String(lead.stage || "");
+          if (stage.includes("预订待定金")) return "周六晚上还有包间吗？定金怎么收？";
+          if (stage.includes("菜单确认")) return "可以自带蛋糕吗？菜单怎么选比较合适？";
+          if (stage.includes("到店意向")) return "停车方便吗？我们大概8-10人，需要预订吗？";
+          if (stage.includes("复购")) return "最近有啥推荐的？想换个口味。";
+          return "你们现在人多吗？需要提前预订吗？";
+        }
+
+        function buildAutoFollowupPlan({ lead, inboundText }) {
+          const name = lead.name;
+          const stage = String(lead.stage || "");
+          const inbound = String(inboundText || "").trim();
+          const action = String(lead.next_best_action || "").trim();
+
+          const keyword =
+            inbound.includes("包间") ? "包间/档期" :
+            inbound.includes("定金") ? "定金" :
+            inbound.includes("菜单") || inbound.includes("套餐") ? "菜单/套餐" :
+            inbound.includes("停车") || inbound.includes("位置") ? "停车/位置" :
+            inbound.includes("开票") || inbound.includes("发票") ? "发票" :
+            "安排";
+
+          const replyNow =
+            stage.includes("预订待定金") ? `${name}，收到～我先帮你看下档期。\n关于${keyword}我给你两种方案：\n1）先把包间预留，定金确认后锁档\n2）不方便付定金的话我也先帮你留到今晚\n你这边大概几点、多少人？` :
+            stage.includes("菜单确认") ? `${name}，可以的～我把规则和菜单建议一次发你：\n- ${action}\n你们大概多少人、有没有忌口？我按人数给你 2 档更稳的菜单。` :
+            stage.includes("到店意向") ? `${name}，收到～\n- 停车/位置我发你指引\n- 为了不排队，建议先把时间/人数定一下\n你预计几点到、几个人？` :
+            stage.includes("复购") ? `${name}，安排～我按你上次的口味偏好给你配一份更稳的推荐。\n你这次偏清淡还是想试试微辣？` :
+            `${name}，收到～我先把关键信息确认一下：时间/人数/是否包间。\n确认后我就按 ${action} 帮你安排好。`;
+
+          const fu4h =
+            stage.includes("预订待定金") ? `${name}，我刚确认了包间档期。\n如果你方便，我建议先付定金锁档，我这边就帮你把包间预留好。\n你要不要我把定金规则和两档套餐一起发你？` :
+            `${name}，我把你这边的安排整理成一条信息了（时间/人数/菜单/预订方式）。\n你看我按哪个方案先给你定？`;
+
+          const fu24h =
+            stage.includes("预订待定金") ? `${name}，怕你临时不好安排，我再确认一下：今晚前如果你回我一个“时间+人数”，我就先帮你把包间留住。\n需要我直接给你一个更省事的套餐推荐吗？` :
+            `${name}，我这边还可以帮你把“菜单/位置/预订方式”一次讲清，省你来回问。\n你方便的话回我一句：哪天、几个人？`;
+
+          return {
+            lead_id: lead.id,
+            inbound,
+            items: [
+              { step: "reply_now", label: "立即回复", delay_h: 0, text: replyNow },
+              { step: "followup_4h", label: "未回复 4 小时", delay_h: 4, text: fu4h },
+              { step: "followup_24h", label: "未回复 24 小时", delay_h: 24, text: fu24h }
+            ]
+          };
+        }
+
+        function enqueueFollowupPlan(plan, { autoSendDemo } = {}) {
+          if (!plan || !Array.isArray(plan.items)) return 0;
+          const leadId = plan.lead_id;
+          const base = now().getTime();
+          let added = 0;
+
+          plan.items.forEach((it) => {
+            const scheduled = new Date(base + (Number(it.delay_h) || 0) * 3600 * 1000).toISOString();
+            const exists = outboxItems().some((m) => m.lead_id === leadId && m.step === it.step && m.status === "queued");
+            if (exists) return;
+            outboxItems().push({
+              id: uid(),
+              lead_id: leadId,
+              step: it.step,
+              label: it.label,
+              text: it.text,
+              scheduled_at: scheduled,
+              status: "queued",
+              created_at: nowISO()
+            });
+            added += 1;
+          });
+
+          if (autoSendDemo) {
+            const first = outboxItems().find((m) => m.lead_id === leadId && m.step === "reply_now" && m.status === "queued");
+            if (first) {
+              first.status = "sent";
+              first.sent_at = nowISO();
+              const lead = getLead(leadId);
+              if (lead) lead.last_touch_at = nowISO();
+            }
+          }
+
+          return added;
+        }
+
+        function outboxMarkSent(msgId) {
+          const msg = outboxItems().find((m) => m.id === msgId);
+          if (!msg) return;
+          msg.status = "sent";
+          msg.sent_at = nowISO();
+          const lead = getLead(msg.lead_id);
+          if (lead) lead.last_touch_at = nowISO();
+          saveState(state);
+          toast("已标记发送");
+          render();
+        }
+
+        function outboxCancel(msgId) {
+          const msg = outboxItems().find((m) => m.id === msgId);
+          if (!msg) return;
+          msg.status = "canceled";
+          msg.canceled_at = nowISO();
+          saveState(state);
+          toast("已取消");
+          render();
+        }
+
+        function outboxClearQueued() {
+          const before = outboxItems().length;
+          state.db.outbox = outboxItems().filter((m) => m.status !== "queued");
+          saveState(state);
+          toast(before === state.db.outbox.length ? "无待发送" : "已清空待发送");
+          render();
+        }
+
+        function genAdviceForLead(id) {
+          const lead = getLead(id);
+          if (!lead) return;
+          const btn = document.querySelector(`[data-action="genAdvice"][data-id="${CSS.escape(id)}"]`);
+          if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="wda-spin"></span><span>生成中…</span>`;
+          }
+          window.setTimeout(() => {
+            const variants = buildAdvice(lead);
+            const body = document.getElementById("wdaDrawerBody");
+            if (body) {
+              const blockId = "wdaAdviceBlock";
+              if (!body.querySelector(`#${blockId}`)) {
+                const wrap = document.createElement("div");
+                wrap.id = blockId;
+                wrap.className = "mt-3 gstroke p-3";
+                wrap.innerHTML = `
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="text-xs font-black text-zinc-200/60">跟进话术（点击复制）</div>
+                      <div class="mt-1 text-xs text-zinc-200/55">仅生成与复制，你可微调语气。</div>
+                    </div>
+                    <span class="wda-chip wda-chip--ok">不代发</span>
+                  </div>
+                  <div class="mt-2 grid gap-2">
+                    ${variants.map((t, i) => `
+                      <div class="wda-item" data-action="copyText" data-text="${escapeHtml(t)}">
+                        <div class="text-xs font-black text-zinc-200/55">版本 ${i + 1}</div>
+                        <div class="mt-1 text-sm text-zinc-100/85 leading-6 whitespace-pre-wrap">${escapeHtml(t)}</div>
+                        <div class="mt-2"><span class="wda-chip wda-chip--ok">点击复制</span></div>
+                      </div>
+                    `).join("")}
+                  </div>
+                `;
+                body.appendChild(wrap);
+              }
+            }
+            if (btn) {
+              btn.disabled = false;
+              btn.innerHTML = `生成话术`;
+            }
+            toast("已生成 3 条话术");
+          }, 780);
+        }
+
+        function markTouched(id) {
+          const lead = getLead(id);
+          if (!lead) return;
+          lead.last_touch_at = now().toISOString();
+          const hasFuture = state.db.tasks.some((t) => t.lead_id === id && t.status !== "done" && new Date(t.due_at).getTime() > now().getTime());
+          if (!hasFuture) {
+            state.db.tasks.push({ id: uid(), lead_id: id, title: "回访：确认进展与下一步", due_at: new Date(now().getTime() + 3 * 86400000).toISOString(), status: "planned" });
+          }
+          saveState(state);
+          toast("已标记跟进，已生成回访待办");
+          render();
+          openLead(id);
+        }
+
+        function ensureRebuyActivationTask(leadId) {
+          const exists = state.db.tasks.some((t) =>
+            t.lead_id === leadId &&
+            t.status !== "done" &&
+            t.kind === "rebuy_activation" &&
+            new Date(t.due_at).getTime() >= now().getTime() - 2 * 3600 * 1000
+          );
+          if (exists) return false;
+          state.db.tasks.push({
+            id: uid(),
+            lead_id: leadId,
+            title: "老客激活：发送开场并引导复购",
+            due_at: new Date(now().getTime() + 24 * 3600 * 1000).toISOString(),
+            status: "planned",
+            kind: "rebuy_activation"
+          });
+          return true;
+        }
+
+        function taskDone(taskId) {
+          const t = state.db.tasks.find((x) => x.id === taskId);
+          if (!t) return;
+          t.status = "done";
+          saveState(state);
+          toast("已完成");
+          render();
+          if (state.ui.drawer_open && state.ui.selected_lead_id) openLead(state.ui.selected_lead_id);
+        }
+
+        function taskSnooze(taskId) {
+          const t = state.db.tasks.find((x) => x.id === taskId);
+          if (!t) return;
+          t.due_at = new Date(new Date(t.due_at).getTime() + 24 * 3600 * 1000).toISOString();
+          t.status = "planned";
+          saveState(state);
+          toast("已延后 1 天");
+          render();
+          if (state.ui.drawer_open && state.ui.selected_lead_id) openLead(state.ui.selected_lead_id);
+        }
+
+        function copyToClipboard(text) {
+          const t = String(text || "");
+          if (!t) return;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(t).then(() => toast("已复制")).catch(() => fallbackCopy(t));
+            return;
+          }
+          fallbackCopy(t);
+        }
+
+        function fallbackCopy(text) {
+          try {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            toast("已复制");
+          } catch {
+            window.prompt("复制以下文本：", text);
+          }
+        }
+
+        function explainRadar() {
+          openModal({
+            title: "雷达规则",
+            bodyHtml: `
+              <div class="grid gap-3">
+                <div class="gstroke p-3">
+                  <div class="text-sm font-black">排序依据</div>
+                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">阶段 / 客单价 / 意向信号 / 未推进时长。</div>
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-sm font-black">输出内容</div>
+                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">
+                    <span class="text-emerald-200/90 font-black">下一步动作</span> + <span class="text-emerald-200/90 font-black">可复制话术</span> + <span class="text-emerald-200/90 font-black">待办时间</span>。
+                  </div>
+                </div>
+              </div>
+            `,
+            footHtml: `<button class="btn-primary btn-sm" type="button" data-action="closeModal">知道了</button>`
+          });
+        }
+
+        function openLead(id) {
+          const lead = getLead(id);
+          if (!lead) return;
+          state.ui.selected_lead_id = id;
+          saveState(state);
+          const score = computeScore(lead);
+          const lb = scoreLabel(score);
+          const dueTasks = state.db.tasks.filter((t) => t.lead_id === id && t.status !== "done").sort((a, b) => new Date(a.due_at) - new Date(b.due_at));
+          const tags = (lead.tags || []).map((t) => `<span class="wda-chip">${escapeHtml(t)}</span>`).join("");
+          openDrawer(`
+            <div class="pt-2">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="text-lg font-black text-zinc-100 truncate">${escapeHtml(lead.name)} <span class="text-zinc-200/55 font-black">· ${escapeHtml(lead.alias)}</span></div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">
+                    阶段：<span class="text-zinc-100/85 font-black">${escapeHtml(lead.stage)}</span> · 上次触达：${escapeHtml(fmtRelTime(lead.last_touch_at))}前 · 预估：${escapeHtml(fmtMoney(lead.value_estimate))}
+                  </div>
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    <span class="wda-chip ${escapeHtml(lb.cls)}">${escapeHtml(lb.text)} · ${escapeHtml(score)}分</span>
+                    <span class="wda-chip wda-chip--warn">${escapeHtml(lead.risk || "需维护关系")}</span>
+                    <span class="wda-chip wda-chip--cyan">下一步：${escapeHtml(lead.next_best_action)}</span>
+                  </div>
+                  <div class="mt-2 flex flex-wrap gap-2">${tags}</div>
+                </div>
+                <div class="shrink-0 flex flex-col gap-2">
+                  <button class="btn-secondary btn-sm" type="button" data-action="editLead" data-id="${escapeHtml(id)}">编辑</button>
+                  <button class="btn-secondary btn-sm" type="button" data-action="closeDrawer">关闭</button>
+                </div>
+              </div>
+
+              <div class="mt-3 grid gap-2">
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">客户备注</div>
+                  <div class="mt-2 text-sm text-zinc-100/80 leading-6 whitespace-pre-wrap">${escapeHtml(lead.notes || "暂无备注。建议记录：人数/时间/包间/预算/忌口/偏好。")}</div>
+                </div>
+
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">下一步动作</div>
+                  <div class="mt-2 text-sm text-zinc-100/85 leading-6">${escapeHtml(lead.next_best_action)}</div>
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <button class="btn-primary btn-sm" type="button" data-action="genAdvice" data-id="${escapeHtml(id)}">生成话术</button>
+                    <button class="btn-secondary btn-sm" type="button" data-action="openFollowup" data-id="${escapeHtml(id)}">自动跟进</button>
+                    <button class="btn-secondary btn-sm" type="button" data-action="markTouched" data-id="${escapeHtml(id)}">标记已跟进</button>
+                    <button class="btn-secondary btn-sm" type="button" data-action="addTaskForLead" data-id="${escapeHtml(id)}">加待办</button>
+                  </div>
+                  <div class="mt-2 text-xs text-zinc-200/55 leading-5">仅建议，不代发。</div>
+                </div>
+
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">关键信号（证据链）</div>
+                  <div class="mt-2 grid gap-2">
+                    ${(lead.signals || []).map((s) => `
+                      <div class="flex items-center justify-between gap-3">
+                        <span class="text-sm text-zinc-100/85">${escapeHtml(s.k)}</span>
+                        <span class="wda-chip">+${escapeHtml(String((Number(s.w) || 0) * 3))}</span>
+                      </div>
+                    `).join("")}
+                  </div>
+                </div>
+
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">对话摘要</div>
+                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">${escapeHtml(lead.last_summary)}</div>
+                  <div class="mt-3">
+                    <input class="wda-input" placeholder="搜索关键词：价格 / 时间 / 家人" data-action="leadEvidenceSearch" data-id="${escapeHtml(id)}" />
+                  </div>
+                  <div class="mt-2 grid gap-1" id="evi-${escapeHtml(id)}">
+                    ${(lead.chat_evidence || []).slice(0, 8).map((x) => `
+                      <div class="text-xs text-zinc-200/60 leading-5" data-evi data-text="${escapeHtml(String(x).toLowerCase())}">• ${escapeHtml(x)}</div>
+                    `).join("")}
+                  </div>
+                </div>
+
+                <div class="gstroke p-3">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="text-xs font-black text-zinc-200/60">待办</div>
+                      <div class="mt-1 text-xs text-zinc-200/55">对该客户的执行清单。</div>
+                    </div>
+                  </div>
+                  <div class="mt-2 grid gap-2">
+                    ${dueTasks.length ? dueTasks.map((t) => `
+                      <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+                        <div class="text-sm font-black text-zinc-100/85">${escapeHtml(t.title)}</div>
+                        <div class="mt-1 text-xs text-zinc-200/55">到期：${escapeHtml(new Date(t.due_at).toLocaleString("zh-CN"))}</div>
+                        <div class="mt-2 flex flex-wrap gap-2">
+                          <button class="btn-secondary btn-sm" type="button" data-action="taskDone" data-task="${escapeHtml(t.id)}">完成</button>
+                          <button class="btn-secondary btn-sm" type="button" data-action="taskSnooze" data-task="${escapeHtml(t.id)}">延后</button>
+                          ${t.status === "overdue" ? `<span class="wda-chip wda-chip--danger">逾期</span>` : t.status === "due" ? `<span class="wda-chip wda-chip--warn">今天</span>` : `<span class="wda-chip">计划</span>`}
+                        </div>
+                      </div>
+                    `).join("") : `<div class="text-xs text-zinc-200/55">暂无待办。</div>`}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `);
+        }
+
+        function editLead(leadId) {
+          const lead = getLead(leadId);
+          if (!lead) return;
+          const stages = Array.from(new Set(["新客咨询", "到店意向", "菜单确认", "预订待定金", "已到店未成单", "已消费", "复购机会", ...state.db.leads.map((l) => l.stage || "").filter(Boolean)]));
+          openModal({
+            title: "编辑客户",
+            bodyHtml: `
+              <div class="grid gap-3">
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">客户</div>
+                  <div class="mt-2 text-sm font-black text-zinc-100/85">${escapeHtml(lead.name)} · ${escapeHtml(lead.alias)}</div>
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">阶段</div>
+                  <select id="elStage" class="wda-select">
+                    ${stages.map((s) => `<option value="${escapeHtml(s)}"${s === lead.stage ? " selected" : ""}>${escapeHtml(s)}</option>`).join("")}
+                  </select>
+                  <div class="mt-2 text-xs text-zinc-200/55">影响雷达排序与提醒。</div>
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">标签（用逗号/顿号分隔）</div>
+                  <input id="elTags" class="wda-input" value="${escapeHtml((lead.tags || []).join("，"))}" />
+                  <div class="mt-2 text-xs text-zinc-200/55">建议：包间、生日、团建、已消费、可转介绍。</div>
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">预估金额</div>
+                  <input id="elValue" class="wda-input" type="number" value="${escapeHtml(String(lead.value_estimate || 0))}" />
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">备注（人数/时间/预算/忌口/偏好）</div>
+                  <textarea id="elNotes" class="wda-textarea">${escapeHtml(lead.notes || "")}</textarea>
+                </div>
+              </div>
+            `,
+            footHtml: `
+              <button class="btn-secondary btn-sm" type="button" data-action="closeModal">取消</button>
+              <button class="btn-primary btn-sm" type="button" data-action="saveLeadEdit" data-id="${escapeHtml(leadId)}">保存</button>
+            `
+          });
+        }
+
+        function quickTask() {
+          openModal({
+            title: "新建待办",
+            bodyHtml: `
+              <div class="grid gap-3">
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">选择客户</div>
+                  <select class="wda-select" id="qtLead">
+                    ${state.db.leads.map((l) => `<option value="${escapeHtml(l.id)}">${escapeHtml(l.name)} · ${escapeHtml(l.alias)}</option>`).join("")}
+                  </select>
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">待办内容</div>
+                  <input id="qtTitle" class="wda-input" placeholder="例如：发报价单 + 约电话" />
+                  <div class="mt-2 text-xs text-zinc-200/55">写成“动作 + 结果”。</div>
+                </div>
+              </div>
+            `,
+            footHtml: `
+              <button class="btn-secondary btn-sm" type="button" data-action="closeModal">取消</button>
+              <button class="btn-primary btn-sm" type="button" data-action="saveQuickTask">保存</button>
+            `
+          });
+        }
+
+        function addTaskForLead(leadId) {
+          const lead = getLead(leadId);
+          if (!lead) return;
+          openModal({
+            title: "加待办（对这个客户）",
+            bodyHtml: `
+              <div class="grid gap-3">
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">客户</div>
+                  <div class="mt-2 text-sm font-black text-zinc-100/85">${escapeHtml(lead.name)} · ${escapeHtml(lead.alias)}</div>
+                  <div class="mt-1 text-xs text-zinc-200/55">阶段：${escapeHtml(lead.stage)} · 下一步：${escapeHtml(lead.next_best_action)}</div>
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">待办内容</div>
+                  <input id="ltTitle" class="wda-input" placeholder="例如：发对比方案 + 让对方确认哪档" />
+                  <div class="mt-2 text-xs text-zinc-200/55">尽量写清“明确答复”。</div>
+                </div>
+              </div>
+            `,
+            footHtml: `
+              <button class="btn-secondary btn-sm" type="button" data-action="closeModal">取消</button>
+              <button class="btn-primary btn-sm" type="button" data-action="saveLeadTask" data-id="${escapeHtml(leadId)}">保存</button>
+            `
+          });
+        }
+
+        function newLead() {
+          openModal({
+            title: "新增客户",
+            bodyHtml: `
+              <div class="grid gap-3">
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">名字</div>
+                  <input id="nlName" class="wda-input" placeholder="例如：赵女士" />
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">场景</div>
+                  <input id="nlAlias" class="wda-input" placeholder="例如：包间预订 / 生日宴 / 团建" />
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">预估金额</div>
+                  <input id="nlValue" type="number" class="wda-input" placeholder="例如：3000" />
+                </div>
+              </div>
+            `,
+            footHtml: `
+              <button class="btn-secondary btn-sm" type="button" data-action="closeModal">取消</button>
+              <button class="btn-primary btn-sm" type="button" data-action="saveNewLead">保存</button>
+            `
+          });
+        }
+
+        function followupGenerate() {
+          const lead = getLead(state.ui.followup_lead_id) || state.db.leads[0];
+          let inbound = String(state.ui.followup_inbound || "").trim();
+          if (!inbound) {
+            inbound = defaultInboundForLead(lead);
+            state.ui.followup_inbound = inbound;
+          }
+          state.ui.followup_plan = buildAutoFollowupPlan({ lead, inboundText: inbound });
+          saveState(state);
+          render();
+          toast("已生成跟进计划");
+        }
+
+        function followupEnqueue() {
+          const lead = getLead(state.ui.followup_lead_id) || state.db.leads[0];
+          let inbound = String(state.ui.followup_inbound || "").trim();
+          if (!inbound) {
+            inbound = defaultInboundForLead(lead);
+            state.ui.followup_inbound = inbound;
+          }
+
+          const plan = buildAutoFollowupPlan({ lead, inboundText: inbound });
+          state.ui.followup_plan = plan;
+
+          const demoSendAllowed = !state.prefs.safety.never_auto_send;
+          const demoSend = !!state.prefs.followup?.demo_send && demoSendAllowed;
+          const added = enqueueFollowupPlan(plan, { autoSendDemo: demoSend });
+          saveState(state);
+          render();
+          toast(added ? `已入队 ${added} 条` : "已在队列中");
+        }
+
+        function followupReset() {
+          state.ui.followup_inbound = "";
+          state.ui.followup_plan = null;
+          saveState(state);
+          render();
+          toast("已清空");
+        }
+
+        function followupSimInbound() {
+          const lead = getLead(state.ui.followup_lead_id) || state.db.leads[0];
+          state.ui.followup_inbound = defaultInboundForLead(lead);
+          saveState(state);
+          render();
+          toast("已填入示例消息");
+
+          if (state.prefs.followup?.enabled && state.prefs.followup?.auto_queue) {
+            followupEnqueue();
+          }
+        }
+
+        function toggleFollowupEnabled() {
+          state.prefs.followup.enabled = !state.prefs.followup.enabled;
+          saveState(state);
+          render();
+          toast(state.prefs.followup.enabled ? "自动跟进：已开启" : "自动跟进：已关闭");
+        }
+
+        function toggleFollowupAutoQueue() {
+          state.prefs.followup.auto_queue = !state.prefs.followup.auto_queue;
+          saveState(state);
+          render();
+          toast(state.prefs.followup.auto_queue ? "自动入队：已开启" : "自动入队：已关闭");
+        }
+
+        function toggleFollowupDemoSend() {
+          if (state.prefs.safety.never_auto_send) return toast("在“安全边界”关闭“不自动发送”后再开启");
+          state.prefs.followup.demo_send = !state.prefs.followup.demo_send;
+          saveState(state);
+          render();
+          toast(state.prefs.followup.demo_send ? "自动发送(演示)：已开启" : "自动发送(演示)：已关闭");
+        }
+
+        function toggleSafety(key) {
+          state.prefs.safety[key] = !state.prefs.safety[key];
+          saveState(state);
+          render();
+          toast(state.prefs.safety[key] ? "已开启" : "已关闭");
+        }
+
+        function resetAll() {
+          localStorage.removeItem(LS_KEY);
+          state = seedState();
+          saveState(state);
+          closeDrawer();
+          closeModal();
+          setSec("radar");
+          toast("已恢复示例数据");
+        }
+
+        function openSettings() {
+          const persona = state.prefs.persona || "销售/顾问/中介";
+          const s = state.prefs.safety;
+          const checkbox = (id, label, desc) => `
+            <label class="rounded-2xl border border-white/10 bg-white/5 p-3 flex items-start gap-3">
+              <input type="checkbox" class="mt-1 accent-emerald-300" id="${escapeHtml(id)}" />
+              <div class="min-w-0">
+                <div class="font-black text-zinc-100">${escapeHtml(label)}</div>
+                <div class="mt-1 text-xs text-zinc-200/60 leading-5">${escapeHtml(desc)}</div>
+              </div>
+            </label>
+          `;
+          openModal({
+            title: "偏好设置",
+            bodyHtml: `
+              <div class="grid gap-3">
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">用户类型</div>
+                  <div class="mt-2">
+                    <select class="wda-select" id="personaSel">
+                      ${["销售/顾问/中介", "私域商家", "高价值自由职业者"].map((p) => `<option value="${escapeHtml(p)}"${p === persona ? " selected" : ""}>${escapeHtml(p)}</option>`).join("")}
+                    </select>
+                  </div>
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-xs font-black text-zinc-200/60">安全模式</div>
+                  <div class="mt-2 grid gap-2">
+                    ${checkbox("s_never_auto_send", "不自动发送消息", "只生成与复制。")}
+                    ${checkbox("s_never_mass_message", "禁止群发/刷屏", "不做群发动作。")}
+                    ${checkbox("s_never_auto_add", "禁止自动加好友", "不做自动加人。")}
+                    ${checkbox("s_require_confirm", "每条建议都需确认", "默认需要确认。")}
+                    ${checkbox("s_local_first", "本地优先（可选）", "优先本地存储/计算。")}
+                  </div>
+                </div>
+              </div>
+            `,
+            footHtml: `
+              <button class="btn-secondary btn-sm" type="button" data-action="closeModal">取消</button>
+              <button class="btn-primary btn-sm" type="button" data-action="saveSettings">保存</button>
+            `,
+            onMount: () => {
+              document.getElementById("s_never_auto_send").checked = !!s.never_auto_send;
+              document.getElementById("s_never_mass_message").checked = !!s.never_mass_message;
+              document.getElementById("s_never_auto_add").checked = !!s.never_auto_add;
+              document.getElementById("s_require_confirm").checked = !!s.require_confirm;
+              document.getElementById("s_local_first").checked = !!s.local_first;
+            }
+          });
+        }
+
+        function rebuyPlaybook() {
+          openModal({
+            title: "老客激活怎么做",
+            bodyHtml: `
+              <div class="grid gap-3">
+                <div class="gstroke p-3">
+                  <div class="text-sm font-black">结构</div>
+                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">近况 → 升级点 → 转介绍（不施压）。</div>
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-sm font-black">不要做</div>
+                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">群发、硬推优惠、连续追问、尴尬式“要转介绍”。</div>
+                </div>
+                <div class="gstroke p-3">
+                  <div class="text-sm font-black">要做</div>
+                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">目标是让对方愿意回你一句话，重启对话。</div>
+                </div>
+              </div>
+            `,
+            footHtml: `<button class="btn-primary btn-sm" type="button" data-action="closeModal">知道了</button>`
+          });
+        }
+
+        // --- events ---
+        document.addEventListener("click", (e) => {
+          const secBtn = e.target.closest("#wdaSeg [data-sec]");
+          if (secBtn) return setSec(secBtn.dataset.sec);
+
+          const btn = e.target.closest("[data-action]");
+          if (!btn) return;
+          const act = btn.dataset.action;
+          if (act === "openLead") return openLead(btn.dataset.id);
+          if (act === "closeDrawer") return closeDrawer();
+          if (act === "openSettings") return openSettings();
+          if (act === "explainRadar") return explainRadar();
+          if (act === "genAdvice") return genAdviceForLead(btn.dataset.id);
+          if (act === "openFollowup") {
+            const id = btn.dataset.id;
+            state.ui.followup_lead_id = id;
+            state.ui.followup_inbound = "";
+            state.ui.followup_plan = null;
+            saveState(state);
+            closeDrawer();
+            setSec("copilot");
+            render();
+            return;
+          }
+          if (act === "markTouched") return markTouched(btn.dataset.id);
+          if (act === "taskDone") return taskDone(btn.dataset.task);
+          if (act === "taskSnooze") return taskSnooze(btn.dataset.task);
+          if (act === "copyText") return copyToClipboard(btn.dataset.text);
+          if (act === "quickTask") return quickTask();
+          if (act === "addTaskForLead") return addTaskForLead(btn.dataset.id);
+          if (act === "newLead") return newLead();
+          if (act === "followupGenerate") return followupGenerate();
+          if (act === "followupEnqueue") return followupEnqueue();
+          if (act === "followupReset") return followupReset();
+          if (act === "followupSimInbound") return followupSimInbound();
+          if (act === "toggleFollowupEnabled") return toggleFollowupEnabled();
+          if (act === "toggleFollowupAutoQueue") return toggleFollowupAutoQueue();
+          if (act === "toggleFollowupDemoSend") return toggleFollowupDemoSend();
+          if (act === "outboxMarkSent") return outboxMarkSent(btn.dataset.msg);
+          if (act === "outboxCancel") return outboxCancel(btn.dataset.msg);
+          if (act === "outboxClear") return outboxClearQueued();
+          if (act === "toggleSafety") return toggleSafety(btn.dataset.key);
+          if (act === "resetAll") return resetAll();
+          if (act === "rebuyPlaybook") return rebuyPlaybook();
+          if (act === "rebuyNudge") {
+            const id = btn.dataset.id;
+            const added = ensureRebuyActivationTask(id);
+            saveState(state);
+            render();
+            if (added) toast("已加入跟进清单");
+            openLead(id);
+            window.setTimeout(() => genAdviceForLead(id), 220);
+            return;
+          }
+          if (act === "editLead") return editLead(btn.dataset.id);
+          if (act === "closeModal") return closeModal();
+          if (act === "saveSettings") {
+            const personaSel = document.getElementById("personaSel");
+            state.prefs.persona = personaSel ? personaSel.value : state.prefs.persona;
+            state.prefs.safety.never_auto_send = !!document.getElementById("s_never_auto_send")?.checked;
+            state.prefs.safety.never_mass_message = !!document.getElementById("s_never_mass_message")?.checked;
+            state.prefs.safety.never_auto_add = !!document.getElementById("s_never_auto_add")?.checked;
+            state.prefs.safety.require_confirm = !!document.getElementById("s_require_confirm")?.checked;
+            state.prefs.safety.local_first = !!document.getElementById("s_local_first")?.checked;
+            saveState(state);
+            closeModal();
+            toast("已保存设置");
+            return;
+          }
+          if (act === "saveQuickTask") {
+            const leadId = document.getElementById("qtLead")?.value;
+            const title = String(document.getElementById("qtTitle")?.value || "").trim();
+            if (!leadId || !title) return toast("请选客户并填写内容");
+            state.db.tasks.push({ id: uid(), lead_id: leadId, title, due_at: now().toISOString(), status: "due" });
+            saveState(state);
+            closeModal();
+            toast("已添加待办");
+            render();
+            return setSec("tasks");
+          }
+          if (act === "saveLeadTask") {
+            const leadId = btn.dataset.id;
+            const title = String(document.getElementById("ltTitle")?.value || "").trim();
+            if (!title) return toast("请输入待办内容");
+            state.db.tasks.push({ id: uid(), lead_id: leadId, title, due_at: now().toISOString(), status: "due" });
+            saveState(state);
+            closeModal();
+            toast("已添加待办");
+            render();
+            return openLead(leadId);
+          }
+          if (act === "saveNewLead") {
+            const name = String(document.getElementById("nlName")?.value || "").trim();
+            const alias = String(document.getElementById("nlAlias")?.value || "").trim();
+            const value = Number(document.getElementById("nlValue")?.value || 0);
+            if (!name || !alias) return toast("请填写名字与场景");
+            state.db.leads.unshift({
+              id: uid(),
+              name,
+              alias,
+              stage: "新客咨询",
+              tags: ["待评估"],
+              value_estimate: value || 0,
+              last_touch_at: now().toISOString(),
+              channel: "好友",
+              signals: [{ k: "新客咨询", w: 1 }],
+              notes: "",
+              chat_evidence: [],
+              last_summary: "新客咨询：需要确认时间/人数/预算与偏好。",
+              next_best_action: "问时间/人数 + 发菜单/定位",
+              risk: "新客不跟进会去别家"
+            });
+            saveState(state);
+            closeModal();
+            toast("已新增客户");
+            render();
+            return setSec("customers");
+          }
+          if (act === "saveLeadEdit") {
+            const id = btn.dataset.id;
+            const lead = getLead(id);
+            if (!lead) return;
+            const stage = String(document.getElementById("elStage")?.value || "").trim();
+            const tagsRaw = String(document.getElementById("elTags")?.value || "");
+            const tags = tagsRaw.split(/[，,、\n]+/).map((s) => s.trim()).filter(Boolean).slice(0, 12);
+            const value = Number(document.getElementById("elValue")?.value || 0);
+            const notes = String(document.getElementById("elNotes")?.value || "").trim();
+            if (stage) lead.stage = stage;
+            lead.tags = tags;
+            lead.value_estimate = Number.isFinite(value) ? value : lead.value_estimate;
+            lead.notes = notes;
+            saveState(state);
+            closeModal();
+            toast("已保存");
+            render();
+            if (state.ui.drawer_open) openLead(id);
+            return;
+          }
+        });
+
+        document.addEventListener("input", (e) => {
+          const el = e.target;
+          if (!el || !el.dataset.action) return;
+          const act = el.dataset.action;
+          if (act === "customerSearch") {
+            state.ui.customer_q = el.value || "";
+            saveState(state);
+            return render();
+          }
+          if (act === "followupInbound") {
+            state.ui.followup_inbound = el.value || "";
+            saveState(state);
+            return;
+          }
+          if (act === "leadEvidenceSearch") {
+            const id = el.dataset.id;
+            const box = document.getElementById(`evi-${id}`);
+            if (!box) return;
+            const q = String(el.value || "").trim().toLowerCase();
+            box.querySelectorAll("[data-evi]").forEach((row) => {
+              const hay = String(row.dataset.text || "");
+              row.style.display = !q || hay.includes(q) ? "" : "none";
+            });
+            return;
+          }
+        });
+
+        document.addEventListener("change", (e) => {
+          const el = e.target;
+          if (!el || !el.dataset.action) return;
+          const act = el.dataset.action;
+          if (act === "followupLead") {
+            state.ui.followup_lead_id = el.value;
+            state.ui.followup_plan = null;
+            saveState(state);
+            return render();
+          }
+        });
+
+        document.addEventListener("click", (e) => {
+          const stageBtn = e.target.closest("[data-action='customerStage']");
+          if (!stageBtn) return;
+          state.ui.customer_stage = stageBtn.dataset.stage || "全部";
+          saveState(state);
+          render();
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            if (document.getElementById("wdaModalWrap").classList.contains("show")) return closeModal();
+            if (document.getElementById("wdaDrawer").classList.contains("show")) return closeDrawer();
+          }
+        });
+
+        // --- boot ---
+        let state = normalizeState(loadState() || seedState());
+        saveState(state);
+        setSec(state.ui.sec || "radar");
+        render();
+      })();
+    </script>
+
+  </body>
+</html>
