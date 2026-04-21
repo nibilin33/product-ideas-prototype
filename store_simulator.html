@@ -103,6 +103,41 @@
       .kpi .label { color: rgba(247,245,237,0.52); font-size: 12px; font-weight: 800; }
       .kpi .value { margin-top: 8px; font-size: 24px; font-weight: 950; letter-spacing: -0.04em; }
       .kpi .trend { margin-top: 5px; color: rgba(45,212,191,0.88); font-size: 12px; font-weight: 900; }
+      .source-strip {
+        margin-top: 12px;
+        border-radius: 20px;
+        padding: 12px 14px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        background: rgba(0,0,0,0.20);
+        border: 1px solid rgba(255,255,255,0.09);
+      }
+      .source-label { color: rgba(247,245,237,0.56); font-size: 12px; font-weight: 900; letter-spacing: 0.06em; }
+      .source-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
+      .platform-badge {
+        display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px;
+        font-size: 12px; font-weight: 950; border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.88);
+      }
+      .platform-badge.meituan { border-color: rgba(250, 204, 21, 0.32); background: rgba(250,204,21,0.12); color: rgba(255,246,214,0.92); }
+      .platform-badge.eleme { border-color: rgba(56, 189, 248, 0.32); background: rgba(56,189,248,0.12); color: rgba(219, 241, 255, 0.92); }
+      .source-note { color: rgba(247,245,237,0.50); font-size: 12px; font-weight: 850; }
+      .source-meta { text-align: right; }
+      .source-state { font-size: 12px; font-weight: 950; color: rgba(45,212,191,0.92); }
+      .source-sub { margin-top: 4px; font-size: 12px; color: rgba(247,245,237,0.52); font-weight: 850; }
+      .source-today {
+        margin-top: 10px;
+        border-radius: 18px;
+        padding: 10px 14px;
+        background: rgba(255,255,255,0.035);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: rgba(247,245,237,0.72);
+        font-size: 12px;
+        font-weight: 850;
+        line-height: 1.6;
+      }
       .board { display: grid; grid-template-columns: 1fr 330px; gap: 14px; margin-top: 14px; }
       .today {
         min-height: 430px;
@@ -136,6 +171,7 @@
       .log .top { display:flex; justify-content:space-between; gap:10px; align-items:center; }
       .log .name { font-size: 13px; font-weight: 950; }
       .log .money { color: rgba(45,212,191,0.9); font-size: 12px; font-weight: 950; }
+      .log .meta { margin-top: 6px; color: rgba(247,245,237,0.52); font-size: 12px; font-weight: 850; line-height: 1.55; }
       .log p { margin: 7px 0 0; color: rgba(247,245,237,0.58); font-size: 12px; line-height: 1.65; }
       .trajectory { margin-top: 14px; display: grid; grid-template-columns: repeat(7, minmax(46px, 1fr)); gap: 8px; }
       .bar { height: 118px; border-radius: 18px; background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.08); display:flex; align-items:flex-end; padding: 7px; position:relative; overflow:hidden; }
@@ -152,7 +188,7 @@
       <section class="hero">
         <span class="badge"><span class="dot"></span> STORE OPENING SIMULATOR</span>
         <h1 class="title">模拟一家店，<br /><span>每天怎么活下来。</span></h1>
-        <p class="lead">这个页面用来真实演示“开店辅助能力”：系统每天生成开店任务、突发事件和经营选择，你点击决策后，它会沉淀一家门店从第 1 天到第 N 天的营收、口碑、库存、员工压力和复购轨迹。</p>
+        <p class="lead">这个页面用来真实演示“开店辅助能力”：系统基于 <strong>美团 / 饿了么帐号托管</strong> 拉取的订单、评价、曝光与履约数据生成每日任务、突发事件与经营选择；你点击决策后，它会沉淀一家门店从第 1 天到第 N 天的营收、口碑、库存、员工压力和复购轨迹。</p>
       </section>
 
       <section class="layout">
@@ -206,20 +242,35 @@
         </aside>
 
         <section>
-          <div class="card">
-            <div class="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p class="eyebrow">02 / 经营仪表盘</p>
-                <h2 class="text-2xl" id="dashTitle">等待开店</h2>
+	          <div class="card">
+	            <div class="flex flex-wrap items-start justify-between gap-3">
+	              <div>
+	                <p class="eyebrow">02 / 经营仪表盘</p>
+	                <h2 class="text-2xl" id="dashTitle">等待开店</h2>
+	              </div>
+	              <button class="btn secondary" id="nextDayBtn" disabled>模拟下一天</button>
+	            </div>
+              <div class="source-strip" id="sourceStrip">
+                <div>
+                  <div class="source-label">数据来源</div>
+                  <div class="source-badges">
+                    <span class="platform-badge meituan">美团外卖</span>
+                    <span class="platform-badge eleme">饿了么</span>
+                    <span class="source-note">帐号托管（只读拉取）</span>
+                  </div>
+                </div>
+                <div class="source-meta">
+                  <div class="source-state" id="hostedState">未连接</div>
+                  <div class="source-sub" id="hostedIds">请先托管美团/饿了么账号</div>
+                </div>
               </div>
-              <button class="btn secondary" id="nextDayBtn" disabled>模拟下一天</button>
-            </div>
-            <div class="kpis mt-4">
-              <div class="kpi"><div class="label">现金余额</div><div class="value" id="cashKpi">--</div><div class="trend" id="cashTrend">待生成</div></div>
-              <div class="kpi"><div class="label">今日营收</div><div class="value" id="revenueKpi">--</div><div class="trend" id="profitTrend">毛利待算</div></div>
-              <div class="kpi"><div class="label">口碑评分</div><div class="value" id="ratingKpi">--</div><div class="trend" id="ratingTrend">服务未开始</div></div>
-              <div class="kpi"><div class="label">库存健康</div><div class="value" id="stockKpi">--</div><div class="trend" id="stockTrend">未备货</div></div>
-            </div>
+              <div class="source-today" id="hostedToday">演示：这里展示托管账号拉取的订单/评价/曝光汇总（可脱敏样例）。</div>
+	            <div class="kpis mt-4">
+	              <div class="kpi"><div class="label">现金余额</div><div class="value" id="cashKpi">--</div><div class="trend" id="cashTrend">待生成</div></div>
+	              <div class="kpi"><div class="label">今日营收</div><div class="value" id="revenueKpi">--</div><div class="trend" id="profitTrend">毛利待算</div></div>
+	              <div class="kpi"><div class="label">口碑评分</div><div class="value" id="ratingKpi">--</div><div class="trend" id="ratingTrend">服务未开始</div></div>
+	              <div class="kpi"><div class="label">库存健康</div><div class="value" id="stockKpi">--</div><div class="trend" id="stockTrend">未备货</div></div>
+	            </div>
 
             <div class="board">
               <div class="today">
@@ -242,13 +293,13 @@
                 </div>
               </div>
 
-              <aside class="card soft">
-                <p class="eyebrow">05 / 门店经营轨迹</p>
-                <h3 class="text-xl">每天发生了什么</h3>
-                <div class="story mt-4" id="storyLog">
-                  <div class="empty">经营日志会记录每天的选择、结果和 AI 复盘。</div>
-                </div>
-              </aside>
+	              <aside class="card soft">
+	                <p class="eyebrow">05 / 门店经营轨迹</p>
+	                <h3 class="text-xl">每天发生了什么</h3>
+	                <div class="story mt-4" id="storyLog">
+	                  <div class="empty">经营日志会记录每天的选择、托管数据摘要、结果和 AI 复盘。</div>
+	                </div>
+	              </aside>
             </div>
 
             <div class="card soft mt-4">
@@ -266,10 +317,25 @@
       </section>
     </main>
 
-    <script>
-      const $ = (id) => document.getElementById(id);
-      const fmt = (n) => Math.round(n).toLocaleString("zh-CN");
-      const state = { day: 0, cash: 0, rating: 4.6, stock: 82, pressure: 36, strategy: "steady", history: [], selectedDecision: null };
+	    <script>
+	      const $ = (id) => document.getElementById(id);
+	      const fmt = (n) => Math.round(n).toLocaleString("zh-CN");
+	      const state = {
+          day: 0,
+          cash: 0,
+          rating: 4.6,
+          stock: 82,
+          pressure: 36,
+          strategy: "steady",
+          history: [],
+          selectedDecision: null,
+          hosting: {
+            connected: false,
+            lastSync: "--",
+            meituan: { status: "未托管", storeId: "--" },
+            eleme: { status: "未托管", storeId: "--" }
+          }
+        };
 
       const profiles = {
         light: { base: 4300, cost: 0.46, tasks: ["洗切蔬菜与蛋白备料", "检查沙拉酱保质期", "上架午餐套餐图", "复盘差评里的口味反馈"] },
@@ -328,13 +394,75 @@
         }
       ];
 
-      function activeProfile() { return profiles[$("storeType").value]; }
-      function activeDistrict() { return districts[$("district").value]; }
+	      function activeProfile() { return profiles[$("storeType").value]; }
+	      function activeDistrict() { return districts[$("district").value]; }
 
-      function renderTasks(weather) {
-        const p = activeProfile();
-        const baseTasks = [
-          ["08:30", p.tasks[0], "开店前先确保核心原料够支撑第一波高峰。"],
+        const pad2 = (n) => String(n).padStart(2, "0");
+        function syncTimeText(d = new Date()) { return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; }
+        function seededInt(seed, min, max) {
+          const x = Math.sin(seed) * 10000;
+          const r = x - Math.floor(x);
+          return Math.floor(min + r * (max - min + 1));
+        }
+        function connectHostedAccounts() {
+          state.hosting.connected = true;
+          state.hosting.meituan.status = "已托管";
+          state.hosting.eleme.status = "已托管";
+          const seedBase = ($("storeName").value || "").length + $("storeType").value.length * 7;
+          state.hosting.meituan.storeId = `MT${seededInt(seedBase + 11, 100000, 999999)}`;
+          state.hosting.eleme.storeId = `ELM${seededInt(seedBase + 29, 100000, 999999)}`;
+          syncHostedData();
+        }
+        function disconnectHostedAccounts() {
+          state.hosting.connected = false;
+          state.hosting.lastSync = "--";
+          state.hosting.meituan = { status: "未托管", storeId: "--" };
+          state.hosting.eleme = { status: "未托管", storeId: "--" };
+          renderHostedStrip();
+        }
+        function syncHostedData() {
+          state.hosting.lastSync = syncTimeText();
+          renderHostedStrip();
+        }
+        function platformBreakdown(revenue, day, profileKey) {
+          const baseAov = profileKey === "coffee" ? 32 : profileKey === "tea" ? 28 : profileKey === "light" ? 36 : 26;
+          const aov = baseAov + (state.strategy === "premium" ? 6 : state.strategy === "growth" ? -2 : 0);
+          const totalOrders = Math.max(10, Math.round(revenue / Math.max(18, aov)));
+          const shareSeed = (day * 9 + ($("storeName").value || "").length * 3 + profileKey.length * 11) % 100;
+          const meituanShare = 0.56 + (shareSeed % 17) / 100; // 0.56 - 0.72
+          const meituanOrders = Math.max(0, Math.round(totalOrders * meituanShare));
+          const elemeOrders = Math.max(0, totalOrders - meituanOrders);
+          const meituanRevenue = revenue * meituanShare;
+          const elemeRevenue = Math.max(0, revenue - meituanRevenue);
+          return {
+            meituan: { revenue: meituanRevenue, orders: meituanOrders },
+            eleme: { revenue: elemeRevenue, orders: elemeOrders }
+          };
+        }
+        function renderHostedStrip(today = null) {
+          const connected = state.hosting.connected;
+          $("hostedState").textContent = connected ? `已连接 · 最近同步 ${state.hosting.lastSync}` : "未连接";
+          $("hostedIds").textContent = connected
+            ? `美团店铺 ${state.hosting.meituan.storeId} · 饿了么店铺 ${state.hosting.eleme.storeId}`
+            : "请先托管美团/饿了么账号";
+          if (!connected) {
+            $("hostedToday").textContent = "演示：这里展示托管账号拉取的订单/评价/曝光汇总（可脱敏样例）。";
+            return;
+          }
+          if (!today || !today.platform) {
+            $("hostedToday").textContent = "托管数据已连接：开始模拟后，将在这里展示今日托管汇总。";
+            return;
+          }
+          $("hostedToday").textContent =
+            `今日托管汇总：美团 ${today.platform.meituan.orders} 单 / ¥${fmt(today.platform.meituan.revenue)} · ` +
+            `饿了么 ${today.platform.eleme.orders} 单 / ¥${fmt(today.platform.eleme.revenue)} · ` +
+            `同步 ${today.syncAt}`;
+        }
+
+	      function renderTasks(weather) {
+	        const p = activeProfile();
+	        const baseTasks = [
+	          ["08:30", p.tasks[0], "开店前先确保核心原料够支撑第一波高峰。"],
           ["10:40", p.tasks[1], "把容易造成差评的质量点提前检查。"],
           ["11:20", p.tasks[2], "在平台首屏给用户一个明确下单理由。"],
           ["14:30", "查看库存与差评", "决定晚高峰是否补货、调价或收缩菜单。"],
@@ -370,75 +498,85 @@
         $("stockTrend").textContent = state.day ? (state.stock < 28 ? "明早必须补货" : state.stock < 48 ? "库存偏紧" : "库存健康") : "未备货";
       }
 
-      function renderHistory() {
-        if (!state.history.length) return;
-        $("storyLog").innerHTML = state.history.slice().reverse().map(h => `
-          <div class="log">
-            <div class="top"><div class="name">DAY ${h.day} · ${h.choice}</div><div class="money">¥${fmt(h.revenue)}</div></div>
-            <p>${h.story}</p>
-          </div>
-        `).join("");
-      }
+	      function renderHistory() {
+	        if (!state.history.length) return;
+	        $("storyLog").innerHTML = state.history.slice().reverse().map(h => `
+	          <div class="log">
+	            <div class="top"><div class="name">DAY ${h.day} · ${h.choice}</div><div class="money">¥${fmt(h.revenue)}</div></div>
+              ${h.platform ? `<div class="meta">托管数据：美团 ${h.platform.meituan.orders} 单 / ¥${fmt(h.platform.meituan.revenue)} · 饿了么 ${h.platform.eleme.orders} 单 / ¥${fmt(h.platform.eleme.revenue)} · 同步 ${h.syncAt}</div>` : ""}
+	            <p>${h.story}</p>
+	          </div>
+	        `).join("");
+	      }
 
-      function renderTrajectory() {
-        const recent = state.history.slice(-7);
-        const max = Math.max(1, ...recent.map(h => h.revenue));
-        $("trajectory").innerHTML = recent.length ? recent.map(h => {
-          const height = Math.max(8, Math.round((h.revenue / max) * 100));
-          return `<div><div class="bar"><div class="bar-fill" style="height:${height}%"></div><span>${fmt(h.revenue)}</span></div><div class="bar-label">D${h.day}</div></div>`;
-        }).join("") : `<div class="empty" style="grid-column: 1 / -1;">还没有轨迹。先开店，然后每天模拟一次。</div>`;
-      }
+	      function renderTrajectory() {
+	        const recent = state.history.slice(-7);
+	        const max = Math.max(1, ...recent.map(h => h.revenue));
+	        $("trajectory").innerHTML = recent.length ? recent.map(h => {
+	          const height = Math.max(8, Math.round((h.revenue / max) * 100));
+            const tip = h.platform
+              ? `托管汇总：美团 ¥${fmt(h.platform.meituan.revenue)}（${h.platform.meituan.orders}单） · 饿了么 ¥${fmt(h.platform.eleme.revenue)}（${h.platform.eleme.orders}单） · 同步 ${h.syncAt}`
+              : "托管汇总：--";
+	          return `<div title="${tip}"><div class="bar"><div class="bar-fill" style="height:${height}%"></div><span>${fmt(h.revenue)}</span></div><div class="bar-label">D${h.day}</div></div>`;
+	        }).join("") : `<div class="empty" style="grid-column: 1 / -1;">还没有轨迹。先开店，然后每天模拟一次。</div>`;
+	      }
 
-      function simulateDay() {
-        state.day += 1;
-        const p = activeProfile();
-        const d = activeDistrict();
-        const weather = weatherList[(state.day * 2 + $("storeName").value.length) % weatherList.length];
-        const decision = state.selectedDecision || decisions[(state.day - 1) % decisions.length].options[0];
-        const strategyFactor = state.strategy === "growth" ? 1.1 : state.strategy === "premium" ? 0.96 : 1;
-        const weekdayFactor = [1, 1.03, 1.06, 1.0, 1.12, 0.92, 0.86][(state.day - 1) % 7];
-        const reputationFactor = 0.88 + state.rating / 5 * 0.22;
-        const stockFactor = state.stock < 25 ? 0.82 : state.stock < 45 ? 0.94 : 1;
-        const revenue = p.base * d.factor * weather.factor * decision.revenue * strategyFactor * weekdayFactor * reputationFactor * stockFactor;
-        const fixedCost = 980 + (state.strategy === "growth" ? 160 : 0);
-        const profit = revenue * (1 - p.cost) - fixedCost + decision.cash;
-        state.cash += profit;
-        state.rating = Math.max(3.8, Math.min(5, state.rating + decision.rating - Math.max(0, state.pressure - 70) / 900));
-        state.stock = Math.max(8, Math.min(100, state.stock + decision.stock + weather.stock));
-        state.pressure = Math.max(18, Math.min(100, state.pressure + decision.pressure + (revenue > p.base * 1.12 ? 6 : -4)));
+	      function simulateDay() {
+	        state.day += 1;
+	        const p = activeProfile();
+	        const d = activeDistrict();
+	        const weather = weatherList[(state.day * 2 + $("storeName").value.length) % weatherList.length];
+	        const decision = state.selectedDecision || decisions[(state.day - 1) % decisions.length].options[0];
+	        const strategyFactor = state.strategy === "growth" ? 1.1 : state.strategy === "premium" ? 0.96 : 1;
+	        const weekdayFactor = [1, 1.03, 1.06, 1.0, 1.12, 0.92, 0.86][(state.day - 1) % 7];
+	        const reputationFactor = 0.88 + state.rating / 5 * 0.22;
+	        const stockFactor = state.stock < 25 ? 0.82 : state.stock < 45 ? 0.94 : 1;
+	        const revenue = p.base * d.factor * weather.factor * decision.revenue * strategyFactor * weekdayFactor * reputationFactor * stockFactor;
+	        const fixedCost = 980 + (state.strategy === "growth" ? 160 : 0);
+	        const profit = revenue * (1 - p.cost) - fixedCost + decision.cash;
+	        state.cash += profit;
+	        state.rating = Math.max(3.8, Math.min(5, state.rating + decision.rating - Math.max(0, state.pressure - 70) / 900));
+	        state.stock = Math.max(8, Math.min(100, state.stock + decision.stock + weather.stock));
+	        state.pressure = Math.max(18, Math.min(100, state.pressure + decision.pressure + (revenue > p.base * 1.12 ? 6 : -4)));
+          if (state.hosting.connected) syncHostedData();
 
-        const today = {
-          day: state.day,
-          revenue,
-          profit,
-          choice: decision.title,
-          story: `${weather.text}，${d.name}商圈呈现“${d.peak}”。你选择了“${decision.title}”，当天现金${profit >= 0 ? "增加" : "减少"} ¥${fmt(Math.abs(profit))}，库存剩余 ${Math.round(state.stock)}%，员工压力 ${Math.round(state.pressure)}%。AI 建议：${state.stock < 35 ? "明天优先补货并收缩爆款售卖节奏。" : state.rating < 4.45 ? "明天先处理评价和出餐稳定性。" : "明天可以继续测试套餐和复购动作。"}`
-        };
-        state.history.push(today);
+          const platform = state.hosting.connected ? platformBreakdown(revenue, state.day, $("storeType").value) : null;
+	        const today = {
+	          day: state.day,
+	          revenue,
+	          profit,
+	          choice: decision.title,
+            platform,
+            syncAt: state.hosting.connected ? state.hosting.lastSync : "--",
+	          story: `${weather.text}，${d.name}商圈呈现“${d.peak}”。你选择了“${decision.title}”，当天现金${profit >= 0 ? "增加" : "减少"} ¥${fmt(Math.abs(profit))}，库存剩余 ${Math.round(state.stock)}%，员工压力 ${Math.round(state.pressure)}%。AI 建议：${state.stock < 35 ? "明天优先补货并收缩爆款售卖节奏。" : state.rating < 4.45 ? "明天先处理评价和出餐稳定性。" : "明天可以继续测试套餐和复购动作。"}`
+	        };
+	        state.history.push(today);
 
-        $("dashTitle").textContent = $("storeName").value;
-        $("dayNum").textContent = `DAY ${state.day}`;
-        $("weatherBox").innerHTML = `${weather.text}<br><span style="color:rgba(247,245,237,.48);font-size:12px;">${d.name} · ${d.peak}</span>`;
-        $("daySummary").textContent = `今天的重点是：守住履约质量，同时把一个经营决策转化成真实结果。`;
-        renderTasks(weather);
-        renderKpis(today);
-        renderHistory();
-        renderTrajectory();
-        renderDecision(state.day + 1);
-      }
+	        $("dashTitle").textContent = $("storeName").value;
+	        $("dayNum").textContent = `DAY ${state.day}`;
+	        $("weatherBox").innerHTML = `${weather.text}<br><span style="color:rgba(247,245,237,.48);font-size:12px;">${d.name} · ${d.peak}</span>`;
+	        $("daySummary").textContent = `今天的重点是：守住履约质量，同时把一个经营决策转化成真实结果。`;
+	        renderTasks(weather);
+	        renderKpis(today);
+          renderHostedStrip(today);
+	        renderHistory();
+	        renderTrajectory();
+	        renderDecision(state.day + 1);
+	      }
 
-      function start() {
-        state.day = 0;
-        state.cash = Number($("cash").value);
-        state.rating = 4.6;
-        state.stock = 82;
-        state.pressure = 36;
-        state.history = [];
-        $("nextDayBtn").disabled = false;
-        renderTrajectory();
-        renderDecision(1);
-        simulateDay();
-      }
+	      function start() {
+	        state.day = 0;
+	        state.cash = Number($("cash").value);
+	        state.rating = 4.6;
+	        state.stock = 82;
+	        state.pressure = 36;
+	        state.history = [];
+          connectHostedAccounts();
+	        $("nextDayBtn").disabled = false;
+	        renderTrajectory();
+	        renderDecision(1);
+	        simulateDay();
+	      }
 
       Array.from(document.querySelectorAll(".chip")).forEach((chip) => {
         chip.addEventListener("click", () => {
@@ -449,16 +587,17 @@
       });
       $("startBtn").addEventListener("click", start);
       $("nextDayBtn").addEventListener("click", simulateDay);
-      $("resetBtn").addEventListener("click", () => {
-        state.day = 0; state.cash = 0; state.history = []; state.selectedDecision = null;
-        $("dashTitle").textContent = "等待开店"; $("dayNum").textContent = "DAY 0"; $("weatherBox").textContent = "--";
-        $("daySummary").textContent = "点击“开店模拟”，系统会生成第一天的开店事项。";
-        $("taskGrid").innerHTML = `<div class="empty">还没有生成任务。<br />这里会出现备货、排班、上架、巡店、私域触达和复盘。</div>`;
-        $("decisionTitle").textContent = "等待事件"; $("decisionDesc").textContent = "每天会出现一个真实经营选择，例如是否加投平台、是否临时补货、是否压缩 SKU。"; $("decisionOptions").innerHTML = "";
-        $("storyLog").innerHTML = `<div class="empty">经营日志会记录每天的选择、结果和 AI 复盘。</div>`;
-        $("nextDayBtn").disabled = true; renderKpis(); renderTrajectory();
-      });
-      renderKpis(); renderTrajectory();
-    </script>
-  </body>
+	      $("resetBtn").addEventListener("click", () => {
+	        state.day = 0; state.cash = 0; state.history = []; state.selectedDecision = null;
+	        $("dashTitle").textContent = "等待开店"; $("dayNum").textContent = "DAY 0"; $("weatherBox").textContent = "--";
+	        $("daySummary").textContent = "点击“开店模拟”，系统会生成第一天的开店事项。";
+	        $("taskGrid").innerHTML = `<div class="empty">还没有生成任务。<br />这里会出现备货、排班、上架、巡店、私域触达和复盘。</div>`;
+	        $("decisionTitle").textContent = "等待事件"; $("decisionDesc").textContent = "每天会出现一个真实经营选择，例如是否加投平台、是否临时补货、是否压缩 SKU。"; $("decisionOptions").innerHTML = "";
+	        $("storyLog").innerHTML = `<div class="empty">经营日志会记录每天的选择、托管数据摘要、结果和 AI 复盘。</div>`;
+          disconnectHostedAccounts();
+	        $("nextDayBtn").disabled = true; renderKpis(); renderTrajectory();
+	      });
+	      renderKpis(); renderTrajectory(); renderHostedStrip();
+	    </script>
+	  </body>
 </html>
