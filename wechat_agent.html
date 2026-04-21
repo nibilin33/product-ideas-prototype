@@ -525,6 +525,11 @@
         box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.10);
       }
 
+      .wda-input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        opacity: 0.75;
+      }
+
       .wda-textarea {
         min-height: 112px;
         resize: vertical;
@@ -1177,10 +1182,10 @@
                   <div class="text-base font-black">开店日报</div>
                   <div class="mt-1 text-xs text-zinc-200/60 leading-5">${escapeHtml(dayLabel(storeDayKey))}</div>
                 </div>
-                <div class="flex flex-wrap gap-2 justify-end">
-                  <button class="btn-secondary btn-sm" type="button" data-action="storePrevDay">前一天</button>
-                  <button class="btn-secondary btn-sm" type="button" data-action="storeNextDay">后一天</button>
-                  <button class="btn-secondary btn-sm" type="button" data-action="storeRegenerate">重生成</button>
+                <div class="flex items-center justify-end">
+                  <div class="w-44">
+                    <input class="wda-input h-10 text-sm" type="date" value="${escapeHtml(storeDayKey)}" data-action="storePickDay" aria-label="选择日报日期" />
+                  </div>
                 </div>
               </div>
 
@@ -1218,15 +1223,14 @@
               </div>
             </div>
 
-            <div class="gstroke p-4">
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <div class="text-base font-black">今日雷达</div>
-                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">按“意向 + 客单 + 漏单风险”排序。</div>
-                </div>
-                <button class="btn-secondary btn-sm" type="button" data-action="explainRadar">规则</button>
-              </div>
-              <div class="mt-3 grid gap-2">
+	            <div class="gstroke p-4">
+	              <div class="flex items-start justify-between gap-3">
+	                <div>
+	                  <div class="text-base font-black">今日雷达</div>
+	                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">优先跟进清单</div>
+	                </div>
+	              </div>
+	              <div class="mt-3 grid gap-2">
                 ${dealLeads.map(({ l, s }) => {
                   const lb = scoreLabel(s);
                   const risk = String(l.risk || "").includes("当天") ? `<span class="wda-chip wda-chip--danger">窗口期</span>` : `<span class="wda-chip wda-chip--warn">易漏</span>`;
@@ -1252,14 +1256,13 @@
               </div>
             </div>
 
-            <div class="gstroke p-4">
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <div class="text-base font-black">老客激活</div>
-                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">沉默≥30天的已消费客户，给开场话术并加入跟进清单。</div>
-                </div>
-                <button class="btn-secondary btn-sm" type="button" data-action="rebuyPlaybook">怎么做</button>
-              </div>
+	            <div class="gstroke p-4">
+	              <div class="flex items-start justify-between gap-3">
+	                <div>
+	                  <div class="text-base font-black">老客激活</div>
+	                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">沉默≥30天</div>
+	                </div>
+	              </div>
 
               <div class="mt-3 grid gap-2">
                 ${activationLeads.length ? activationLeads.map(({ l, silent }) => `
@@ -1865,27 +1868,6 @@
           }
         }
 
-        function explainRadar() {
-          openModal({
-            title: "雷达规则",
-            bodyHtml: `
-              <div class="grid gap-3">
-                <div class="gstroke p-3">
-                  <div class="text-sm font-black">排序依据</div>
-                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">阶段 / 客单价 / 意向信号 / 未推进时长。</div>
-                </div>
-                <div class="gstroke p-3">
-                  <div class="text-sm font-black">输出内容</div>
-                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">
-                    <span class="text-emerald-200/90 font-black">下一步动作</span> + <span class="text-emerald-200/90 font-black">可复制话术</span> + <span class="text-emerald-200/90 font-black">待办时间</span>。
-                  </div>
-                </div>
-              </div>
-            `,
-            footHtml: `<button class="btn-primary btn-sm" type="button" data-action="closeModal">知道了</button>`
-          });
-        }
-
         function openLead(id) {
           const lead = getLead(id);
           if (!lead) return;
@@ -2244,29 +2226,6 @@
           });
         }
 
-        function rebuyPlaybook() {
-          openModal({
-            title: "老客激活怎么做",
-            bodyHtml: `
-              <div class="grid gap-3">
-                <div class="gstroke p-3">
-                  <div class="text-sm font-black">结构</div>
-                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">近况 → 升级点 → 转介绍（不施压）。</div>
-                </div>
-                <div class="gstroke p-3">
-                  <div class="text-sm font-black">不要做</div>
-                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">群发、硬推优惠、连续追问、尴尬式“要转介绍”。</div>
-                </div>
-                <div class="gstroke p-3">
-                  <div class="text-sm font-black">要做</div>
-                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">目标是让对方愿意回你一句话，重启对话。</div>
-                </div>
-              </div>
-            `,
-            footHtml: `<button class="btn-primary btn-sm" type="button" data-action="closeModal">知道了</button>`
-          });
-        }
-
         // --- events ---
         document.addEventListener("click", (e) => {
           const secBtn = e.target.closest("#wdaSeg [data-sec]");
@@ -2278,27 +2237,6 @@
           if (act === "openLead") return openLead(btn.dataset.id);
           if (act === "closeDrawer") return closeDrawer();
           if (act === "openSettings") return openSettings();
-          if (act === "storePrevDay") {
-            state.ui.day_key = shiftDayKey(state.ui.day_key || isoDayKey(now()), -1);
-            saveState(state);
-            render();
-            return;
-          }
-          if (act === "storeNextDay") {
-            state.ui.day_key = shiftDayKey(state.ui.day_key || isoDayKey(now()), 1);
-            saveState(state);
-            render();
-            return;
-          }
-          if (act === "storeRegenerate") {
-            const k = state.ui.day_key || isoDayKey(now());
-            if (state.db.store_days) delete state.db.store_days[k];
-            saveState(state);
-            render();
-            toast("已重生成日报");
-            return;
-          }
-          if (act === "explainRadar") return explainRadar();
           if (act === "genAdvice") return genAdviceForLead(btn.dataset.id);
           if (act === "openFollowup") {
             const id = btn.dataset.id;
@@ -2330,7 +2268,6 @@
           if (act === "outboxClear") return outboxClearQueued();
           if (act === "toggleSafety") return toggleSafety(btn.dataset.key);
           if (act === "resetAll") return resetAll();
-          if (act === "rebuyPlaybook") return rebuyPlaybook();
           if (act === "rebuyNudge") {
             const id = btn.dataset.id;
             const added = ensureRebuyActivationTask(id);
@@ -2458,6 +2395,13 @@
           const el = e.target;
           if (!el || !el.dataset.action) return;
           const act = el.dataset.action;
+          if (act === "storePickDay") {
+            const v = String(el.value || "").trim();
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return;
+            state.ui.day_key = v;
+            saveState(state);
+            return render();
+          }
           if (act === "followupLead") {
             state.ui.followup_lead_id = el.value;
             state.ui.followup_plan = null;
