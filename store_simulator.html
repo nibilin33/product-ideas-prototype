@@ -14,10 +14,9 @@
         color: #f7f5ed;
         font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
         background:
-          radial-gradient(circle at 12% 10%, rgba(245, 158, 11, 0.16), transparent 32%),
-          radial-gradient(circle at 92% 16%, rgba(20, 184, 166, 0.13), transparent 34%),
-          radial-gradient(circle at 55% 92%, rgba(248, 113, 113, 0.12), transparent 35%),
-          linear-gradient(180deg, #11140d 0%, #060806 62%, #030403 100%);
+          radial-gradient(900px 520px at 18% 12%, rgba(56,189,248,0.08), transparent 55%),
+          radial-gradient(740px 460px at 86% 18%, rgba(251,191,36,0.10), transparent 58%),
+          linear-gradient(180deg, #0b0f14 0%, #05070b 60%, #040508 100%);
         overflow-x: hidden;
       }
       body::before {
@@ -26,26 +25,26 @@
         inset: 0;
         pointer-events: none;
         background-image:
-          linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px),
-          radial-gradient(circle, rgba(251, 191, 36, 0.45) 1px, transparent 1.5px);
-        background-size: 34px 34px, 34px 34px, 420px 420px;
-        mask-image: radial-gradient(circle at center, black 58%, transparent 96%);
-        opacity: 0.86;
+          linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: 48px 48px, 48px 48px;
+        mask-image: radial-gradient(circle at 30% 10%, black 18%, transparent 62%);
+        opacity: 0.45;
       }
-      .shell { position: relative; z-index: 1; width: min(1180px, calc(100vw - 28px)); margin: 0 auto; padding: 22px 0 42px; }
+      .shell { position: relative; z-index: 1; width: min(1260px, calc(100vw - 28px)); margin: 0 auto; padding: 16px 0 42px; }
       .hero {
-        border-radius: 32px;
-        padding: 24px;
-        background:
-          linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.025)),
-          radial-gradient(120% 100% at 8% 0%, rgba(245,158,11,0.18), transparent 54%),
-          rgba(255,255,255,0.035);
-        border: 1px solid rgba(255,255,255,0.12);
-        box-shadow: 0 24px 80px rgba(0,0,0,0.45);
-        backdrop-filter: blur(18px);
-        overflow: hidden;
+        border-radius: 16px;
+        padding: 14px 16px;
+        background: rgba(15,18,24,0.72);
+        border: 1px solid rgba(255,255,255,0.10);
+        box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+        position: sticky;
+        top: 12px;
+        z-index: 3;
       }
+      .hero-row { display:flex; align-items:flex-start; justify-content: space-between; gap: 14px; }
+      .appname { font-size: 16px; font-weight: 950; letter-spacing: -0.02em; }
+      .appsub { margin-top: 3px; font-size: 12px; color: rgba(247,245,237,0.58); font-weight: 850; }
       .badge {
         display: inline-flex;
         align-items: center;
@@ -66,15 +65,14 @@
       .lead { margin-top: 18px; max-width: 740px; color: rgba(247,245,237,0.68); font-size: 15px; line-height: 1.9; }
       .layout { display: grid; grid-template-columns: 380px 1fr; gap: 16px; margin-top: 16px; align-items: start; }
       .card {
-        border-radius: 26px;
-        padding: 18px;
-        background: rgba(255,255,255,0.055);
-        border: 1px solid rgba(255,255,255,0.105);
-        box-shadow: 0 20px 58px rgba(0,0,0,0.34);
-        backdrop-filter: blur(16px);
+        border-radius: 16px;
+        padding: 16px;
+        background: rgba(255,255,255,0.035);
+        border: 1px solid rgba(255,255,255,0.09);
+        box-shadow: 0 10px 28px rgba(0,0,0,0.30);
       }
-      .card.soft { box-shadow: none; background: rgba(255,255,255,0.04); }
-      .eyebrow { color: rgba(45, 212, 191, 0.85); font-size: 11px; font-weight: 950; letter-spacing: 0.22em; text-transform: uppercase; }
+      .card.soft { box-shadow: none; background: rgba(255,255,255,0.028); }
+      .eyebrow { color: rgba(247,245,237,0.58); font-size: 12px; font-weight: 900; letter-spacing: 0; text-transform: none; }
       .card h2, .card h3 { margin: 7px 0 0; font-weight: 950; letter-spacing: -0.035em; }
       .muted { color: rgba(247,245,237,0.58); line-height: 1.7; }
       .field { margin-top: 14px; }
@@ -92,10 +90,16 @@
       .chip.active { color: #241706; background: #fbbf24; border-color: #fbbf24; box-shadow: 0 0 22px rgba(251,191,36,0.22); }
       .btn {
         height: 46px; border: 0; border-radius: 16px; padding: 0 16px; cursor: pointer; font-weight: 950;
-        color: #160f05; background: linear-gradient(135deg, #fbbf24, #fb923c); box-shadow: 0 12px 34px rgba(251,146,60,0.25);
+        color: #160f05; background: #fbbf24; box-shadow: none;
       }
-      .btn:hover { transform: translateY(-1px); box-shadow: 0 18px 44px rgba(251,146,60,0.35); }
-      .btn.secondary { color: rgba(247,245,237,0.88); background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); box-shadow: none; }
+      .btn:hover { transform: translateY(-1px); filter: brightness(1.02); }
+      .btn.secondary { color: rgba(247,245,237,0.86); background: rgba(0,0,0,0.14); border: 1px solid rgba(255,255,255,0.12); box-shadow: none; }
+      .btn.record {
+        color: rgba(255,255,255,0.92);
+        background: linear-gradient(135deg, rgba(239,68,68,0.92), rgba(249,115,22,0.88));
+        box-shadow: 0 14px 34px rgba(239,68,68,0.22);
+      }
+      .btn.record:hover { box-shadow: 0 18px 44px rgba(239,68,68,0.32); }
       .btn.full { width: 100%; }
       .btn:disabled { opacity: 0.55; cursor: wait; transform: none; }
       .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
@@ -104,15 +108,15 @@
       .kpi .value { margin-top: 8px; font-size: 24px; font-weight: 950; letter-spacing: -0.04em; }
       .kpi .trend { margin-top: 5px; color: rgba(45,212,191,0.88); font-size: 12px; font-weight: 900; }
       .source-strip {
-        margin-top: 12px;
-        border-radius: 20px;
-        padding: 12px 14px;
+        margin-top: 10px;
+        border-radius: 14px;
+        padding: 10px 12px;
         display: flex;
         justify-content: space-between;
         gap: 12px;
         align-items: center;
-        background: rgba(0,0,0,0.20);
-        border: 1px solid rgba(255,255,255,0.09);
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
       }
       .source-label { color: rgba(247,245,237,0.56); font-size: 12px; font-weight: 900; letter-spacing: 0.06em; }
       .source-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
@@ -129,9 +133,9 @@
       .source-sub { margin-top: 4px; font-size: 12px; color: rgba(247,245,237,0.52); font-weight: 850; }
       .source-today {
         margin-top: 10px;
-        border-radius: 18px;
-        padding: 10px 14px;
-        background: rgba(255,255,255,0.035);
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: rgba(255,255,255,0.03);
         border: 1px solid rgba(255,255,255,0.08);
         color: rgba(247,245,237,0.72);
         font-size: 12px;
@@ -154,6 +158,7 @@
       .task-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
       .task {
         border-radius: 20px; padding: 13px; background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.09);
+        cursor: pointer;
       }
       .task .time { color: rgba(251,191,36,0.9); font-size: 11px; font-weight: 950; letter-spacing: 0.08em; }
       .task .name { margin-top: 7px; color: rgba(247,245,237,0.94); font-weight: 950; }
@@ -172,7 +177,77 @@
       .log .name { font-size: 13px; font-weight: 950; }
       .log .money { color: rgba(45,212,191,0.9); font-size: 12px; font-weight: 950; }
       .log .meta { margin-top: 6px; color: rgba(247,245,237,0.52); font-size: 12px; font-weight: 850; line-height: 1.55; }
+      .log .actions { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
       .log p { margin: 7px 0 0; color: rgba(247,245,237,0.58); font-size: 12px; line-height: 1.65; }
+      .mini-btn {
+        height: 30px;
+        padding: 0 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        color: rgba(255,255,255,0.88);
+        font-size: 12px;
+        font-weight: 950;
+        cursor: pointer;
+      }
+      .mini-btn:hover { transform: translateY(-1px); border-color: rgba(251,191,36,0.28); }
+      .task.done { border-color: rgba(45,212,191,0.34); background: rgba(20,184,166,0.08); }
+      .task.done .time { color: rgba(45,212,191,0.92); }
+
+      .ops {
+        margin-top: 12px;
+        border-radius: 22px;
+        padding: 14px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.09);
+      }
+      .tabs { display:flex; flex-wrap: wrap; gap: 8px; }
+      .tab {
+        height: 30px; padding: 0 10px; border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.16);
+        color: rgba(247,245,237,0.78); font-size: 12px; font-weight: 950; cursor: pointer;
+      }
+      .tab.active { background: rgba(251,191,36,0.14); border-color: rgba(251,191,36,0.38); color: rgba(255,246,214,0.92); }
+      .ops-body { margin-top: 12px; display: grid; gap: 10px; }
+      .ops-row { display:flex; align-items:center; justify-content:space-between; gap: 12px; padding: 10px 12px; border-radius: 16px; background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.08); }
+      .ops-row .left { display:grid; gap: 2px; }
+      .ops-row .title { font-size: 12px; font-weight: 950; margin: 0; letter-spacing: -0.02em; }
+      .ops-row .sub { font-size: 12px; color: rgba(247,245,237,0.56); font-weight: 850; }
+      .ops-kv { display:flex; gap: 10px; flex-wrap: wrap; align-items:center; }
+      .pill {
+        height: 22px; display:inline-flex; align-items:center; gap: 6px; padding: 0 10px; border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04);
+        color: rgba(247,245,237,0.72); font-size: 11px; font-weight: 950;
+      }
+      .rec-indicator { display:inline-flex; align-items:center; gap: 8px; }
+      .rec-dot { width: 9px; height: 9px; border-radius: 99px; background: rgba(239,68,68,0.95); box-shadow: 0 0 18px rgba(239,68,68,0.5); }
+      .rec-dot.blink { animation: blink 1.05s infinite; }
+      @keyframes blink { 0%, 48% { opacity: 1 } 50%, 100% { opacity: 0.25 } }
+
+      .modal {
+        position: fixed; inset: 0; z-index: 50; display:none;
+        background: rgba(0,0,0,0.62);
+        padding: 22px;
+      }
+      .modal.show { display:flex; align-items: center; justify-content: center; }
+      .modal-card {
+        width: min(820px, 100%);
+        max-height: min(78vh, 720px);
+        overflow: auto;
+        border-radius: 22px;
+        padding: 16px;
+        background: rgba(15,18,12,0.92);
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 0 26px 80px rgba(0,0,0,0.55);
+        backdrop-filter: blur(18px);
+      }
+      .event-item { padding: 10px 12px; border-radius: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+      .event-item .t { font-size: 12px; font-weight: 950; color: rgba(45,212,191,0.92); }
+      .event-item .d { margin-top: 5px; font-size: 12px; color: rgba(247,245,237,0.74); font-weight: 850; line-height: 1.55; }
+      .modal-head { display:flex; align-items:flex-start; justify-content: space-between; gap: 12px; }
+      .modal-title { font-size: 16px; font-weight: 950; letter-spacing: -0.03em; }
+      .modal-sub { margin-top: 5px; color: rgba(247,245,237,0.58); font-size: 12px; font-weight: 850; }
+      .modal-actions { display:flex; gap: 8px; flex-wrap: wrap; align-items:center; justify-content:flex-end; }
       .trajectory { margin-top: 14px; display: grid; grid-template-columns: repeat(7, minmax(46px, 1fr)); gap: 8px; }
       .bar { height: 118px; border-radius: 18px; background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.08); display:flex; align-items:flex-end; padding: 7px; position:relative; overflow:hidden; }
       .bar-fill { width: 100%; border-radius: 12px; background: linear-gradient(180deg, #2dd4bf, #fbbf24); min-height: 6px; transition: height 0.5s ease; }
@@ -184,18 +259,37 @@
     </style>
   </head>
   <body>
-    <main class="shell">
-      <section class="hero">
-        <span class="badge"><span class="dot"></span> STORE OPENING SIMULATOR</span>
-        <h1 class="title">模拟一家店，<br /><span>每天怎么活下来。</span></h1>
-        <p class="lead">这个页面用来真实演示“开店辅助能力”：系统基于 <strong>美团 / 饿了么帐号托管</strong> 拉取的订单、评价、曝光与履约数据生成每日任务、突发事件与经营选择；你点击决策后，它会沉淀一家门店从第 1 天到第 N 天的营收、口碑、库存、员工压力和复购轨迹。</p>
-      </section>
+	    <main class="shell">
+	      <section class="hero">
+          <div class="hero-row">
+            <div>
+              <div class="appname">模拟开店训练舱</div>
+              <div class="appsub">每日经营轨迹 · 平台后台实操（操作自动留痕，可回放）</div>
+            </div>
+            <div class="muted text-sm" style="font-weight:850;">数据：美团 / 饿了么帐号托管</div>
+          </div>
+          <div class="source-strip" id="sourceStrip">
+            <div>
+              <div class="source-label">数据来源</div>
+              <div class="source-badges">
+                <span class="platform-badge meituan">美团外卖</span>
+                <span class="platform-badge eleme">饿了么</span>
+                <span class="source-note">帐号托管（只读拉取）</span>
+              </div>
+            </div>
+            <div class="source-meta">
+              <div class="source-state" id="hostedState">未连接</div>
+              <div class="source-sub" id="hostedIds">请先托管美团/饿了么账号</div>
+            </div>
+          </div>
+          <div class="source-today" id="hostedToday" style="display:none;"></div>
+	      </section>
 
       <section class="layout">
-        <aside class="card">
-          <p class="eyebrow">01 / 开店设定</p>
-          <h2 class="text-2xl">先创建你的门店</h2>
-          <p class="muted mt-2 text-sm">演示时只要改几个参数，就能让观众看到不同类型门店的经营命运。</p>
+	        <aside class="card">
+	          <p class="eyebrow">开店设定</p>
+	          <h2 class="text-2xl">先创建你的门店</h2>
+	          <p class="muted mt-2 text-sm">每天像真的在平台后台做投放、处理评价、补货与履约；点击“生成今日复盘”结算当日结果，并沉淀可回放的操作轨迹。</p>
 
           <div class="field">
             <label for="storeName">门店名称</label>
@@ -242,74 +336,78 @@
         </aside>
 
         <section>
-	          <div class="card">
-	            <div class="flex flex-wrap items-start justify-between gap-3">
-	              <div>
-	                <p class="eyebrow">02 / 经营仪表盘</p>
-	                <h2 class="text-2xl" id="dashTitle">等待开店</h2>
-	              </div>
-	              <button class="btn secondary" id="nextDayBtn" disabled>模拟下一天</button>
-	            </div>
-              <div class="source-strip" id="sourceStrip">
-                <div>
-                  <div class="source-label">数据来源</div>
-                  <div class="source-badges">
-                    <span class="platform-badge meituan">美团外卖</span>
-                    <span class="platform-badge eleme">饿了么</span>
-                    <span class="source-note">帐号托管（只读拉取）</span>
+		          <div class="card">
+		            <div class="flex flex-wrap items-start justify-between gap-3">
+		              <div>
+		                <p class="eyebrow">经营仪表盘</p>
+		                <h2 class="text-2xl" id="dashTitle">等待开店</h2>
+		              </div>
+		              <div class="flex flex-wrap items-center gap-2">
+                    <button class="btn" id="closeDayBtn" disabled>生成今日复盘</button>
+                    <button class="btn secondary" id="nextDayBtn" disabled>进入下一天</button>
                   </div>
-                </div>
-                <div class="source-meta">
-                  <div class="source-state" id="hostedState">未连接</div>
-                  <div class="source-sub" id="hostedIds">请先托管美团/饿了么账号</div>
-                </div>
-              </div>
-              <div class="source-today" id="hostedToday">演示：这里展示托管账号拉取的订单/评价/曝光汇总（可脱敏样例）。</div>
-	            <div class="kpis mt-4">
-	              <div class="kpi"><div class="label">现金余额</div><div class="value" id="cashKpi">--</div><div class="trend" id="cashTrend">待生成</div></div>
-	              <div class="kpi"><div class="label">今日营收</div><div class="value" id="revenueKpi">--</div><div class="trend" id="profitTrend">毛利待算</div></div>
-	              <div class="kpi"><div class="label">口碑评分</div><div class="value" id="ratingKpi">--</div><div class="trend" id="ratingTrend">服务未开始</div></div>
+		            </div>
+		            <div class="kpis mt-4">
+		              <div class="kpi"><div class="label">现金余额</div><div class="value" id="cashKpi">--</div><div class="trend" id="cashTrend">待生成</div></div>
+		              <div class="kpi"><div class="label">今日营收</div><div class="value" id="revenueKpi">--</div><div class="trend" id="profitTrend">毛利待算</div></div>
+		              <div class="kpi"><div class="label">口碑评分</div><div class="value" id="ratingKpi">--</div><div class="trend" id="ratingTrend">服务未开始</div></div>
 	              <div class="kpi"><div class="label">库存健康</div><div class="value" id="stockKpi">--</div><div class="trend" id="stockTrend">未备货</div></div>
 	            </div>
 
-            <div class="board">
-              <div class="today">
-                <div class="day-head">
-                  <div>
-                    <p class="eyebrow">03 / 今日开店任务</p>
-                    <div class="day-num" id="dayNum">DAY 0</div>
-                    <p class="muted text-sm" id="daySummary">点击“开店模拟”，系统会生成第一天的开店事项。</p>
-                  </div>
-                  <div class="weather" id="weatherBox">--</div>
-                </div>
+	            <div class="board">
+	              <div class="today">
+	                <div class="day-head">
+	                  <div>
+	                    <p class="eyebrow">今日开店任务</p>
+	                    <div class="day-num" id="dayNum">DAY 0</div>
+	                    <p class="muted text-sm" id="daySummary">点击“开店模拟”，系统会生成第一天的开店事项。</p>
+	                  </div>
+	                  <div class="weather" id="weatherBox">--</div>
+	                </div>
                 <div class="task-grid" id="taskGrid">
                   <div class="empty">还没有生成任务。<br />这里会出现备货、排班、上架、巡店、私域触达和复盘。</div>
                 </div>
-                <div class="card soft mt-4">
-                  <p class="eyebrow">04 / 今日关键决策</p>
-                  <h3 class="text-lg" id="decisionTitle">等待事件</h3>
-                  <p class="muted mt-2 text-sm" id="decisionDesc">每天会出现一个真实经营选择，例如是否加投平台、是否临时补货、是否压缩 SKU。</p>
-                  <div class="decision" id="decisionOptions"></div>
+	                <div class="card soft mt-4">
+	                  <p class="eyebrow">今日关键决策</p>
+	                  <h3 class="text-lg" id="decisionTitle">等待开店</h3>
+	                  <p class="muted mt-2 text-sm" id="decisionDesc">开店后会出现今日关键决策；你的选择与后台操作都会自动留痕并可回放。</p>
+	                  <div class="decision" id="decisionOptions"></div>
+	                </div>
+
+                <div class="ops" id="opsConsole">
+                  <div class="flex items-center justify-between gap-3">
+                    <div>
+                      <p class="eyebrow">平台后台实操</p>
+                      <h3 class="text-lg">后台操作台</h3>
+                      <p class="muted mt-2 text-sm">投放、订单、评价、商品、履约。你的操作会影响当日营收/口碑/压力，并自动沉淀为可回放轨迹。</p>
+                    </div>
+                    <div class="rec-indicator">
+                      <span class="rec-dot"></span>
+                      <span class="muted text-sm" style="font-weight:900;">操作轨迹自动留痕</span>
+                    </div>
+                  </div>
+                  <div class="tabs mt-3" id="opsTabs"></div>
+                  <div class="ops-body" id="opsBody"></div>
                 </div>
               </div>
 
-	              <aside class="card soft">
-	                <p class="eyebrow">05 / 门店经营轨迹</p>
-	                <h3 class="text-xl">每天发生了什么</h3>
-	                <div class="story mt-4" id="storyLog">
-	                  <div class="empty">经营日志会记录每天的选择、托管数据摘要、结果和 AI 复盘。</div>
-	                </div>
-	              </aside>
+		              <aside class="card soft">
+		                <p class="eyebrow">门店经营轨迹</p>
+		                <h3 class="text-xl">每天发生了什么</h3>
+		                <div class="story mt-4" id="storyLog">
+		                  <div class="empty">经营日志会记录每天的选择、托管数据摘要、结果和 AI 复盘。</div>
+		                </div>
+		              </aside>
             </div>
 
-            <div class="card soft mt-4">
-              <div class="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p class="eyebrow">06 / 首周营收轨迹</p>
-                  <h3 class="text-xl">看见这家店的成长曲线</h3>
-                </div>
-                <span class="muted text-sm" id="weekHint">最多展示最近 7 天</span>
-              </div>
+	            <div class="card soft mt-4">
+	              <div class="flex flex-wrap items-center justify-between gap-3">
+	                <div>
+	                  <p class="eyebrow">首周营收轨迹</p>
+	                  <h3 class="text-xl">看见这家店的成长曲线</h3>
+	                </div>
+	                <span class="muted text-sm" id="weekHint">最多展示最近 7 天</span>
+	              </div>
               <div class="trajectory" id="trajectory"></div>
             </div>
           </div>
@@ -317,10 +415,26 @@
       </section>
     </main>
 
+    <div class="modal" id="replayModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div>
+            <div class="modal-title" id="replayTitle">回放</div>
+            <div class="modal-sub" id="replaySub">—</div>
+          </div>
+          <div class="modal-actions">
+            <button class="mini-btn" id="exportBtn">导出 JSON</button>
+            <button class="mini-btn" id="closeModalBtn">关闭</button>
+          </div>
+        </div>
+        <div class="story mt-4" id="replayBody"></div>
+      </div>
+    </div>
+
 	    <script>
 	      const $ = (id) => document.getElementById(id);
 	      const fmt = (n) => Math.round(n).toLocaleString("zh-CN");
-	      const state = {
+		      const state = {
           day: 0,
           cash: 0,
           rating: 4.6,
@@ -329,6 +443,7 @@
           strategy: "steady",
           history: [],
           selectedDecision: null,
+          dayDraft: null,
           hosting: {
             connected: false,
             lastSync: "--",
@@ -397,13 +512,19 @@
 	      function activeProfile() { return profiles[$("storeType").value]; }
 	      function activeDistrict() { return districts[$("district").value]; }
 
-        const pad2 = (n) => String(n).padStart(2, "0");
-        function syncTimeText(d = new Date()) { return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; }
-        function seededInt(seed, min, max) {
-          const x = Math.sin(seed) * 10000;
-          const r = x - Math.floor(x);
-          return Math.floor(min + r * (max - min + 1));
-        }
+	        const pad2 = (n) => String(n).padStart(2, "0");
+	        function syncTimeText(d = new Date()) { return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; }
+          function mmss(seconds) {
+            const s = Math.max(0, Math.floor(seconds));
+            const m = Math.floor(s / 60);
+            const r = s % 60;
+            return `${pad2(m)}:${pad2(r)}`;
+          }
+	        function seededInt(seed, min, max) {
+	          const x = Math.sin(seed) * 10000;
+	          const r = x - Math.floor(x);
+	          return Math.floor(min + r * (max - min + 1));
+	        }
         function connectHostedAccounts() {
           state.hosting.connected = true;
           state.hosting.meituan.status = "已托管";
@@ -439,38 +560,52 @@
             eleme: { revenue: elemeRevenue, orders: elemeOrders }
           };
         }
-        function renderHostedStrip(today = null) {
-          const connected = state.hosting.connected;
-          $("hostedState").textContent = connected ? `已连接 · 最近同步 ${state.hosting.lastSync}` : "未连接";
-          $("hostedIds").textContent = connected
-            ? `美团店铺 ${state.hosting.meituan.storeId} · 饿了么店铺 ${state.hosting.eleme.storeId}`
-            : "请先托管美团/饿了么账号";
-          if (!connected) {
-            $("hostedToday").textContent = "演示：这里展示托管账号拉取的订单/评价/曝光汇总（可脱敏样例）。";
-            return;
-          }
-          if (!today || !today.platform) {
-            $("hostedToday").textContent = "托管数据已连接：开始模拟后，将在这里展示今日托管汇总。";
-            return;
-          }
-          $("hostedToday").textContent =
-            `今日托管汇总：美团 ${today.platform.meituan.orders} 单 / ¥${fmt(today.platform.meituan.revenue)} · ` +
-            `饿了么 ${today.platform.eleme.orders} 单 / ¥${fmt(today.platform.eleme.revenue)} · ` +
-            `同步 ${today.syncAt}`;
-        }
+	        function renderHostedStrip(today = null) {
+	          const connected = state.hosting.connected;
+            const live = state.dayDraft ? " · 今日实操中" : "";
+	          $("hostedState").textContent = connected ? `已连接 · 最近同步 ${state.hosting.lastSync}${live}` : "未连接";
+	          $("hostedIds").textContent = connected
+	            ? `美团店铺 ${state.hosting.meituan.storeId} · 饿了么店铺 ${state.hosting.eleme.storeId}`
+	            : "请先托管美团/饿了么账号";
+            $("hostedToday").style.display = "none";
+	          if (!connected) {
+	            return;
+	          }
+	          if (!today || !today.platform) {
+	            return;
+	          }
+            $("hostedToday").style.display = "block";
+	          $("hostedToday").textContent =
+	            `今日托管汇总：美团 ${today.platform.meituan.orders} 单 / ¥${fmt(today.platform.meituan.revenue)} · ` +
+	            `饿了么 ${today.platform.eleme.orders} 单 / ¥${fmt(today.platform.eleme.revenue)} · ` +
+	            `同步 ${today.syncAt}`;
+	        }
 
-	      function renderTasks(weather) {
-	        const p = activeProfile();
-	        const baseTasks = [
-	          ["08:30", p.tasks[0], "开店前先确保核心原料够支撑第一波高峰。"],
-          ["10:40", p.tasks[1], "把容易造成差评的质量点提前检查。"],
-          ["11:20", p.tasks[2], "在平台首屏给用户一个明确下单理由。"],
-          ["14:30", "查看库存与差评", "决定晚高峰是否补货、调价或收缩菜单。"],
-          ["17:10", "私域/会员触达", "对老客发一句足够具体的回店理由。"],
-          ["21:40", p.tasks[3], "把今天的订单、评价和损耗变成明天动作。"]
-        ];
-        $("taskGrid").innerHTML = baseTasks.map(t => `<div class="task"><div class="time">${t[0]}</div><div class="name">${t[1]}</div><div class="desc">${t[2]}</div></div>`).join("");
-      }
+	      function renderTasks() {
+          if (!state.dayDraft) return;
+	        $("taskGrid").innerHTML = state.dayDraft.tasks.map(t => {
+            const done = state.dayDraft.doneTasks.includes(t.key);
+            return `<div class="task ${done ? "done" : ""}" data-task="${t.key}">
+              <div class="time">${done ? "✓ " : ""}${t.time}</div>
+              <div class="name">${t.name}</div>
+              <div class="desc">${t.desc}</div>
+            </div>`;
+          }).join("");
+	          Array.from($("taskGrid").querySelectorAll("[data-task]")).forEach((el) => {
+	            el.addEventListener("click", () => {
+	              const key = el.dataset.task;
+	              const i = state.dayDraft.doneTasks.indexOf(key);
+	              if (i >= 0) {
+	                state.dayDraft.doneTasks.splice(i, 1);
+	                addEvent(`取消完成任务：${key}`);
+              } else {
+                state.dayDraft.doneTasks.push(key);
+                addEvent(`完成任务：${key}`);
+              }
+              renderTasks();
+            });
+          });
+	      }
 
       function renderDecision(day) {
         const decision = decisions[(day - 1) % decisions.length];
@@ -479,13 +614,14 @@
         $("decisionDesc").textContent = decision.desc;
         $("decisionOptions").innerHTML = decision.options.map((o, i) => `<button class="${i === 0 ? "active" : ""}" data-option="${i}"><strong>${o.title}</strong><span>${o.desc}</span></button>`).join("");
         Array.from($("decisionOptions").querySelectorAll("button")).forEach((btn) => {
-          btn.addEventListener("click", () => {
-            Array.from($("decisionOptions").querySelectorAll("button")).forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            state.selectedDecision = decision.options[Number(btn.dataset.option)];
-          });
-        });
-      }
+	          btn.addEventListener("click", () => {
+	            Array.from($("decisionOptions").querySelectorAll("button")).forEach(b => b.classList.remove("active"));
+	            btn.classList.add("active");
+	            state.selectedDecision = decision.options[Number(btn.dataset.option)];
+	            if (state.dayDraft) addEvent(`选择决策：${state.selectedDecision.title}`);
+	          });
+	        });
+	      }
 
       function renderKpis(today = null) {
         $("cashKpi").textContent = state.cash ? `¥${fmt(state.cash)}` : "--";
@@ -504,9 +640,15 @@
 	          <div class="log">
 	            <div class="top"><div class="name">DAY ${h.day} · ${h.choice}</div><div class="money">¥${fmt(h.revenue)}</div></div>
               ${h.platform ? `<div class="meta">托管数据：美团 ${h.platform.meituan.orders} 单 / ¥${fmt(h.platform.meituan.revenue)} · 饿了么 ${h.platform.eleme.orders} 单 / ¥${fmt(h.platform.eleme.revenue)} · 同步 ${h.syncAt}</div>` : ""}
+              <div class="actions">
+                <button class="mini-btn" data-replay="${h.day}">查看回放</button>
+              </div>
 	            <p>${h.story}</p>
 	          </div>
 	        `).join("");
+          Array.from($("storyLog").querySelectorAll("[data-replay]")).forEach((btn) => {
+            btn.addEventListener("click", () => openReplay(Number(btn.dataset.replay)));
+          });
 	      }
 
 	      function renderTrajectory() {
@@ -518,65 +660,351 @@
               ? `托管汇总：美团 ¥${fmt(h.platform.meituan.revenue)}（${h.platform.meituan.orders}单） · 饿了么 ¥${fmt(h.platform.eleme.revenue)}（${h.platform.eleme.orders}单） · 同步 ${h.syncAt}`
               : "托管汇总：--";
 	          return `<div title="${tip}"><div class="bar"><div class="bar-fill" style="height:${height}%"></div><span>${fmt(h.revenue)}</span></div><div class="bar-label">D${h.day}</div></div>`;
-	        }).join("") : `<div class="empty" style="grid-column: 1 / -1;">还没有轨迹。先开店，然后每天模拟一次。</div>`;
+	        }).join("") : `<div class="empty" style="grid-column: 1 / -1;">还没有轨迹。先开店，然后每天实操并生成一次复盘。</div>`;
 	      }
 
-	      function simulateDay() {
-	        state.day += 1;
-	        const p = activeProfile();
-	        const d = activeDistrict();
-	        const weather = weatherList[(state.day * 2 + $("storeName").value.length) % weatherList.length];
-	        const decision = state.selectedDecision || decisions[(state.day - 1) % decisions.length].options[0];
-	        const strategyFactor = state.strategy === "growth" ? 1.1 : state.strategy === "premium" ? 0.96 : 1;
-	        const weekdayFactor = [1, 1.03, 1.06, 1.0, 1.12, 0.92, 0.86][(state.day - 1) % 7];
-	        const reputationFactor = 0.88 + state.rating / 5 * 0.22;
-	        const stockFactor = state.stock < 25 ? 0.82 : state.stock < 45 ? 0.94 : 1;
-	        const revenue = p.base * d.factor * weather.factor * decision.revenue * strategyFactor * weekdayFactor * reputationFactor * stockFactor;
-	        const fixedCost = 980 + (state.strategy === "growth" ? 160 : 0);
-	        const profit = revenue * (1 - p.cost) - fixedCost + decision.cash;
-	        state.cash += profit;
-	        state.rating = Math.max(3.8, Math.min(5, state.rating + decision.rating - Math.max(0, state.pressure - 70) / 900));
-	        state.stock = Math.max(8, Math.min(100, state.stock + decision.stock + weather.stock));
-	        state.pressure = Math.max(18, Math.min(100, state.pressure + decision.pressure + (revenue > p.base * 1.12 ? 6 : -4)));
+        const opsTabs = [
+          { key: "ads", name: "投放" },
+          { key: "orders", name: "订单" },
+          { key: "reviews", name: "评价" },
+          { key: "menu", name: "商品" },
+          { key: "fulfill", name: "履约" }
+        ];
+
+        function addEvent(desc, payload = null) {
+          if (!state.dayDraft) return;
+          const t = (Date.now() - state.dayDraft.startedAt) / 1000;
+          state.dayDraft.events.push({ t, desc, payload });
+        }
+
+        function setActiveTab(key) {
+          if (!state.dayDraft) return;
+          state.dayDraft.activeTab = key;
+          renderOpsConsole();
+          addEvent(`切换模块：${opsTabs.find(t => t.key === key)?.name || key}`);
+        }
+
+        function applyOpsDelta(delta, desc) {
+          if (!state.dayDraft) return;
+          state.dayDraft.ops.revenueMul *= delta.revenueMul ?? 1;
+          state.dayDraft.ops.cashDelta += delta.cashDelta ?? 0;
+          state.dayDraft.ops.ratingDelta += delta.ratingDelta ?? 0;
+          state.dayDraft.ops.stockDelta += delta.stockDelta ?? 0;
+          state.dayDraft.ops.pressureDelta += delta.pressureDelta ?? 0;
+          addEvent(desc, delta);
+          renderOpsConsole();
+        }
+
+        function renderOpsConsole() {
+          if (!state.dayDraft) {
+            $("opsTabs").innerHTML = "";
+            $("opsBody").innerHTML = `<div class="empty">开店后会自动进入“今日实操”。<br />在这里像平台后台一样操作，然后点击“生成今日复盘”结算。</div>`;
+            return;
+          }
+          $("opsTabs").innerHTML = opsTabs.map(t => `<button class="tab ${t.key === state.dayDraft.activeTab ? "active" : ""}" data-tab="${t.key}">${t.name}</button>`).join("");
+          Array.from($("opsTabs").querySelectorAll("[data-tab]")).forEach((btn) => btn.addEventListener("click", () => setActiveTab(btn.dataset.tab)));
+
+          const ops = state.dayDraft.ops;
+          const kv = `
+            <div class="ops-kv">
+              <span class="pill">营收系数 ×${ops.revenueMul.toFixed(2)}</span>
+              <span class="pill">现金变动 ${ops.cashDelta >= 0 ? "+" : "-"}¥${fmt(Math.abs(ops.cashDelta))}</span>
+              <span class="pill">口碑 Δ${ops.ratingDelta >= 0 ? "+" : ""}${ops.ratingDelta.toFixed(2)}</span>
+              <span class="pill">库存 Δ${ops.stockDelta >= 0 ? "+" : ""}${Math.round(ops.stockDelta)}%</span>
+              <span class="pill">压力 Δ${ops.pressureDelta >= 0 ? "+" : ""}${Math.round(ops.pressureDelta)}</span>
+            </div>
+          `;
+
+          if (state.dayDraft.activeTab === "ads") {
+            $("opsBody").innerHTML = `
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">午高峰加投（平台广告）</div>
+                  <div class="sub">把曝光买回来，但现金会先花出去。</div>
+                </div>
+                <button class="mini-btn" id="opBoost">应用：+15%营收 / -¥120</button>
+              </div>
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">退回加投，保履约</div>
+                  <div class="sub">增长慢一点，但压力下降。</div>
+                </div>
+                <button class="mini-btn" id="opHold">应用：-2%营收 / 压力-4</button>
+              </div>
+              ${kv}
+            `;
+            $("opBoost").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.15, cashDelta: -120, pressureDelta: 6 }, "投放：午高峰加投（+15%营收 / -¥120）"));
+            $("opHold").addEventListener("click", () => applyOpsDelta({ revenueMul: 0.98, pressureDelta: -4, ratingDelta: 0.01 }, "投放：退回加投（保履约）"));
+            return;
+          }
+
+          if (state.dayDraft.activeTab === "orders") {
+            $("opsBody").innerHTML = `
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">处理异常单：补发餐具/饮料</div>
+                  <div class="sub">降低差评概率，现金小额损耗。</div>
+                </div>
+                <button class="mini-btn" id="opComp">处理：口碑+0.03 / -¥35</button>
+              </div>
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">催单 & 出餐加急</div>
+                  <div class="sub">履约稳，但员工压力上升。</div>
+                </div>
+                <button class="mini-btn" id="opRush">处理：口碑+0.02 / 压力+5</button>
+              </div>
+              ${kv}
+            `;
+            $("opComp").addEventListener("click", () => applyOpsDelta({ cashDelta: -35, ratingDelta: 0.03, pressureDelta: 2 }, "订单：处理异常单（补发）"));
+            $("opRush").addEventListener("click", () => applyOpsDelta({ ratingDelta: 0.02, pressureDelta: 5 }, "订单：催单 & 出餐加急"));
+            return;
+          }
+
+          if (state.dayDraft.activeTab === "reviews") {
+            $("opsBody").innerHTML = `
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">一键回复差评（模板）</div>
+                  <div class="sub">解释+承诺改进，口碑回升但不立刻增收。</div>
+                </div>
+                <button class="mini-btn" id="opReply">回复：口碑+0.05</button>
+              </div>
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">发补偿券（挽回老客）</div>
+                  <div class="sub">花钱止损，复购更稳。</div>
+                </div>
+                <button class="mini-btn" id="opCoupon">发券：营收+6% / -¥80 / 口碑+0.02</button>
+              </div>
+              ${kv}
+            `;
+            $("opReply").addEventListener("click", () => applyOpsDelta({ ratingDelta: 0.05, pressureDelta: 1 }, "评价：一键回复差评"));
+            $("opCoupon").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.06, cashDelta: -80, ratingDelta: 0.02 }, "评价：发补偿券（挽回）"));
+            return;
+          }
+
+          if (state.dayDraft.activeTab === "menu") {
+            $("opsBody").innerHTML = `
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">爆款套餐置顶（首页 3 套餐）</div>
+                  <div class="sub">转化提升，但会更吃库存。</div>
+                </div>
+                <button class="mini-btn" id="opTop">应用：营收+8% / 库存-6%</button>
+              </div>
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">临时限量（防爆单）</div>
+                  <div class="sub">营收下降但压力下降，评分更稳。</div>
+                </div>
+                <button class="mini-btn" id="opLimit">应用：营收-6% / 压力-6 / 口碑+0.02</button>
+              </div>
+              ${kv}
+            `;
+            $("opTop").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.08, stockDelta: -6, pressureDelta: 3 }, "商品：爆款套餐置顶"));
+            $("opLimit").addEventListener("click", () => applyOpsDelta({ revenueMul: 0.94, pressureDelta: -6, ratingDelta: 0.02 }, "商品：临时限量（防爆单）"));
+            return;
+          }
+
+          if (state.dayDraft.activeTab === "fulfill") {
+            $("opsBody").innerHTML = `
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">加人手 / 提前备料</div>
+                  <div class="sub">履约更稳，口碑上升，但会增加压力。</div>
+                </div>
+                <button class="mini-btn" id="opPrep">应用：口碑+0.03 / 压力+4 / 库存-3%</button>
+              </div>
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">补货（承接晚高峰）</div>
+                  <div class="sub">现金减少，库存上升，晚高峰更稳。</div>
+                </div>
+                <button class="mini-btn" id="opRestock">补货：营收+4% / -¥220 / 库存+12%</button>
+              </div>
+              ${kv}
+            `;
+            $("opPrep").addEventListener("click", () => applyOpsDelta({ ratingDelta: 0.03, pressureDelta: 4, stockDelta: -3 }, "履约：加人手/提前备料"));
+            $("opRestock").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.04, cashDelta: -220, stockDelta: 12 }, "履约：补货（承接晚高峰）"));
+            return;
+          }
+        }
+
+        function openDay(dayNumber) {
+          if (!state.hosting.connected) connectHostedAccounts();
+          if (state.dayDraft) return;
+
+          state.day = dayNumber;
+          const p = activeProfile();
+          const d = activeDistrict();
+          const weather = weatherList[(state.day * 2 + $("storeName").value.length) % weatherList.length];
+          const tasks = [
+            { time: "08:30", name: p.tasks[0], desc: "开店前先确保核心原料够支撑第一波高峰。", key: "08:30 备料" },
+            { time: "10:40", name: p.tasks[1], desc: "把容易造成差评的质量点提前检查。", key: "10:40 品控" },
+            { time: "11:20", name: p.tasks[2], desc: "在平台首屏给用户一个明确下单理由。", key: "11:20 上架" },
+            { time: "14:30", name: "查看库存与差评", desc: "决定晚高峰是否补货、调价或收缩菜单。", key: "14:30 巡检" },
+            { time: "17:10", name: "私域/会员触达", desc: "对老客发一句足够具体的回店理由。", key: "17:10 触达" },
+            { time: "21:40", name: p.tasks[3], desc: "把今天的订单、评价和损耗变成明天动作。", key: "21:40 复盘" }
+          ];
+
+          state.dayDraft = {
+            day: state.day,
+            startedAt: Date.now(),
+            weather,
+            district: d,
+            tasks,
+            doneTasks: [],
+            ops: { revenueMul: 1, cashDelta: 0, ratingDelta: 0, stockDelta: 0, pressureDelta: 0 },
+            activeTab: "ads",
+            events: []
+          };
+
+          $("closeDayBtn").disabled = false;
+          $("nextDayBtn").disabled = true;
+          $("dashTitle").textContent = $("storeName").value;
+          $("dayNum").textContent = `DAY ${state.day}`;
+          $("weatherBox").innerHTML = `${weather.text}<br><span style="color:rgba(247,245,237,.48);font-size:12px;">${d.name} · ${d.peak}</span>`;
+          $("daySummary").textContent = "今日实操中：在“平台后台实操”里完成操作，点击“生成今日复盘”结算。";
+
+          renderDecision(state.day);
+          renderTasks();
+          renderOpsConsole();
+          renderHostedStrip();
+          addEvent(`进入当天：DAY ${state.day}`);
+        }
+
+        function closeDay() {
+          if (!state.dayDraft) return;
+          const p = activeProfile();
+          const d = state.dayDraft.district;
+          const weather = state.dayDraft.weather;
+          const decision = state.selectedDecision || decisions[(state.day - 1) % decisions.length].options[0];
+
+          const strategyFactor = state.strategy === "growth" ? 1.1 : state.strategy === "premium" ? 0.96 : 1;
+          const weekdayFactor = [1, 1.03, 1.06, 1.0, 1.12, 0.92, 0.86][(state.day - 1) % 7];
+          const reputationFactor = 0.88 + state.rating / 5 * 0.22;
+          const stockFactor = state.stock < 25 ? 0.82 : state.stock < 45 ? 0.94 : 1;
+
+          const taskCompletion = state.dayDraft.doneTasks.length / Math.max(1, state.dayDraft.tasks.length);
+          const taskRevenueMul = 0.94 + taskCompletion * 0.10; // 0.94 - 1.04
+          const taskRatingBoost = taskCompletion >= 0.8 ? 0.03 : taskCompletion >= 0.5 ? 0.01 : -0.02;
+
           if (state.hosting.connected) syncHostedData();
+          const revenue =
+            p.base *
+            d.factor *
+            weather.factor *
+            decision.revenue *
+            strategyFactor *
+            weekdayFactor *
+            reputationFactor *
+            stockFactor *
+            taskRevenueMul *
+            state.dayDraft.ops.revenueMul;
+          const fixedCost = 980 + (state.strategy === "growth" ? 160 : 0);
+          const profit = revenue * (1 - p.cost) - fixedCost + decision.cash + state.dayDraft.ops.cashDelta;
+
+          state.cash += profit;
+          state.rating = Math.max(3.8, Math.min(5, state.rating + decision.rating + state.dayDraft.ops.ratingDelta + taskRatingBoost - Math.max(0, state.pressure - 70) / 900));
+          state.stock = Math.max(8, Math.min(100, state.stock + decision.stock + weather.stock + state.dayDraft.ops.stockDelta));
+          state.pressure = Math.max(18, Math.min(100, state.pressure + decision.pressure + state.dayDraft.ops.pressureDelta + (revenue > p.base * 1.12 ? 6 : -4)));
 
           const platform = state.hosting.connected ? platformBreakdown(revenue, state.day, $("storeType").value) : null;
-	        const today = {
-	          day: state.day,
-	          revenue,
-	          profit,
-	          choice: decision.title,
+          const syncAt = state.hosting.connected ? state.hosting.lastSync : "--";
+          addEvent(`生成今日复盘：任务 ${state.dayDraft.doneTasks.length}/${state.dayDraft.tasks.length}`);
+
+          const today = {
+            day: state.day,
+            revenue,
+            profit,
+            choice: decision.title,
             platform,
-            syncAt: state.hosting.connected ? state.hosting.lastSync : "--",
-	          story: `${weather.text}，${d.name}商圈呈现“${d.peak}”。你选择了“${decision.title}”，当天现金${profit >= 0 ? "增加" : "减少"} ¥${fmt(Math.abs(profit))}，库存剩余 ${Math.round(state.stock)}%，员工压力 ${Math.round(state.pressure)}%。AI 建议：${state.stock < 35 ? "明天优先补货并收缩爆款售卖节奏。" : state.rating < 4.45 ? "明天先处理评价和出餐稳定性。" : "明天可以继续测试套餐和复购动作。"}`
-	        };
-	        state.history.push(today);
+            syncAt,
+            events: state.dayDraft.events.slice(),
+            story:
+              `${weather.text}，${d.name}商圈呈现“${d.peak}”。` +
+              `你完成任务 ${state.dayDraft.doneTasks.length}/${state.dayDraft.tasks.length}，并选择了“${decision.title}”。` +
+              `当天现金${profit >= 0 ? "增加" : "减少"} ¥${fmt(Math.abs(profit))}，库存剩余 ${Math.round(state.stock)}%，员工压力 ${Math.round(state.pressure)}%。` +
+              `AI 建议：${state.stock < 35 ? "明天优先补货并收缩爆款售卖节奏。" : state.rating < 4.45 ? "明天先处理评价和出餐稳定性。" : "明天可以继续测试套餐和复购动作。"}`
+          };
+          state.history.push(today);
 
-	        $("dashTitle").textContent = $("storeName").value;
-	        $("dayNum").textContent = `DAY ${state.day}`;
-	        $("weatherBox").innerHTML = `${weather.text}<br><span style="color:rgba(247,245,237,.48);font-size:12px;">${d.name} · ${d.peak}</span>`;
-	        $("daySummary").textContent = `今天的重点是：守住履约质量，同时把一个经营决策转化成真实结果。`;
-	        renderTasks(weather);
-	        renderKpis(today);
+          state.dayDraft = null;
+          $("closeDayBtn").disabled = true;
+          $("nextDayBtn").disabled = false;
+
+          $("daySummary").textContent = "今日已结算：可查看回放，或进入下一天继续实操。";
+          renderKpis(today);
           renderHostedStrip(today);
-	        renderHistory();
-	        renderTrajectory();
-	        renderDecision(state.day + 1);
-	      }
+          renderHistory();
+          renderTrajectory();
+          renderOpsConsole();
 
-	      function start() {
-	        state.day = 0;
-	        state.cash = Number($("cash").value);
-	        state.rating = 4.6;
-	        state.stock = 82;
-	        state.pressure = 36;
-	        state.history = [];
-          connectHostedAccounts();
-	        $("nextDayBtn").disabled = false;
-	        renderTrajectory();
-	        renderDecision(1);
-	        simulateDay();
-	      }
+          $("taskGrid").innerHTML = `<div class="empty">今日已结算。<br />点击“进入下一天”开始新的实操。</div>`;
+          $("decisionTitle").textContent = "今日已结算";
+          $("decisionDesc").textContent = "你可以查看回放，或进入下一天继续操作。";
+          $("decisionOptions").innerHTML = "";
+        }
+
+        function goNextDay() {
+          if (state.dayDraft) return;
+          openDay(state.day + 1);
+        }
+
+        function openReplay(day) {
+          const entry = state.history.find(h => h.day === day);
+          if (!entry) return;
+          $("replayTitle").textContent = `DAY ${entry.day} · 操作回放`;
+          const p = entry.platform
+            ? `美团 ${entry.platform.meituan.orders} 单 / ¥${fmt(entry.platform.meituan.revenue)} · 饿了么 ${entry.platform.eleme.orders} 单 / ¥${fmt(entry.platform.eleme.revenue)}`
+            : "--";
+          $("replaySub").textContent = `托管汇总：${p} · 同步 ${entry.syncAt}`;
+          const events = entry.events || [];
+          $("replayBody").innerHTML = events.length
+            ? events.map(e => `<div class="event-item"><div class="t">${mmss(e.t)}</div><div class="d">${e.desc}</div></div>`).join("")
+            : `<div class="empty">这一天没有操作事件。</div>`;
+          $("replayModal").classList.add("show");
+          $("replayModal").setAttribute("aria-hidden", "false");
+
+          $("exportBtn").onclick = () => {
+            const blob = new Blob([JSON.stringify(entry, null, 2)], { type: "application/json;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `day-${entry.day}-replay.json`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1200);
+          };
+        }
+
+        function closeReplay() {
+          $("replayModal").classList.remove("show");
+          $("replayModal").setAttribute("aria-hidden", "true");
+        }
+
+		      function start() {
+		        state.day = 0;
+		        state.cash = Number($("cash").value);
+		        state.rating = 4.6;
+		        state.stock = 82;
+		        state.pressure = 36;
+		        state.history = [];
+		        state.selectedDecision = null;
+		        state.dayDraft = null;
+            closeReplay();
+
+	          connectHostedAccounts();
+            $("closeDayBtn").disabled = true;
+            $("nextDayBtn").disabled = true;
+
+		        renderKpis();
+		        renderHistory();
+		        renderTrajectory();
+            renderHostedStrip();
+	          renderOpsConsole();
+            openDay(1);
+		      }
 
       Array.from(document.querySelectorAll(".chip")).forEach((chip) => {
         chip.addEventListener("click", () => {
@@ -585,19 +1013,25 @@
           state.strategy = chip.dataset.strategy;
         });
       });
-      $("startBtn").addEventListener("click", start);
-      $("nextDayBtn").addEventListener("click", simulateDay);
-	      $("resetBtn").addEventListener("click", () => {
-	        state.day = 0; state.cash = 0; state.history = []; state.selectedDecision = null;
-	        $("dashTitle").textContent = "等待开店"; $("dayNum").textContent = "DAY 0"; $("weatherBox").textContent = "--";
-	        $("daySummary").textContent = "点击“开店模拟”，系统会生成第一天的开店事项。";
-	        $("taskGrid").innerHTML = `<div class="empty">还没有生成任务。<br />这里会出现备货、排班、上架、巡店、私域触达和复盘。</div>`;
-	        $("decisionTitle").textContent = "等待事件"; $("decisionDesc").textContent = "每天会出现一个真实经营选择，例如是否加投平台、是否临时补货、是否压缩 SKU。"; $("decisionOptions").innerHTML = "";
-	        $("storyLog").innerHTML = `<div class="empty">经营日志会记录每天的选择、托管数据摘要、结果和 AI 复盘。</div>`;
-          disconnectHostedAccounts();
-	        $("nextDayBtn").disabled = true; renderKpis(); renderTrajectory();
-	      });
-	      renderKpis(); renderTrajectory(); renderHostedStrip();
+	      $("startBtn").addEventListener("click", start);
+        $("closeDayBtn").addEventListener("click", closeDay);
+        $("nextDayBtn").addEventListener("click", goNextDay);
+	      $("closeModalBtn").addEventListener("click", closeReplay);
+	      $("replayModal").addEventListener("click", (e) => { if (e.target === $("replayModal")) closeReplay(); });
+		      $("resetBtn").addEventListener("click", () => {
+		        state.day = 0; state.cash = 0; state.history = []; state.selectedDecision = null; state.dayDraft = null;
+	          closeReplay();
+		        $("dashTitle").textContent = "等待开店"; $("dayNum").textContent = "DAY 0"; $("weatherBox").textContent = "--";
+		        $("daySummary").textContent = "点击“开店模拟”，系统会生成第一天的开店事项。";
+		        $("taskGrid").innerHTML = `<div class="empty">还没有生成任务。<br />这里会出现备货、排班、上架、巡店、私域触达和复盘。</div>`;
+		        $("decisionTitle").textContent = "等待开店"; $("decisionDesc").textContent = "开店后会出现今日关键决策；你的选择与后台操作都会自动留痕并可回放。"; $("decisionOptions").innerHTML = "";
+		        $("storyLog").innerHTML = `<div class="empty">经营日志会记录每天的选择、托管数据摘要、结果和 AI 复盘。</div>`;
+	          disconnectHostedAccounts();
+            $("closeDayBtn").disabled = true;
+            $("nextDayBtn").disabled = true;
+	          renderOpsConsole(); renderHostedStrip(); renderKpis(); renderTrajectory();
+		      });
+	      renderKpis(); renderTrajectory(); renderHostedStrip(); renderOpsConsole();
 	    </script>
 	  </body>
 </html>
