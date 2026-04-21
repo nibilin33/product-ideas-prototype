@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>模拟开店训练舱 · 每日经营轨迹</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: #f7f5ed;
+        font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        background:
+          radial-gradient(circle at 12% 10%, rgba(245, 158, 11, 0.16), transparent 32%),
+          radial-gradient(circle at 92% 16%, rgba(20, 184, 166, 0.13), transparent 34%),
+          radial-gradient(circle at 55% 92%, rgba(248, 113, 113, 0.12), transparent 35%),
+          linear-gradient(180deg, #11140d 0%, #060806 62%, #030403 100%);
+        overflow-x: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px),
+          radial-gradient(circle, rgba(251, 191, 36, 0.45) 1px, transparent 1.5px);
+        background-size: 34px 34px, 34px 34px, 420px 420px;
+        mask-image: radial-gradient(circle at center, black 58%, transparent 96%);
+        opacity: 0.86;
+      }
+      .shell { position: relative; z-index: 1; width: min(1180px, calc(100vw - 28px)); margin: 0 auto; padding: 22px 0 42px; }
+      .hero {
+        border-radius: 32px;
+        padding: 24px;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.025)),
+          radial-gradient(120% 100% at 8% 0%, rgba(245,158,11,0.18), transparent 54%),
+          rgba(255,255,255,0.035);
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+        backdrop-filter: blur(18px);
+        overflow: hidden;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 30px;
+        padding: 0 12px;
+        border-radius: 999px;
+        color: rgba(255,246,214,0.9);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        border: 1px solid rgba(251,191,36,0.24);
+        background: rgba(251,191,36,0.10);
+      }
+      .dot { width: 7px; height: 7px; border-radius: 99px; background: #fbbf24; box-shadow: 0 0 18px rgba(251,191,36,0.7); }
+      .title { margin: 14px 0 0; font-size: clamp(34px, 8vw, 74px); line-height: 0.96; letter-spacing: -0.075em; font-weight: 950; }
+      .title span { color: #fbbf24; text-shadow: 0 0 30px rgba(251,191,36,0.18); }
+      .lead { margin-top: 18px; max-width: 740px; color: rgba(247,245,237,0.68); font-size: 15px; line-height: 1.9; }
+      .layout { display: grid; grid-template-columns: 380px 1fr; gap: 16px; margin-top: 16px; align-items: start; }
+      .card {
+        border-radius: 26px;
+        padding: 18px;
+        background: rgba(255,255,255,0.055);
+        border: 1px solid rgba(255,255,255,0.105);
+        box-shadow: 0 20px 58px rgba(0,0,0,0.34);
+        backdrop-filter: blur(16px);
+      }
+      .card.soft { box-shadow: none; background: rgba(255,255,255,0.04); }
+      .eyebrow { color: rgba(45, 212, 191, 0.85); font-size: 11px; font-weight: 950; letter-spacing: 0.22em; text-transform: uppercase; }
+      .card h2, .card h3 { margin: 7px 0 0; font-weight: 950; letter-spacing: -0.035em; }
+      .muted { color: rgba(247,245,237,0.58); line-height: 1.7; }
+      .field { margin-top: 14px; }
+      .field label { display: block; margin-bottom: 7px; color: rgba(247,245,237,0.64); font-size: 12px; font-weight: 800; }
+      .input, .select {
+        width: 100%; height: 44px; border-radius: 15px; padding: 0 13px;
+        border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.24); color: #fff9ec; outline: none;
+      }
+      .input:focus, .select:focus { border-color: rgba(251,191,36,0.52); box-shadow: 0 0 0 4px rgba(251,191,36,0.09); }
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 9px; }
+      .chip {
+        border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.045); color: rgba(247,245,237,0.72);
+        border-radius: 999px; padding: 8px 10px; font-size: 12px; font-weight: 850; cursor: pointer; transition: 0.18s ease;
+      }
+      .chip.active { color: #241706; background: #fbbf24; border-color: #fbbf24; box-shadow: 0 0 22px rgba(251,191,36,0.22); }
+      .btn {
+        height: 46px; border: 0; border-radius: 16px; padding: 0 16px; cursor: pointer; font-weight: 950;
+        color: #160f05; background: linear-gradient(135deg, #fbbf24, #fb923c); box-shadow: 0 12px 34px rgba(251,146,60,0.25);
+      }
+      .btn:hover { transform: translateY(-1px); box-shadow: 0 18px 44px rgba(251,146,60,0.35); }
+      .btn.secondary { color: rgba(247,245,237,0.88); background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); box-shadow: none; }
+      .btn.full { width: 100%; }
+      .btn:disabled { opacity: 0.55; cursor: wait; transform: none; }
+      .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+      .kpi { border-radius: 20px; padding: 14px; background: rgba(0,0,0,0.23); border: 1px solid rgba(255,255,255,0.09); }
+      .kpi .label { color: rgba(247,245,237,0.52); font-size: 12px; font-weight: 800; }
+      .kpi .value { margin-top: 8px; font-size: 24px; font-weight: 950; letter-spacing: -0.04em; }
+      .kpi .trend { margin-top: 5px; color: rgba(45,212,191,0.88); font-size: 12px; font-weight: 900; }
+      .board { display: grid; grid-template-columns: 1fr 330px; gap: 14px; margin-top: 14px; }
+      .today {
+        min-height: 430px;
+        border-radius: 28px;
+        padding: 18px;
+        background:
+          radial-gradient(circle at 90% 8%, rgba(20,184,166,0.16), transparent 34%),
+          rgba(0,0,0,0.22);
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+      .day-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+      .day-num { font-size: 46px; font-weight: 950; letter-spacing: -0.08em; line-height: 1; color: #fbbf24; }
+      .weather { text-align: right; color: rgba(247,245,237,0.72); font-weight: 850; }
+      .task-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+      .task {
+        border-radius: 20px; padding: 13px; background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.09);
+      }
+      .task .time { color: rgba(251,191,36,0.9); font-size: 11px; font-weight: 950; letter-spacing: 0.08em; }
+      .task .name { margin-top: 7px; color: rgba(247,245,237,0.94); font-weight: 950; }
+      .task .desc { margin-top: 5px; color: rgba(247,245,237,0.56); font-size: 12px; line-height: 1.65; }
+      .decision { display: grid; gap: 10px; margin-top: 14px; }
+      .decision button {
+        text-align: left; border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 13px;
+        background: rgba(255,255,255,0.045); color: rgba(247,245,237,0.82); cursor: pointer;
+      }
+      .decision button.active { border-color: rgba(251,191,36,0.55); background: rgba(251,191,36,0.12); color: #fff7df; }
+      .decision strong { display: block; font-size: 13px; margin-bottom: 4px; }
+      .decision span { display: block; font-size: 12px; color: rgba(247,245,237,0.56); line-height: 1.55; }
+      .story { display: grid; gap: 10px; max-height: 510px; overflow: auto; padding-right: 4px; }
+      .log { border-radius: 18px; padding: 12px; background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.08); }
+      .log .top { display:flex; justify-content:space-between; gap:10px; align-items:center; }
+      .log .name { font-size: 13px; font-weight: 950; }
+      .log .money { color: rgba(45,212,191,0.9); font-size: 12px; font-weight: 950; }
+      .log p { margin: 7px 0 0; color: rgba(247,245,237,0.58); font-size: 12px; line-height: 1.65; }
+      .trajectory { margin-top: 14px; display: grid; grid-template-columns: repeat(7, minmax(46px, 1fr)); gap: 8px; }
+      .bar { height: 118px; border-radius: 18px; background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.08); display:flex; align-items:flex-end; padding: 7px; position:relative; overflow:hidden; }
+      .bar-fill { width: 100%; border-radius: 12px; background: linear-gradient(180deg, #2dd4bf, #fbbf24); min-height: 6px; transition: height 0.5s ease; }
+      .bar span { position:absolute; left:0; right:0; bottom:8px; text-align:center; color: rgba(0,0,0,0.72); font-size: 10px; font-weight: 950; mix-blend-mode: multiply; }
+      .bar-label { margin-top: 6px; text-align: center; color: rgba(247,245,237,0.46); font-size: 11px; font-weight: 850; }
+      .empty { border: 1px dashed rgba(255,255,255,0.15); color: rgba(247,245,237,0.44); text-align: center; padding: 22px; border-radius: 20px; line-height: 1.7; }
+      @media (max-width: 920px) { .layout, .board { grid-template-columns: 1fr; } .kpis { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 560px) { .hero { padding: 18px; border-radius: 24px; } .task-grid, .kpis { grid-template-columns: 1fr; } .trajectory { grid-template-columns: repeat(4, minmax(0,1fr)); } }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <span class="badge"><span class="dot"></span> STORE OPENING SIMULATOR</span>
+        <h1 class="title">模拟一家店，<br /><span>每天怎么活下来。</span></h1>
+        <p class="lead">这个页面用来真实演示“开店辅助能力”：系统每天生成开店任务、突发事件和经营选择，你点击决策后，它会沉淀一家门店从第 1 天到第 N 天的营收、口碑、库存、员工压力和复购轨迹。</p>
+      </section>
+
+      <section class="layout">
+        <aside class="card">
+          <p class="eyebrow">01 / 开店设定</p>
+          <h2 class="text-2xl">先创建你的门店</h2>
+          <p class="muted mt-2 text-sm">演示时只要改几个参数，就能让观众看到不同类型门店的经营命运。</p>
+
+          <div class="field">
+            <label for="storeName">门店名称</label>
+            <input class="input" id="storeName" value="鲜能量轻食 · 国贸店" />
+          </div>
+          <div class="field">
+            <label for="storeType">品类</label>
+            <select class="select" id="storeType">
+              <option value="light">轻食沙拉</option>
+              <option value="coffee">咖啡烘焙</option>
+              <option value="noodle">粉面快餐</option>
+              <option value="tea">新茶饮</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="district">商圈</label>
+            <select class="select" id="district">
+              <option value="office">写字楼</option>
+              <option value="community">社区</option>
+              <option value="mall">商场</option>
+              <option value="school">学校</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="cash">启动现金</label>
+            <select class="select" id="cash">
+              <option value="42000">42,000 元</option>
+              <option value="65000">65,000 元</option>
+              <option value="90000">90,000 元</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>经营策略</label>
+            <div class="chips" id="strategyChips">
+              <button class="chip active" data-strategy="steady">稳健控损</button>
+              <button class="chip" data-strategy="growth">激进拉新</button>
+              <button class="chip" data-strategy="premium">高客单利润</button>
+            </div>
+          </div>
+          <div class="mt-5 grid grid-cols-2 gap-2">
+            <button class="btn full" id="startBtn">开店模拟</button>
+            <button class="btn secondary full" id="resetBtn">重置</button>
+          </div>
+        </aside>
+
+        <section>
+          <div class="card">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="eyebrow">02 / 经营仪表盘</p>
+                <h2 class="text-2xl" id="dashTitle">等待开店</h2>
+              </div>
+              <button class="btn secondary" id="nextDayBtn" disabled>模拟下一天</button>
+            </div>
+            <div class="kpis mt-4">
+              <div class="kpi"><div class="label">现金余额</div><div class="value" id="cashKpi">--</div><div class="trend" id="cashTrend">待生成</div></div>
+              <div class="kpi"><div class="label">今日营收</div><div class="value" id="revenueKpi">--</div><div class="trend" id="profitTrend">毛利待算</div></div>
+              <div class="kpi"><div class="label">口碑评分</div><div class="value" id="ratingKpi">--</div><div class="trend" id="ratingTrend">服务未开始</div></div>
+              <div class="kpi"><div class="label">库存健康</div><div class="value" id="stockKpi">--</div><div class="trend" id="stockTrend">未备货</div></div>
+            </div>
+
+            <div class="board">
+              <div class="today">
+                <div class="day-head">
+                  <div>
+                    <p class="eyebrow">03 / 今日开店任务</p>
+                    <div class="day-num" id="dayNum">DAY 0</div>
+                    <p class="muted text-sm" id="daySummary">点击“开店模拟”，系统会生成第一天的开店事项。</p>
+                  </div>
+                  <div class="weather" id="weatherBox">--</div>
+                </div>
+                <div class="task-grid" id="taskGrid">
+                  <div class="empty">还没有生成任务。<br />这里会出现备货、排班、上架、巡店、私域触达和复盘。</div>
+                </div>
+                <div class="card soft mt-4">
+                  <p class="eyebrow">04 / 今日关键决策</p>
+                  <h3 class="text-lg" id="decisionTitle">等待事件</h3>
+                  <p class="muted mt-2 text-sm" id="decisionDesc">每天会出现一个真实经营选择，例如是否加投平台、是否临时补货、是否压缩 SKU。</p>
+                  <div class="decision" id="decisionOptions"></div>
+                </div>
+              </div>
+
+              <aside class="card soft">
+                <p class="eyebrow">05 / 门店经营轨迹</p>
+                <h3 class="text-xl">每天发生了什么</h3>
+                <div class="story mt-4" id="storyLog">
+                  <div class="empty">经营日志会记录每天的选择、结果和 AI 复盘。</div>
+                </div>
+              </aside>
+            </div>
+
+            <div class="card soft mt-4">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="eyebrow">06 / 首周营收轨迹</p>
+                  <h3 class="text-xl">看见这家店的成长曲线</h3>
+                </div>
+                <span class="muted text-sm" id="weekHint">最多展示最近 7 天</span>
+              </div>
+              <div class="trajectory" id="trajectory"></div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const fmt = (n) => Math.round(n).toLocaleString("zh-CN");
+      const state = { day: 0, cash: 0, rating: 4.6, stock: 82, pressure: 36, strategy: "steady", history: [], selectedDecision: null };
+
+      const profiles = {
+        light: { base: 4300, cost: 0.46, tasks: ["洗切蔬菜与蛋白备料", "检查沙拉酱保质期", "上架午餐套餐图", "复盘差评里的口味反馈"] },
+        coffee: { base: 3600, cost: 0.38, tasks: ["校准磨豆机刻度", "烘焙陈列补满", "设置早高峰第二杯优惠", "记录出杯速度"] },
+        noodle: { base: 5200, cost: 0.42, tasks: ["熬汤底并检查咸度", "预煮高峰面量", "补齐外卖餐具", "盯午高峰出餐时长"] },
+        tea: { base: 4700, cost: 0.35, tasks: ["煮茶汤和珍珠", "检查水果损耗", "上新团购券", "统计爆款甜度偏好"] }
+      };
+
+      const districts = {
+        office: { name: "写字楼", peak: "午高峰强", factor: 1.12 },
+        community: { name: "社区", peak: "晚高峰稳", factor: 0.96 },
+        mall: { name: "商场", peak: "周末强", factor: 1.05 },
+        school: { name: "学校", peak: "价格敏感", factor: 0.9 }
+      };
+
+      const weatherList = [
+        { text: "晴 · 午高峰外卖强", factor: 1.08, stock: -7 },
+        { text: "小雨 · 堂食下降", factor: 0.92, stock: -4 },
+        { text: "闷热 · 饮品加购高", factor: 1.04, stock: -8 },
+        { text: "大风 · 平台订单集中", factor: 0.98, stock: -5 },
+        { text: "晴转阴 · 客流正常", factor: 1.0, stock: -6 }
+      ];
+
+      const decisions = [
+        {
+          title: "午高峰前，平台建议你加 120 元曝光。",
+          desc: "加投可能带来新客，但如果库存和出餐跟不上，评分会被拖累。",
+          options: [
+            { key: "boost", title: "加投曝光", desc: "营收更高，现金消耗增加，员工压力上升。", revenue: 1.16, cash: -120, rating: -0.03, stock: -8, pressure: 10 },
+            { key: "hold", title: "不加投，守住履约", desc: "增长慢一点，但评分和出餐更稳。", revenue: 0.98, cash: 0, rating: 0.02, stock: -2, pressure: -3 }
+          ]
+        },
+        {
+          title: "爆款库存只够 70 单，要不要临时补货？",
+          desc: "补货能承接晚高峰，但会增加损耗风险。",
+          options: [
+            { key: "restock", title: "临时补货", desc: "库存更安全，现金减少，损耗略升。", revenue: 1.1, cash: -360, rating: 0.01, stock: 18, pressure: 5 },
+            { key: "limit", title: "限量售卖", desc: "少赚一些，但损耗低，后厨更稳。", revenue: 0.93, cash: 0, rating: 0.02, stock: 4, pressure: -6 }
+          ]
+        },
+        {
+          title: "差评集中在“选择太多、下单慢”。",
+          desc: "你可以临时把菜单首页收敛到 3 个套餐。",
+          options: [
+            { key: "bundle", title: "首页只推 3 个套餐", desc: "转化提升，部分自由搭配用户流失。", revenue: 1.08, cash: 0, rating: 0.04, stock: -3, pressure: -4 },
+            { key: "wide", title: "保持全量菜单", desc: "选择丰富，但新客决策成本继续偏高。", revenue: 0.97, cash: 0, rating: -0.02, stock: -5, pressure: 3 }
+          ]
+        },
+        {
+          title: "老客群今天沉默，要不要发 8 元复购券？",
+          desc: "复购券会拉回一部分用户，但会压缩当日利润。",
+          options: [
+            { key: "coupon", title: "发复购券", desc: "订单增加，利润率下降，复购资产增强。", revenue: 1.12, cash: -260, rating: 0.03, stock: -7, pressure: 6 },
+            { key: "none", title: "今天不发券", desc: "现金更稳，但老客唤醒不足。", revenue: 0.96, cash: 0, rating: -0.01, stock: -2, pressure: -2 }
+          ]
+        }
+      ];
+
+      function activeProfile() { return profiles[$("storeType").value]; }
+      function activeDistrict() { return districts[$("district").value]; }
+
+      function renderTasks(weather) {
+        const p = activeProfile();
+        const baseTasks = [
+          ["08:30", p.tasks[0], "开店前先确保核心原料够支撑第一波高峰。"],
+          ["10:40", p.tasks[1], "把容易造成差评的质量点提前检查。"],
+          ["11:20", p.tasks[2], "在平台首屏给用户一个明确下单理由。"],
+          ["14:30", "查看库存与差评", "决定晚高峰是否补货、调价或收缩菜单。"],
+          ["17:10", "私域/会员触达", "对老客发一句足够具体的回店理由。"],
+          ["21:40", p.tasks[3], "把今天的订单、评价和损耗变成明天动作。"]
+        ];
+        $("taskGrid").innerHTML = baseTasks.map(t => `<div class="task"><div class="time">${t[0]}</div><div class="name">${t[1]}</div><div class="desc">${t[2]}</div></div>`).join("");
+      }
+
+      function renderDecision(day) {
+        const decision = decisions[(day - 1) % decisions.length];
+        state.selectedDecision = decision.options[0];
+        $("decisionTitle").textContent = decision.title;
+        $("decisionDesc").textContent = decision.desc;
+        $("decisionOptions").innerHTML = decision.options.map((o, i) => `<button class="${i === 0 ? "active" : ""}" data-option="${i}"><strong>${o.title}</strong><span>${o.desc}</span></button>`).join("");
+        Array.from($("decisionOptions").querySelectorAll("button")).forEach((btn) => {
+          btn.addEventListener("click", () => {
+            Array.from($("decisionOptions").querySelectorAll("button")).forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            state.selectedDecision = decision.options[Number(btn.dataset.option)];
+          });
+        });
+      }
+
+      function renderKpis(today = null) {
+        $("cashKpi").textContent = state.cash ? `¥${fmt(state.cash)}` : "--";
+        $("revenueKpi").textContent = today ? `¥${fmt(today.revenue)}` : "--";
+        $("ratingKpi").textContent = state.day ? state.rating.toFixed(1) : "--";
+        $("stockKpi").textContent = state.day ? `${Math.max(0, Math.round(state.stock))}%` : "--";
+        $("cashTrend").textContent = state.day ? (state.cash > 30000 ? "现金安全" : "现金偏紧") : "待生成";
+        $("profitTrend").textContent = today ? `今日毛利 ¥${fmt(today.profit)}` : "毛利待算";
+        $("ratingTrend").textContent = state.day ? (state.rating >= 4.7 ? "口碑优秀" : state.rating >= 4.4 ? "基本稳定" : "需要救火") : "服务未开始";
+        $("stockTrend").textContent = state.day ? (state.stock < 28 ? "明早必须补货" : state.stock < 48 ? "库存偏紧" : "库存健康") : "未备货";
+      }
+
+      function renderHistory() {
+        if (!state.history.length) return;
+        $("storyLog").innerHTML = state.history.slice().reverse().map(h => `
+          <div class="log">
+            <div class="top"><div class="name">DAY ${h.day} · ${h.choice}</div><div class="money">¥${fmt(h.revenue)}</div></div>
+            <p>${h.story}</p>
+          </div>
+        `).join("");
+      }
+
+      function renderTrajectory() {
+        const recent = state.history.slice(-7);
+        const max = Math.max(1, ...recent.map(h => h.revenue));
+        $("trajectory").innerHTML = recent.length ? recent.map(h => {
+          const height = Math.max(8, Math.round((h.revenue / max) * 100));
+          return `<div><div class="bar"><div class="bar-fill" style="height:${height}%"></div><span>${fmt(h.revenue)}</span></div><div class="bar-label">D${h.day}</div></div>`;
+        }).join("") : `<div class="empty" style="grid-column: 1 / -1;">还没有轨迹。先开店，然后每天模拟一次。</div>`;
+      }
+
+      function simulateDay() {
+        state.day += 1;
+        const p = activeProfile();
+        const d = activeDistrict();
+        const weather = weatherList[(state.day * 2 + $("storeName").value.length) % weatherList.length];
+        const decision = state.selectedDecision || decisions[(state.day - 1) % decisions.length].options[0];
+        const strategyFactor = state.strategy === "growth" ? 1.1 : state.strategy === "premium" ? 0.96 : 1;
+        const weekdayFactor = [1, 1.03, 1.06, 1.0, 1.12, 0.92, 0.86][(state.day - 1) % 7];
+        const reputationFactor = 0.88 + state.rating / 5 * 0.22;
+        const stockFactor = state.stock < 25 ? 0.82 : state.stock < 45 ? 0.94 : 1;
+        const revenue = p.base * d.factor * weather.factor * decision.revenue * strategyFactor * weekdayFactor * reputationFactor * stockFactor;
+        const fixedCost = 980 + (state.strategy === "growth" ? 160 : 0);
+        const profit = revenue * (1 - p.cost) - fixedCost + decision.cash;
+        state.cash += profit;
+        state.rating = Math.max(3.8, Math.min(5, state.rating + decision.rating - Math.max(0, state.pressure - 70) / 900));
+        state.stock = Math.max(8, Math.min(100, state.stock + decision.stock + weather.stock));
+        state.pressure = Math.max(18, Math.min(100, state.pressure + decision.pressure + (revenue > p.base * 1.12 ? 6 : -4)));
+
+        const today = {
+          day: state.day,
+          revenue,
+          profit,
+          choice: decision.title,
+          story: `${weather.text}，${d.name}商圈呈现“${d.peak}”。你选择了“${decision.title}”，当天现金${profit >= 0 ? "增加" : "减少"} ¥${fmt(Math.abs(profit))}，库存剩余 ${Math.round(state.stock)}%，员工压力 ${Math.round(state.pressure)}%。AI 建议：${state.stock < 35 ? "明天优先补货并收缩爆款售卖节奏。" : state.rating < 4.45 ? "明天先处理评价和出餐稳定性。" : "明天可以继续测试套餐和复购动作。"}`
+        };
+        state.history.push(today);
+
+        $("dashTitle").textContent = $("storeName").value;
+        $("dayNum").textContent = `DAY ${state.day}`;
+        $("weatherBox").innerHTML = `${weather.text}<br><span style="color:rgba(247,245,237,.48);font-size:12px;">${d.name} · ${d.peak}</span>`;
+        $("daySummary").textContent = `今天的重点是：守住履约质量，同时把一个经营决策转化成真实结果。`;
+        renderTasks(weather);
+        renderKpis(today);
+        renderHistory();
+        renderTrajectory();
+        renderDecision(state.day + 1);
+      }
+
+      function start() {
+        state.day = 0;
+        state.cash = Number($("cash").value);
+        state.rating = 4.6;
+        state.stock = 82;
+        state.pressure = 36;
+        state.history = [];
+        $("nextDayBtn").disabled = false;
+        renderTrajectory();
+        renderDecision(1);
+        simulateDay();
+      }
+
+      Array.from(document.querySelectorAll(".chip")).forEach((chip) => {
+        chip.addEventListener("click", () => {
+          Array.from(document.querySelectorAll(".chip")).forEach(c => c.classList.remove("active"));
+          chip.classList.add("active");
+          state.strategy = chip.dataset.strategy;
+        });
+      });
+      $("startBtn").addEventListener("click", start);
+      $("nextDayBtn").addEventListener("click", simulateDay);
+      $("resetBtn").addEventListener("click", () => {
+        state.day = 0; state.cash = 0; state.history = []; state.selectedDecision = null;
+        $("dashTitle").textContent = "等待开店"; $("dayNum").textContent = "DAY 0"; $("weatherBox").textContent = "--";
+        $("daySummary").textContent = "点击“开店模拟”，系统会生成第一天的开店事项。";
+        $("taskGrid").innerHTML = `<div class="empty">还没有生成任务。<br />这里会出现备货、排班、上架、巡店、私域触达和复盘。</div>`;
+        $("decisionTitle").textContent = "等待事件"; $("decisionDesc").textContent = "每天会出现一个真实经营选择，例如是否加投平台、是否临时补货、是否压缩 SKU。"; $("decisionOptions").innerHTML = "";
+        $("storyLog").innerHTML = `<div class="empty">经营日志会记录每天的选择、结果和 AI 复盘。</div>`;
+        $("nextDayBtn").disabled = true; renderKpis(); renderTrajectory();
+      });
+      renderKpis(); renderTrajectory();
+    </script>
+  </body>
+</html>
