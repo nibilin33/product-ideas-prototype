@@ -94,14 +94,19 @@
       }
       .btn:hover { transform: translateY(-1px); filter: brightness(1.02); }
       .btn.secondary { color: rgba(247,245,237,0.86); background: rgba(0,0,0,0.14); border: 1px solid rgba(255,255,255,0.12); box-shadow: none; }
-      .btn.record {
-        color: rgba(255,255,255,0.92);
-        background: linear-gradient(135deg, rgba(239,68,68,0.92), rgba(249,115,22,0.88));
-        box-shadow: 0 14px 34px rgba(239,68,68,0.22);
-      }
-      .btn.record:hover { box-shadow: 0 18px 44px rgba(239,68,68,0.32); }
       .btn.full { width: 100%; }
       .btn:disabled { opacity: 0.55; cursor: wait; transform: none; }
+      .flow-hint {
+        margin-top: 10px;
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: rgba(247,245,237,0.72);
+        font-size: 12px;
+        font-weight: 850;
+        line-height: 1.7;
+      }
       .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
       .kpi { border-radius: 20px; padding: 14px; background: rgba(0,0,0,0.23); border: 1px solid rgba(255,255,255,0.09); }
       .kpi .label { color: rgba(247,245,237,0.52); font-size: 12px; font-weight: 800; }
@@ -160,6 +165,7 @@
         border-radius: 20px; padding: 13px; background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.09);
         cursor: pointer;
       }
+      .task:hover { border-color: rgba(56,189,248,0.26); background: rgba(56,189,248,0.06); }
       .task .time { color: rgba(251,191,36,0.9); font-size: 11px; font-weight: 950; letter-spacing: 0.08em; }
       .task .name { margin-top: 7px; color: rgba(247,245,237,0.94); font-weight: 950; }
       .task .desc { margin-top: 5px; color: rgba(247,245,237,0.56); font-size: 12px; line-height: 1.65; }
@@ -207,6 +213,7 @@
         border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.16);
         color: rgba(247,245,237,0.78); font-size: 12px; font-weight: 950; cursor: pointer;
       }
+      .tab:hover { border-color: rgba(56,189,248,0.26); }
       .tab.active { background: rgba(251,191,36,0.14); border-color: rgba(251,191,36,0.38); color: rgba(255,246,214,0.92); }
       .ops-body { margin-top: 12px; display: grid; gap: 10px; }
       .ops-row { display:flex; align-items:center; justify-content:space-between; gap: 12px; padding: 10px 12px; border-radius: 16px; background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.08); }
@@ -289,7 +296,7 @@
 	        <aside class="card">
 	          <p class="eyebrow">开店设定</p>
 	          <h2 class="text-2xl">先创建你的门店</h2>
-	          <p class="muted mt-2 text-sm">每天像真的在平台后台做投放、处理评价、补货与履约；点击“生成今日复盘”结算当日结果，并沉淀可回放的操作轨迹。</p>
+	          <p class="muted mt-2 text-sm">每天像真的在平台后台做投放、处理评价、补货与履约；点击“结算今日（生成复盘）”结算当日结果，并沉淀可回放的操作轨迹。</p>
 
           <div class="field">
             <label for="storeName">门店名称</label>
@@ -329,11 +336,11 @@
               <button class="chip" data-strategy="premium">高客单利润</button>
             </div>
           </div>
-          <div class="mt-5 grid grid-cols-2 gap-2">
-            <button class="btn full" id="startBtn">开店模拟</button>
-            <button class="btn secondary full" id="resetBtn">重置</button>
-          </div>
-        </aside>
+	          <div class="mt-5 grid grid-cols-2 gap-2">
+	            <button class="btn full" id="startBtn">开店并进入 DAY 1</button>
+	            <button class="btn secondary full" id="resetBtn">重置</button>
+	          </div>
+	        </aside>
 
         <section>
 		          <div class="card">
@@ -342,17 +349,19 @@
 		                <p class="eyebrow">经营仪表盘</p>
 		                <h2 class="text-2xl" id="dashTitle">等待开店</h2>
 		              </div>
-		              <div class="flex flex-wrap items-center gap-2">
-                    <button class="btn" id="closeDayBtn" disabled>生成今日复盘</button>
-                    <button class="btn secondary" id="nextDayBtn" disabled>进入下一天</button>
+			              <div class="flex flex-wrap items-center gap-2">
+                    <button class="btn" id="closeDayBtn" disabled>结算今日（生成复盘）</button>
+                    <button class="btn secondary" id="nextDayBtn" disabled>开始下一天</button>
                   </div>
+			            </div>
+                  <div class="flow-hint" id="flowHint">步骤：1）左侧开店 → 2）在“平台后台实操”里点操作 → 3）点任务卡打勾 → 4）选一个关键决策 → 5）点“结算今日（生成复盘）”。</div>
+			            <div class="kpis mt-4">
+			              <div class="kpi"><div class="label">现金余额</div><div class="value" id="cashKpi">--</div><div class="trend" id="cashTrend">待生成</div></div>
+			              <div class="kpi"><div class="label">今日营收</div><div class="value" id="revenueKpi">--</div><div class="trend" id="profitTrend">毛利待算</div></div>
+			              <div class="kpi"><div class="label">口碑评分</div><div class="value" id="ratingKpi">--</div><div class="trend" id="ratingTrend">服务未开始</div></div>
+		              <div class="kpi"><div class="label">库存健康</div><div class="value" id="stockKpi">--</div><div class="trend" id="stockTrend">未备货</div></div>
 		            </div>
-		            <div class="kpis mt-4">
-		              <div class="kpi"><div class="label">现金余额</div><div class="value" id="cashKpi">--</div><div class="trend" id="cashTrend">待生成</div></div>
-		              <div class="kpi"><div class="label">今日营收</div><div class="value" id="revenueKpi">--</div><div class="trend" id="profitTrend">毛利待算</div></div>
-		              <div class="kpi"><div class="label">口碑评分</div><div class="value" id="ratingKpi">--</div><div class="trend" id="ratingTrend">服务未开始</div></div>
-	              <div class="kpi"><div class="label">库存健康</div><div class="value" id="stockKpi">--</div><div class="trend" id="stockTrend">未备货</div></div>
-	            </div>
+                <div class="flow-hint" id="todayDigest" style="display:none;"></div>
 
 	            <div class="board">
 	              <div class="today">
@@ -360,7 +369,7 @@
 	                  <div>
 	                    <p class="eyebrow">今日开店任务</p>
 	                    <div class="day-num" id="dayNum">DAY 0</div>
-	                    <p class="muted text-sm" id="daySummary">点击“开店模拟”，系统会生成第一天的开店事项。</p>
+	                    <p class="muted text-sm" id="daySummary">先在左侧配置门店，然后点击“开店并进入 DAY 1”。</p>
 	                  </div>
 	                  <div class="weather" id="weatherBox">--</div>
 	                </div>
@@ -545,10 +554,10 @@
           state.hosting.lastSync = syncTimeText();
           renderHostedStrip();
         }
-        function platformBreakdown(revenue, day, profileKey) {
+        function platformBreakdown(revenue, day, profileKey, totalOrdersOverride = null) {
           const baseAov = profileKey === "coffee" ? 32 : profileKey === "tea" ? 28 : profileKey === "light" ? 36 : 26;
           const aov = baseAov + (state.strategy === "premium" ? 6 : state.strategy === "growth" ? -2 : 0);
-          const totalOrders = Math.max(10, Math.round(revenue / Math.max(18, aov)));
+          const totalOrders = totalOrdersOverride ?? Math.max(10, Math.round(revenue / Math.max(18, aov)));
           const shareSeed = (day * 9 + ($("storeName").value || "").length * 3 + profileKey.length * 11) % 100;
           const meituanShare = 0.56 + (shareSeed % 17) / 100; // 0.56 - 0.72
           const meituanOrders = Math.max(0, Math.round(totalOrders * meituanShare));
@@ -623,28 +632,38 @@
 	        });
 	      }
 
-      function renderKpis(today = null) {
-        $("cashKpi").textContent = state.cash ? `¥${fmt(state.cash)}` : "--";
-        $("revenueKpi").textContent = today ? `¥${fmt(today.revenue)}` : "--";
-        $("ratingKpi").textContent = state.day ? state.rating.toFixed(1) : "--";
-        $("stockKpi").textContent = state.day ? `${Math.max(0, Math.round(state.stock))}%` : "--";
-        $("cashTrend").textContent = state.day ? (state.cash > 30000 ? "现金安全" : "现金偏紧") : "待生成";
-        $("profitTrend").textContent = today ? `今日毛利 ¥${fmt(today.profit)}` : "毛利待算";
-        $("ratingTrend").textContent = state.day ? (state.rating >= 4.7 ? "口碑优秀" : state.rating >= 4.4 ? "基本稳定" : "需要救火") : "服务未开始";
-        $("stockTrend").textContent = state.day ? (state.stock < 28 ? "明早必须补货" : state.stock < 48 ? "库存偏紧" : "库存健康") : "未备货";
-      }
+	      function renderKpis(today = null) {
+	        $("cashKpi").textContent = state.cash ? `¥${fmt(state.cash)}` : "--";
+	        $("revenueKpi").textContent = today ? `¥${fmt(today.revenue)}` : "--";
+	        $("ratingKpi").textContent = state.day ? state.rating.toFixed(1) : "--";
+	        $("stockKpi").textContent = state.day ? `${Math.max(0, Math.round(state.stock))}%` : "--";
+	        $("cashTrend").textContent = state.day ? (state.cash > 30000 ? "现金安全" : "现金偏紧") : "待生成";
+	        $("profitTrend").textContent = today ? `今日毛利 ¥${fmt(today.profit)}` : "毛利待算";
+	        $("ratingTrend").textContent = state.day ? (state.rating >= 4.7 ? "口碑优秀" : state.rating >= 4.4 ? "基本稳定" : "需要救火") : "服务未开始";
+	        $("stockTrend").textContent = state.day ? (state.stock < 28 ? "明早必须补货" : state.stock < 48 ? "库存偏紧" : "库存健康") : "未备货";
+          if (today && typeof today.orders === "number") {
+            $("todayDigest").style.display = "block";
+            $("todayDigest").textContent =
+              `今日摘要：订单 ${today.orders} · 退款 ${today.refunds}（${(today.refundRate * 100).toFixed(1)}%） · ` +
+              `准时 ${(today.onTime * 100).toFixed(0)}% · 广告 ¥${fmt(today.adSpend)}`;
+          } else {
+            $("todayDigest").style.display = "none";
+            $("todayDigest").textContent = "";
+          }
+	      }
 
 	      function renderHistory() {
 	        if (!state.history.length) return;
-	        $("storyLog").innerHTML = state.history.slice().reverse().map(h => `
-	          <div class="log">
-	            <div class="top"><div class="name">DAY ${h.day} · ${h.choice}</div><div class="money">¥${fmt(h.revenue)}</div></div>
-              ${h.platform ? `<div class="meta">托管数据：美团 ${h.platform.meituan.orders} 单 / ¥${fmt(h.platform.meituan.revenue)} · 饿了么 ${h.platform.eleme.orders} 单 / ¥${fmt(h.platform.eleme.revenue)} · 同步 ${h.syncAt}</div>` : ""}
-              <div class="actions">
-                <button class="mini-btn" data-replay="${h.day}">查看回放</button>
-              </div>
-	            <p>${h.story}</p>
-	          </div>
+		        $("storyLog").innerHTML = state.history.slice().reverse().map(h => `
+		          <div class="log">
+		            <div class="top"><div class="name">DAY ${h.day} · ${h.choice}</div><div class="money">¥${fmt(h.revenue)}</div></div>
+	              ${h.platform ? `<div class="meta">托管数据：美团 ${h.platform.meituan.orders} 单 / ¥${fmt(h.platform.meituan.revenue)} · 饿了么 ${h.platform.eleme.orders} 单 / ¥${fmt(h.platform.eleme.revenue)} · 同步 ${h.syncAt}</div>` : ""}
+                ${typeof h.orders === "number" ? `<div class="meta">订单 ${h.orders} · 退款 ${h.refunds}（${(h.refundRate * 100).toFixed(1)}%） · 准时 ${(h.onTime * 100).toFixed(0)}% · 广告 ¥${fmt(h.adSpend)}</div>` : ""}
+	              <div class="actions">
+	                <button class="mini-btn" data-replay="${h.day}">查看回放</button>
+	              </div>
+		            <p>${h.story}</p>
+		          </div>
 	        `).join("");
           Array.from($("storyLog").querySelectorAll("[data-replay]")).forEach((btn) => {
             btn.addEventListener("click", () => openReplay(Number(btn.dataset.replay)));
@@ -663,13 +682,17 @@
 	        }).join("") : `<div class="empty" style="grid-column: 1 / -1;">还没有轨迹。先开店，然后每天实操并生成一次复盘。</div>`;
 	      }
 
-        const opsTabs = [
-          { key: "ads", name: "投放" },
-          { key: "orders", name: "订单" },
-          { key: "reviews", name: "评价" },
-          { key: "menu", name: "商品" },
-          { key: "fulfill", name: "履约" }
-        ];
+	        const opsTabs = [
+	          { key: "ads", name: "投放" },
+	          { key: "orders", name: "订单" },
+	          { key: "reviews", name: "评价" },
+	          { key: "menu", name: "商品" },
+	          { key: "fulfill", name: "履约" },
+            { key: "schedule", name: "排班" },
+            { key: "purchase", name: "采购" },
+            { key: "finance", name: "财务" },
+            { key: "private", name: "私域" }
+	        ];
 
         function addEvent(desc, payload = null) {
           if (!state.dayDraft) return;
@@ -684,61 +707,80 @@
           addEvent(`切换模块：${opsTabs.find(t => t.key === key)?.name || key}`);
         }
 
-        function applyOpsDelta(delta, desc) {
-          if (!state.dayDraft) return;
-          state.dayDraft.ops.revenueMul *= delta.revenueMul ?? 1;
-          state.dayDraft.ops.cashDelta += delta.cashDelta ?? 0;
-          state.dayDraft.ops.ratingDelta += delta.ratingDelta ?? 0;
-          state.dayDraft.ops.stockDelta += delta.stockDelta ?? 0;
-          state.dayDraft.ops.pressureDelta += delta.pressureDelta ?? 0;
-          addEvent(desc, delta);
-          renderOpsConsole();
-        }
+	        function applyOpsDelta(delta, desc) {
+	          if (!state.dayDraft) return;
+            const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+	          state.dayDraft.ops.revenueMul *= delta.revenueMul ?? 1;
+	          state.dayDraft.ops.cashDelta += delta.cashDelta ?? 0;
+	          state.dayDraft.ops.ratingDelta += delta.ratingDelta ?? 0;
+	          state.dayDraft.ops.stockDelta += delta.stockDelta ?? 0;
+	          state.dayDraft.ops.pressureDelta += delta.pressureDelta ?? 0;
+            if (!state.dayDraft.stats) state.dayDraft.stats = { adSpend: 0, refundRate: 0.018, onTime: 0.92, ordersMul: 1 };
+            state.dayDraft.stats.adSpend = Math.max(0, state.dayDraft.stats.adSpend + (delta.adSpend ?? 0));
+            state.dayDraft.stats.refundRate = clamp(state.dayDraft.stats.refundRate + (delta.refundRate ?? 0), 0, 0.12);
+            state.dayDraft.stats.onTime = clamp(state.dayDraft.stats.onTime + (delta.onTime ?? 0), 0.6, 0.99);
+            state.dayDraft.stats.ordersMul = clamp(state.dayDraft.stats.ordersMul * (delta.ordersMul ?? 1), 0.6, 1.6);
+
+            if (Array.isArray(delta.completeTasks)) {
+              delta.completeTasks.forEach((k) => {
+                if (!state.dayDraft.doneTasks.includes(k)) state.dayDraft.doneTasks.push(k);
+              });
+            }
+	          addEvent(desc, delta);
+	          renderOpsConsole();
+            renderTasks();
+            renderHostedStrip();
+	        }
 
         function renderOpsConsole() {
           if (!state.dayDraft) {
             $("opsTabs").innerHTML = "";
-            $("opsBody").innerHTML = `<div class="empty">开店后会自动进入“今日实操”。<br />在这里像平台后台一样操作，然后点击“生成今日复盘”结算。</div>`;
+	            $("opsBody").innerHTML = `<div class="empty">开店后会自动进入“今日实操”。<br />在这里像平台后台一样操作，然后点击“结算今日（生成复盘）”。</div>`;
             return;
           }
           $("opsTabs").innerHTML = opsTabs.map(t => `<button class="tab ${t.key === state.dayDraft.activeTab ? "active" : ""}" data-tab="${t.key}">${t.name}</button>`).join("");
           Array.from($("opsTabs").querySelectorAll("[data-tab]")).forEach((btn) => btn.addEventListener("click", () => setActiveTab(btn.dataset.tab)));
 
-          const ops = state.dayDraft.ops;
-          const kv = `
-            <div class="ops-kv">
-              <span class="pill">营收系数 ×${ops.revenueMul.toFixed(2)}</span>
-              <span class="pill">现金变动 ${ops.cashDelta >= 0 ? "+" : "-"}¥${fmt(Math.abs(ops.cashDelta))}</span>
-              <span class="pill">口碑 Δ${ops.ratingDelta >= 0 ? "+" : ""}${ops.ratingDelta.toFixed(2)}</span>
-              <span class="pill">库存 Δ${ops.stockDelta >= 0 ? "+" : ""}${Math.round(ops.stockDelta)}%</span>
-              <span class="pill">压力 Δ${ops.pressureDelta >= 0 ? "+" : ""}${Math.round(ops.pressureDelta)}</span>
-            </div>
-          `;
+	          const ops = state.dayDraft.ops;
+            const stats = state.dayDraft.stats || { adSpend: 0, refundRate: 0.018, onTime: 0.92, ordersMul: 1 };
+	          const kv = `
+	            <div class="ops-kv">
+	              <span class="pill">营收系数 ×${ops.revenueMul.toFixed(2)}</span>
+	              <span class="pill">现金变动 ${ops.cashDelta >= 0 ? "+" : "-"}¥${fmt(Math.abs(ops.cashDelta))}</span>
+	              <span class="pill">口碑 Δ${ops.ratingDelta >= 0 ? "+" : ""}${ops.ratingDelta.toFixed(2)}</span>
+	              <span class="pill">库存 Δ${ops.stockDelta >= 0 ? "+" : ""}${Math.round(ops.stockDelta)}%</span>
+	              <span class="pill">压力 Δ${ops.pressureDelta >= 0 ? "+" : ""}${Math.round(ops.pressureDelta)}</span>
+                <span class="pill">广告 ¥${fmt(stats.adSpend)}</span>
+                <span class="pill">退款率 ${(stats.refundRate * 100).toFixed(1)}%</span>
+                <span class="pill">准时 ${(stats.onTime * 100).toFixed(0)}%</span>
+                <span class="pill">单量系数 ×${stats.ordersMul.toFixed(2)}</span>
+	            </div>
+	          `;
 
-          if (state.dayDraft.activeTab === "ads") {
-            $("opsBody").innerHTML = `
-              <div class="ops-row">
-                <div class="left">
-                  <div class="title">午高峰加投（平台广告）</div>
-                  <div class="sub">把曝光买回来，但现金会先花出去。</div>
-                </div>
-                <button class="mini-btn" id="opBoost">应用：+15%营收 / -¥120</button>
-              </div>
-              <div class="ops-row">
-                <div class="left">
-                  <div class="title">退回加投，保履约</div>
-                  <div class="sub">增长慢一点，但压力下降。</div>
-                </div>
-                <button class="mini-btn" id="opHold">应用：-2%营收 / 压力-4</button>
-              </div>
-              ${kv}
-            `;
-            $("opBoost").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.15, cashDelta: -120, pressureDelta: 6 }, "投放：午高峰加投（+15%营收 / -¥120）"));
-            $("opHold").addEventListener("click", () => applyOpsDelta({ revenueMul: 0.98, pressureDelta: -4, ratingDelta: 0.01 }, "投放：退回加投（保履约）"));
-            return;
-          }
+	          if (state.dayDraft.activeTab === "ads") {
+	            $("opsBody").innerHTML = `
+	              <div class="ops-row">
+	                <div class="left">
+	                  <div class="title">午高峰加投（平台广告）</div>
+	                  <div class="sub">把曝光买回来，但现金会先花出去。</div>
+	                </div>
+	                <button class="mini-btn" id="opBoost">应用：+15%营收 / -¥120</button>
+	              </div>
+	              <div class="ops-row">
+	                <div class="left">
+	                  <div class="title">退回加投，保履约</div>
+	                  <div class="sub">增长慢一点，但压力下降。</div>
+	                </div>
+	                <button class="mini-btn" id="opHold">应用：-2%营收 / 压力-4</button>
+	              </div>
+	              ${kv}
+	            `;
+	            $("opBoost").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.15, cashDelta: -120, pressureDelta: 6, adSpend: 120, ordersMul: 1.04 }, "投放：午高峰加投（+15%营收 / -¥120）"));
+	            $("opHold").addEventListener("click", () => applyOpsDelta({ revenueMul: 0.98, pressureDelta: -4, ratingDelta: 0.01, onTime: 0.01, refundRate: -0.001 }, "投放：退回加投（保履约）"));
+	            return;
+	          }
 
-          if (state.dayDraft.activeTab === "orders") {
+	          if (state.dayDraft.activeTab === "orders") {
             $("opsBody").innerHTML = `
               <div class="ops-row">
                 <div class="left">
@@ -756,12 +798,12 @@
               </div>
               ${kv}
             `;
-            $("opComp").addEventListener("click", () => applyOpsDelta({ cashDelta: -35, ratingDelta: 0.03, pressureDelta: 2 }, "订单：处理异常单（补发）"));
-            $("opRush").addEventListener("click", () => applyOpsDelta({ ratingDelta: 0.02, pressureDelta: 5 }, "订单：催单 & 出餐加急"));
-            return;
-          }
+	            $("opComp").addEventListener("click", () => applyOpsDelta({ cashDelta: -35, ratingDelta: 0.03, pressureDelta: 2, refundRate: -0.006, onTime: 0.01 }, "订单：处理异常单（补发）"));
+	            $("opRush").addEventListener("click", () => applyOpsDelta({ ratingDelta: 0.02, pressureDelta: 5, onTime: 0.03, refundRate: -0.001 }, "订单：催单 & 出餐加急"));
+	            return;
+	          }
 
-          if (state.dayDraft.activeTab === "reviews") {
+	          if (state.dayDraft.activeTab === "reviews") {
             $("opsBody").innerHTML = `
               <div class="ops-row">
                 <div class="left">
@@ -779,12 +821,12 @@
               </div>
               ${kv}
             `;
-            $("opReply").addEventListener("click", () => applyOpsDelta({ ratingDelta: 0.05, pressureDelta: 1 }, "评价：一键回复差评"));
-            $("opCoupon").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.06, cashDelta: -80, ratingDelta: 0.02 }, "评价：发补偿券（挽回）"));
-            return;
-          }
+	            $("opReply").addEventListener("click", () => applyOpsDelta({ ratingDelta: 0.05, pressureDelta: 1, refundRate: -0.002 }, "评价：一键回复差评"));
+	            $("opCoupon").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.06, cashDelta: -80, ratingDelta: 0.02, ordersMul: 1.02, adSpend: 60 }, "评价：发补偿券（挽回）"));
+	            return;
+	          }
 
-          if (state.dayDraft.activeTab === "menu") {
+	          if (state.dayDraft.activeTab === "menu") {
             $("opsBody").innerHTML = `
               <div class="ops-row">
                 <div class="left">
@@ -802,12 +844,12 @@
               </div>
               ${kv}
             `;
-            $("opTop").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.08, stockDelta: -6, pressureDelta: 3 }, "商品：爆款套餐置顶"));
-            $("opLimit").addEventListener("click", () => applyOpsDelta({ revenueMul: 0.94, pressureDelta: -6, ratingDelta: 0.02 }, "商品：临时限量（防爆单）"));
-            return;
-          }
+	            $("opTop").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.08, stockDelta: -6, pressureDelta: 3, ordersMul: 1.03, completeTasks: ["11:20 上架"] }, "商品：爆款套餐置顶"));
+	            $("opLimit").addEventListener("click", () => applyOpsDelta({ revenueMul: 0.94, pressureDelta: -6, ratingDelta: 0.02, refundRate: -0.002 }, "商品：临时限量（防爆单）"));
+	            return;
+	          }
 
-          if (state.dayDraft.activeTab === "fulfill") {
+	          if (state.dayDraft.activeTab === "fulfill") {
             $("opsBody").innerHTML = `
               <div class="ops-row">
                 <div class="left">
@@ -825,11 +867,103 @@
               </div>
               ${kv}
             `;
-            $("opPrep").addEventListener("click", () => applyOpsDelta({ ratingDelta: 0.03, pressureDelta: 4, stockDelta: -3 }, "履约：加人手/提前备料"));
-            $("opRestock").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.04, cashDelta: -220, stockDelta: 12 }, "履约：补货（承接晚高峰）"));
+	            $("opPrep").addEventListener("click", () => applyOpsDelta({ ratingDelta: 0.03, pressureDelta: 4, stockDelta: -3, onTime: 0.02, refundRate: -0.001, completeTasks: ["08:30 备料"] }, "履约：加人手/提前备料"));
+	            $("opRestock").addEventListener("click", () => applyOpsDelta({ revenueMul: 1.04, cashDelta: -220, stockDelta: 12, onTime: 0.01, completeTasks: ["14:30 巡检"] }, "履约：补货（承接晚高峰）"));
+	            return;
+	          }
+
+          if (state.dayDraft.activeTab === "schedule") {
+            $("opsBody").innerHTML = `
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">高峰加开一班（加人手）</div>
+                  <div class="sub">履约更稳，准时率提升，但人工成本增加。</div>
+                </div>
+                <button class="mini-btn" id="opShiftAdd">应用：准时+3% / 压力-6 / -¥260</button>
+              </div>
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">压缩人力控成本</div>
+                  <div class="sub">现金更稳，但高峰容易爆单，退款率上升。</div>
+                </div>
+                <button class="mini-btn" id="opShiftCut">应用：现金+¥120 / 压力+8 / 准时-4%</button>
+              </div>
+              ${kv}
+            `;
+            $("opShiftAdd").addEventListener("click", () => applyOpsDelta({ cashDelta: -260, pressureDelta: -6, onTime: 0.03, ratingDelta: 0.01, refundRate: -0.001, completeTasks: ["09:30 排班"] }, "排班：高峰加开一班"));
+            $("opShiftCut").addEventListener("click", () => applyOpsDelta({ cashDelta: 120, pressureDelta: 8, onTime: -0.04, refundRate: 0.004, completeTasks: ["09:30 排班"] }, "排班：压缩人力控成本"));
             return;
           }
-        }
+
+          if (state.dayDraft.activeTab === "purchase") {
+            $("opsBody").innerHTML = `
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">订货补爆款（承接晚高峰）</div>
+                  <div class="sub">库存更安全，少错失订单，但现金先付出去。</div>
+                </div>
+                <button class="mini-btn" id="opBuy">应用：库存+18% / -¥520 / 营收+3%</button>
+              </div>
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">控损：先出先用 + 报损复盘</div>
+                  <div class="sub">损耗下降，现金回收一点点，口碑更稳。</div>
+                </div>
+                <button class="mini-btn" id="opWaste">应用：现金+¥90 / 库存+4% / 退款率-0.1%</button>
+              </div>
+              ${kv}
+            `;
+            $("opBuy").addEventListener("click", () => applyOpsDelta({ cashDelta: -520, stockDelta: 18, revenueMul: 1.03, onTime: 0.01, completeTasks: ["13:20 订货"] }, "采购：订货补爆款"));
+            $("opWaste").addEventListener("click", () => applyOpsDelta({ cashDelta: 90, stockDelta: 4, ratingDelta: 0.01, refundRate: -0.001, completeTasks: ["13:20 订货"] }, "采购：控损复盘"));
+            return;
+          }
+
+          if (state.dayDraft.activeTab === "finance") {
+            $("opsBody").innerHTML = `
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">对账：核对补贴/异常单</div>
+                  <div class="sub">把“漏掉的钱”捞回来，异常单及时处理。</div>
+                </div>
+                <button class="mini-btn" id="opRecon">应用：现金+¥80 / 退款率-0.2%</button>
+              </div>
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">调整预算：活动/券成本</div>
+                  <div class="sub">拉动单量，但会挤压当日利润。</div>
+                </div>
+                <button class="mini-btn" id="opBudget">应用：单量系数×1.03 / -¥120</button>
+              </div>
+              ${kv}
+            `;
+            $("opRecon").addEventListener("click", () => applyOpsDelta({ cashDelta: 80, refundRate: -0.002, completeTasks: ["20:30 对账"] }, "财务：对账核对补贴/异常单"));
+            $("opBudget").addEventListener("click", () => applyOpsDelta({ cashDelta: -120, ordersMul: 1.03, adSpend: 50, completeTasks: ["20:30 对账"] }, "财务：调整活动/券预算"));
+            return;
+          }
+
+          if (state.dayDraft.activeTab === "private") {
+            $("opsBody").innerHTML = `
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">社群推送（午/晚高峰提醒）</div>
+                  <div class="sub">拉回一部分老客，单量更稳。</div>
+                </div>
+                <button class="mini-btn" id="opGroup">应用：单量系数×1.04 / 营收+2% / -¥60</button>
+              </div>
+              <div class="ops-row">
+                <div class="left">
+                  <div class="title">会员复购券（定向发放）</div>
+                  <div class="sub">复购上来，口碑更稳，但券成本会消耗现金。</div>
+                </div>
+                <button class="mini-btn" id="opMember">应用：单量系数×1.05 / 口碑+0.02 / -¥120</button>
+              </div>
+              ${kv}
+            `;
+            $("opGroup").addEventListener("click", () => applyOpsDelta({ ordersMul: 1.04, revenueMul: 1.02, cashDelta: -60, ratingDelta: 0.01, completeTasks: ["18:10 私域"] }, "私域：社群推送"));
+            $("opMember").addEventListener("click", () => applyOpsDelta({ ordersMul: 1.05, cashDelta: -120, ratingDelta: 0.02, refundRate: -0.001, completeTasks: ["18:10 私域"] }, "私域：会员复购券"));
+            return;
+          }
+	        }
 
         function openDay(dayNumber) {
           if (!state.hosting.connected) connectHostedAccounts();
@@ -838,39 +972,44 @@
           state.day = dayNumber;
           const p = activeProfile();
           const d = activeDistrict();
-          const weather = weatherList[(state.day * 2 + $("storeName").value.length) % weatherList.length];
-          const tasks = [
-            { time: "08:30", name: p.tasks[0], desc: "开店前先确保核心原料够支撑第一波高峰。", key: "08:30 备料" },
-            { time: "10:40", name: p.tasks[1], desc: "把容易造成差评的质量点提前检查。", key: "10:40 品控" },
-            { time: "11:20", name: p.tasks[2], desc: "在平台首屏给用户一个明确下单理由。", key: "11:20 上架" },
-            { time: "14:30", name: "查看库存与差评", desc: "决定晚高峰是否补货、调价或收缩菜单。", key: "14:30 巡检" },
-            { time: "17:10", name: "私域/会员触达", desc: "对老客发一句足够具体的回店理由。", key: "17:10 触达" },
-            { time: "21:40", name: p.tasks[3], desc: "把今天的订单、评价和损耗变成明天动作。", key: "21:40 复盘" }
-          ];
+	          const weather = weatherList[(state.day * 2 + $("storeName").value.length) % weatherList.length];
+	          const tasks = [
+	            { time: "08:30", name: p.tasks[0], desc: "开店前先确保核心原料够支撑第一波高峰。", key: "08:30 备料" },
+              { time: "09:30", name: "排班与人手", desc: "根据预估单量调整人手与岗位分工，避免高峰爆单。", key: "09:30 排班" },
+	            { time: "10:40", name: p.tasks[1], desc: "把容易造成差评的质量点提前检查。", key: "10:40 品控" },
+	            { time: "11:20", name: p.tasks[2], desc: "在平台首屏给用户一个明确下单理由。", key: "11:20 上架" },
+              { time: "13:20", name: "订货与验收", desc: "补爆款/控损耗，确保晚高峰不缺货。", key: "13:20 订货" },
+	            { time: "14:30", name: "查看库存与差评", desc: "决定晚高峰是否补货、调价或收缩菜单。", key: "14:30 巡检" },
+	            { time: "18:10", name: "私域/会员触达", desc: "把老客拉回高峰：社群推送、会员券、复购提醒。", key: "18:10 私域" },
+              { time: "20:30", name: "对账与费用", desc: "核对补贴、异常单与券成本，把钱算清楚。", key: "20:30 对账" },
+	            { time: "21:40", name: p.tasks[3], desc: "把今天的订单、评价和损耗变成明天动作。", key: "21:40 复盘" }
+	          ];
 
-          state.dayDraft = {
-            day: state.day,
-            startedAt: Date.now(),
-            weather,
-            district: d,
-            tasks,
-            doneTasks: [],
-            ops: { revenueMul: 1, cashDelta: 0, ratingDelta: 0, stockDelta: 0, pressureDelta: 0 },
-            activeTab: "ads",
-            events: []
-          };
+	          state.dayDraft = {
+	            day: state.day,
+	            startedAt: Date.now(),
+	            weather,
+	            district: d,
+	            tasks,
+	            doneTasks: [],
+	            ops: { revenueMul: 1, cashDelta: 0, ratingDelta: 0, stockDelta: 0, pressureDelta: 0 },
+              stats: { adSpend: 0, refundRate: 0.018, onTime: 0.92, ordersMul: 1 },
+	            activeTab: "ads",
+	            events: []
+	          };
 
           $("closeDayBtn").disabled = false;
           $("nextDayBtn").disabled = true;
           $("dashTitle").textContent = $("storeName").value;
           $("dayNum").textContent = `DAY ${state.day}`;
           $("weatherBox").innerHTML = `${weather.text}<br><span style="color:rgba(247,245,237,.48);font-size:12px;">${d.name} · ${d.peak}</span>`;
-          $("daySummary").textContent = "今日实操中：在“平台后台实操”里完成操作，点击“生成今日复盘”结算。";
+          $("daySummary").textContent = "今日实操中：在“平台后台实操”里完成操作，最后点击“结算今日（生成复盘）”。";
 
           renderDecision(state.day);
           renderTasks();
           renderOpsConsole();
           renderHostedStrip();
+          renderFlowHint();
           addEvent(`进入当天：DAY ${state.day}`);
         }
 
@@ -910,24 +1049,37 @@
           state.stock = Math.max(8, Math.min(100, state.stock + decision.stock + weather.stock + state.dayDraft.ops.stockDelta));
           state.pressure = Math.max(18, Math.min(100, state.pressure + decision.pressure + state.dayDraft.ops.pressureDelta + (revenue > p.base * 1.12 ? 6 : -4)));
 
-          const platform = state.hosting.connected ? platformBreakdown(revenue, state.day, $("storeType").value) : null;
-          const syncAt = state.hosting.connected ? state.hosting.lastSync : "--";
-          addEvent(`生成今日复盘：任务 ${state.dayDraft.doneTasks.length}/${state.dayDraft.tasks.length}`);
+            const profileKey = $("storeType").value;
+            const baseAov = profileKey === "coffee" ? 32 : profileKey === "tea" ? 28 : profileKey === "light" ? 36 : 26;
+            const aov = baseAov + (state.strategy === "premium" ? 6 : state.strategy === "growth" ? -2 : 0);
+            const stats = state.dayDraft.stats || { adSpend: 0, refundRate: 0.018, onTime: 0.92, ordersMul: 1 };
+            const orders = Math.max(10, Math.round((revenue / Math.max(18, aov)) * stats.ordersMul));
+            const refunds = Math.max(0, Math.round(orders * stats.refundRate));
 
-          const today = {
-            day: state.day,
-            revenue,
-            profit,
-            choice: decision.title,
-            platform,
-            syncAt,
-            events: state.dayDraft.events.slice(),
-            story:
-              `${weather.text}，${d.name}商圈呈现“${d.peak}”。` +
-              `你完成任务 ${state.dayDraft.doneTasks.length}/${state.dayDraft.tasks.length}，并选择了“${decision.title}”。` +
-              `当天现金${profit >= 0 ? "增加" : "减少"} ¥${fmt(Math.abs(profit))}，库存剩余 ${Math.round(state.stock)}%，员工压力 ${Math.round(state.pressure)}%。` +
-              `AI 建议：${state.stock < 35 ? "明天优先补货并收缩爆款售卖节奏。" : state.rating < 4.45 ? "明天先处理评价和出餐稳定性。" : "明天可以继续测试套餐和复购动作。"}`
-          };
+	          const platform = state.hosting.connected ? platformBreakdown(revenue, state.day, profileKey, orders) : null;
+	          const syncAt = state.hosting.connected ? state.hosting.lastSync : "--";
+	          addEvent(`结算今日：任务 ${state.dayDraft.doneTasks.length}/${state.dayDraft.tasks.length}`);
+
+	          const today = {
+	            day: state.day,
+	            revenue,
+	            profit,
+	            choice: decision.title,
+              orders,
+              refunds,
+              refundRate: stats.refundRate,
+              onTime: stats.onTime,
+              adSpend: stats.adSpend,
+	            platform,
+	            syncAt,
+	            events: state.dayDraft.events.slice(),
+	            story:
+	              `${weather.text}，${d.name}商圈呈现“${d.peak}”。` +
+	              `你完成任务 ${state.dayDraft.doneTasks.length}/${state.dayDraft.tasks.length}，并选择了“${decision.title}”。` +
+                `今日约 ${orders} 单，退款 ${refunds} 单（${(stats.refundRate * 100).toFixed(1)}%），准时 ${(stats.onTime * 100).toFixed(0)}%，广告 ¥${fmt(stats.adSpend)}。` +
+	              `当天现金${profit >= 0 ? "增加" : "减少"} ¥${fmt(Math.abs(profit))}，库存剩余 ${Math.round(state.stock)}%，员工压力 ${Math.round(state.pressure)}%。` +
+	              `AI 建议：${state.stock < 35 ? "明天优先补货并收缩爆款售卖节奏。" : state.rating < 4.45 ? "明天先处理评价和出餐稳定性。" : "明天可以继续测试套餐和复购动作。"}`
+	          };
           state.history.push(today);
 
           state.dayDraft = null;
@@ -940,16 +1092,30 @@
           renderHistory();
           renderTrajectory();
           renderOpsConsole();
+          renderFlowHint();
 
-          $("taskGrid").innerHTML = `<div class="empty">今日已结算。<br />点击“进入下一天”开始新的实操。</div>`;
+          $("taskGrid").innerHTML = `<div class="empty">今日已结算。<br />点击“开始下一天”进入下一天实操。</div>`;
           $("decisionTitle").textContent = "今日已结算";
-          $("decisionDesc").textContent = "你可以查看回放，或进入下一天继续操作。";
+          $("decisionDesc").textContent = "你可以查看回放，或开始下一天继续操作。";
           $("decisionOptions").innerHTML = "";
         }
 
         function goNextDay() {
           if (state.dayDraft) return;
           openDay(state.day + 1);
+        }
+
+        function renderFlowHint() {
+          if (!$("flowHint")) return;
+          if (!state.dayDraft && !state.history.length && state.day === 0) {
+            $("flowHint").textContent = "步骤：1）左侧配置门店 → 2）点击“开店并进入 DAY 1”。";
+            return;
+          }
+          if (state.dayDraft) {
+            $("flowHint").textContent = `DAY ${state.dayDraft.day} 实操：1）在“平台后台实操”里点操作 → 2）点任务卡打勾 → 3）选一个关键决策 → 4）点“结算今日（生成复盘）”。`;
+            return;
+          }
+          $("flowHint").textContent = `DAY ${state.day} 已结算：1）需要的话点日志里的“查看回放” → 2）点“开始下一天”。`;
         }
 
         function openReplay(day) {
@@ -1022,16 +1188,16 @@
 		        state.day = 0; state.cash = 0; state.history = []; state.selectedDecision = null; state.dayDraft = null;
 	          closeReplay();
 		        $("dashTitle").textContent = "等待开店"; $("dayNum").textContent = "DAY 0"; $("weatherBox").textContent = "--";
-		        $("daySummary").textContent = "点击“开店模拟”，系统会生成第一天的开店事项。";
+		        $("daySummary").textContent = "先在左侧配置门店，然后点击“开店并进入 DAY 1”。";
 		        $("taskGrid").innerHTML = `<div class="empty">还没有生成任务。<br />这里会出现备货、排班、上架、巡店、私域触达和复盘。</div>`;
 		        $("decisionTitle").textContent = "等待开店"; $("decisionDesc").textContent = "开店后会出现今日关键决策；你的选择与后台操作都会自动留痕并可回放。"; $("decisionOptions").innerHTML = "";
 		        $("storyLog").innerHTML = `<div class="empty">经营日志会记录每天的选择、托管数据摘要、结果和 AI 复盘。</div>`;
 	          disconnectHostedAccounts();
             $("closeDayBtn").disabled = true;
             $("nextDayBtn").disabled = true;
-	          renderOpsConsole(); renderHostedStrip(); renderKpis(); renderTrajectory();
+	          renderOpsConsole(); renderHostedStrip(); renderKpis(); renderTrajectory(); renderFlowHint();
 		      });
-	      renderKpis(); renderTrajectory(); renderHostedStrip(); renderOpsConsole();
-	    </script>
+		      renderKpis(); renderTrajectory(); renderHostedStrip(); renderOpsConsole(); renderFlowHint();
+		    </script>
 	  </body>
 </html>
