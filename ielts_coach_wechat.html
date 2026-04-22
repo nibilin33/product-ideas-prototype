@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>雅思督学 · 微信自动化（原型）</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      * { box-sizing: border-box; }
+
+      .bg-shell {
+        position: relative;
+        background:
+          radial-gradient(ellipse 1200px 600px at 50% 50%, rgba(16, 185, 129, 0.03), transparent 70%),
+          radial-gradient(circle 800px at 80% 20%, rgba(34, 211, 238, 0.08), transparent 60%),
+          radial-gradient(circle 600px at 20% 80%, rgba(16, 185, 129, 0.06), transparent 50%),
+          linear-gradient(180deg, #0a0f14 0%, #050809 50%, #020304 100%);
+        overflow-x: hidden;
+      }
+
+      .bg-shell::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          radial-gradient(circle, rgba(52, 211, 153, 0.8) 1px, transparent 1px),
+          radial-gradient(circle, rgba(34, 211, 238, 0.6) 1px, transparent 1px),
+          radial-gradient(circle, rgba(255, 255, 255, 0.9) 1.5px, transparent 1.5px),
+          radial-gradient(circle, rgba(52, 211, 153, 0.4) 0.5px, transparent 0.5px),
+          radial-gradient(circle, rgba(34, 211, 238, 0.3) 0.5px, transparent 0.5px);
+        background-size: 550px 550px, 350px 350px, 450px 450px, 250px 250px, 200px 200px;
+        background-position: 0 0, 40px 60px, 130px 270px, 70px 100px, 150px 200px;
+        animation: cosmicDrift 180s linear infinite;
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0.65;
+      }
+
+      @keyframes cosmicDrift {
+        0% { transform: translate(0, 0) scale(1); opacity: 0.55; }
+        33% { opacity: 0.8; }
+        66% { opacity: 0.7; }
+        100% { transform: translate(-200px, -100px) scale(1.05); opacity: 0.6; }
+      }
+
+      .bg-shell::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          radial-gradient(circle, rgba(255, 255, 255, 0.9) 1px, transparent 1px),
+          radial-gradient(circle, rgba(52, 211, 153, 0.8) 1px, transparent 1px),
+          radial-gradient(circle, rgba(34, 211, 238, 0.7) 1px, transparent 1px);
+        background-size: 800px 800px, 600px 600px, 700px 700px;
+        background-position: 50px 50px, 250px 150px, 400px 300px;
+        animation: starTwinkle 3s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      @keyframes starTwinkle {
+        0%, 100% { opacity: 0.28; }
+        50% { opacity: 0.78; }
+      }
+
+      .gstroke {
+        position: relative;
+        border-radius: 18px;
+        background:
+          radial-gradient(120% 85% at 18% 8%, rgba(52, 211, 153, 0.1) 0%, rgba(34, 211, 238, 0.05) 42%, rgba(0, 0, 0, 0) 72%),
+          rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+      }
+
+      .gstroke::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(135deg, rgba(52, 211, 153, 0.22) 0%, rgba(34, 211, 238, 0.14) 45%, rgba(16, 185, 129, 0.06) 100%);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+        opacity: 0.55;
+        filter: blur(0.2px);
+      }
+
+      .btn-primary {
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 12px;
+        font-weight: 900;
+        color: #fff;
+        background: linear-gradient(135deg, #34d399, #34d399);
+        box-shadow: 0 4px 16px rgba(52, 211, 153, 0.3);
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 15px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 24px rgba(52, 211, 153, 0.42), 0 0 40px rgba(52, 211, 153, 0.24);
+      }
+
+      .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+
+      .btn-secondary {
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 12px;
+        font-weight: 800;
+        color: rgba(244, 244, 245, 0.9);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 15px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(52, 211, 153, 0.4);
+        box-shadow: 0 0 16px rgba(52, 211, 153, 0.16);
+      }
+
+      .btn-sm { height: 40px; padding: 0 14px; font-size: 14px; }
+
+      .wda-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 900;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(244, 244, 245, 0.78);
+        white-space: nowrap;
+      }
+
+      .wda-chip--ok { border-color: rgba(52, 211, 153, 0.22); background: rgba(52, 211, 153, 0.10); color: rgba(190, 255, 232, 0.95); }
+      .wda-chip--cyan { border-color: rgba(34, 211, 238, 0.22); background: rgba(34, 211, 238, 0.10); color: rgba(190, 248, 255, 0.92); }
+      .wda-chip--warn { border-color: rgba(240, 179, 72, 0.22); background: rgba(240, 179, 72, 0.10); color: rgba(255, 228, 175, 0.92); }
+      .wda-chip--danger { border-color: rgba(222, 79, 133, 0.20); background: rgba(222, 79, 133, 0.10); color: rgba(255, 199, 220, 0.92); }
+
+      .wda-input, .wda-select, .wda-textarea {
+        width: 100%;
+        border-radius: 16px;
+        padding: 10px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(0, 0, 0, 0.22);
+        color: rgba(244, 244, 245, 0.9);
+        outline: none;
+      }
+
+      .wda-input:focus, .wda-select:focus, .wda-textarea:focus {
+        border-color: rgba(52, 211, 153, 0.35);
+        box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.10);
+      }
+
+      .wda-input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.75; }
+
+      .wda-textarea { min-height: 120px; resize: vertical; line-height: 1.6; }
+
+      .wda-item {
+        border-radius: 18px;
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.03);
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      }
+
+      .wda-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(52, 211, 153, 0.22);
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.6);
+      }
+
+      .wda-toast {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 22px;
+        z-index: 200;
+        padding: 10px 14px;
+        border-radius: 9999px;
+        background: rgba(5, 8, 9, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        color: rgba(244, 244, 245, 0.92);
+        font-weight: 900;
+        font-size: 13px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+      }
+
+      .wda-toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+    </style>
+  </head>
+  <body class="bg-shell min-h-screen text-zinc-100">
+    <div class="relative z-10">
+      <div class="mx-auto max-w-6xl px-4 py-8">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <div class="text-2xl font-black tracking-tight">雅思督学</div>
+            <div class="mt-1 text-sm text-zinc-200/60">日计划 · 打卡解析 · 催学话术（只生成/复制，不自动发送）</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <input class="wda-input h-10 text-sm w-44" type="date" data-action="pickDay" />
+            <button class="btn-secondary btn-sm" type="button" data-action="resetDemo">重置示例</button>
+          </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-12 gap-4">
+          <div class="col-span-12 md:col-span-4 grid gap-4">
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">学员</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">今日状态</div>
+                </div>
+                <button class="btn-secondary btn-sm" type="button" data-action="addStudent">新增</button>
+              </div>
+              <div class="mt-3 grid gap-2" id="stuList"></div>
+            </div>
+
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">自动化</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">到点未打卡则提醒</div>
+                </div>
+              </div>
+              <div class="mt-3 grid gap-2">
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <div class="text-[11px] font-black text-zinc-200/55">提醒时间</div>
+                    <input class="wda-input h-10 text-sm" type="time" data-action="setReminderTime" />
+                  </div>
+                  <div>
+                    <div class="text-[11px] font-black text-zinc-200/55">口吻</div>
+                    <select class="wda-select h-10 text-sm" data-action="setTone">
+                      <option value="鼓励">鼓励</option>
+                      <option value="中性">中性</option>
+                      <option value="严格">严格</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <span class="wda-chip">不自动发</span>
+                  <span class="wda-chip wda-chip--cyan">只生成/复制</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-span-12 md:col-span-8 grid gap-4">
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="text-base font-black truncate" id="panelTitle">今日计划</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5" id="panelSub">—</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="btn-secondary btn-sm" type="button" data-action="regenPlan">重排今日</button>
+                  <button class="btn-primary btn-sm" type="button" data-action="queueNudge">催打卡</button>
+                  <button class="btn-secondary btn-sm" type="button" data-action="queueAdjust">调重点</button>
+                </div>
+              </div>
+              <div class="mt-3 grid gap-2" id="planBox"></div>
+            </div>
+
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">打卡输入</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">解析分钟 / 篇数</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="btn-secondary btn-sm" type="button" data-action="fillExample">填入示例</button>
+                  <button class="btn-primary btn-sm" type="button" data-action="saveCheckin">入库</button>
+                </div>
+              </div>
+              <div class="mt-3 grid gap-2">
+                <textarea class="wda-textarea" placeholder="例如：听力45min 阅读30min 写作Task2 1篇 口语20min 错题12" data-action="checkinText"></textarea>
+                <div class="flex flex-wrap gap-2" id="parseChips"></div>
+              </div>
+            </div>
+
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">微信消息队列</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">一键复制后去微信发。</div>
+                </div>
+                <button class="btn-secondary btn-sm" type="button" data-action="clearOutbox">清空已发送</button>
+              </div>
+              <div class="mt-3 grid gap-2" id="outbox"></div>
+            </div>
+
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">近 7 天</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">走势一眼看懂。</div>
+                </div>
+              </div>
+              <div class="mt-3 grid grid-cols-3 gap-2" id="weekKpis"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wda-toast" id="toast"></div>
+
+    <script>
+      (() => {
+        const LS_KEY = "ielts_coach_wechat_v1";
+
+        const now = () => new Date();
+        const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+        const pad2 = (n) => String(n).padStart(2, "0");
+        const isoDayKey = (d) => {
+          const dt = d instanceof Date ? d : new Date(d);
+          return `${dt.getFullYear()}-${pad2(dt.getMonth() + 1)}-${pad2(dt.getDate())}`;
+        };
+        const shiftDayKey = (key, deltaDays) => {
+          const dt = new Date(String(key) + "T00:00:00");
+          dt.setDate(dt.getDate() + deltaDays);
+          return isoDayKey(dt);
+        };
+        const dayLabel = (key) => {
+          const dt = new Date(String(key) + "T00:00:00");
+          const week = ["日", "一", "二", "三", "四", "五", "六"][dt.getDay()];
+          return `${key} 周${week}`;
+        };
+        const escapeHtml = (s) =>
+          String(s ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+        const uid = () => Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
+
+        const toast = (msg) => {
+          const el = document.getElementById("toast");
+          if (!el) return;
+          el.textContent = String(msg || "");
+          el.classList.add("show");
+          window.clearTimeout(toast._t);
+          toast._t = window.setTimeout(() => el.classList.remove("show"), 1300);
+        };
+
+        const copyToClipboard = (text) => {
+          const t = String(text || "");
+          if (!t) return;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(t).then(() => toast("已复制")).catch(() => fallbackCopy(t));
+            return;
+          }
+          fallbackCopy(t);
+        };
+
+        const fallbackCopy = (text) => {
+          try {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            toast("已复制");
+          } catch {
+            window.prompt("复制以下文本：", text);
+          }
+        };
+
+        function seedState() {
+          const todayKey = isoDayKey(now());
+          return {
+            ui: {
+              day_key: todayKey,
+              student_id: "s1",
+              tone: "鼓励",
+              reminder_time: "21:30",
+              checkin_text: ""
+            },
+            db: {
+              students: [
+                {
+                  id: "s1",
+                  name: "小王",
+                  wechat_tag: "WX: xiaowang",
+                  goal_band: "7.0",
+                  exam_date: shiftDayKey(todayKey, 60),
+                  focus: ["写作", "口语"]
+                },
+                {
+                  id: "s2",
+                  name: "小李",
+                  wechat_tag: "WX: xiaoli",
+                  goal_band: "6.5",
+                  exam_date: shiftDayKey(todayKey, 45),
+                  focus: ["听力", "阅读"]
+                }
+              ],
+              plan_overrides: {}, // key: studentId@dayKey -> tasks[]
+              logs: {}, // key: studentId@dayKey -> { text, parsed, completed_ids, saved_at }
+              outbox: [] // {id, student_id, day_key, kind, type, meta, text, status, created_at}
+            }
+          };
+        }
+
+        function loadState() {
+          try {
+            const raw = localStorage.getItem(LS_KEY);
+            if (!raw) return null;
+            return JSON.parse(raw);
+          } catch {
+            return null;
+          }
+        }
+
+        function saveState(s) {
+          localStorage.setItem(LS_KEY, JSON.stringify(s));
+        }
+
+        function normalizeState(s) {
+          if (!s || typeof s !== "object") return seedState();
+          s.ui = s.ui && typeof s.ui === "object" ? s.ui : {};
+          s.db = s.db && typeof s.db === "object" ? s.db : {};
+          s.db.students = Array.isArray(s.db.students) ? s.db.students : [];
+          s.db.plan_overrides = s.db.plan_overrides && typeof s.db.plan_overrides === "object" ? s.db.plan_overrides : {};
+          s.db.logs = s.db.logs && typeof s.db.logs === "object" ? s.db.logs : {};
+          s.db.outbox = Array.isArray(s.db.outbox) ? s.db.outbox : [];
+          s.db.outbox = s.db.outbox.map((m) => ({
+            ...m,
+            kind: typeof m?.kind === "string" && m.kind ? m.kind : String(m?.type || "msg"),
+            meta: m?.meta && typeof m.meta === "object" ? m.meta : null,
+            status: typeof m?.status === "string" && m.status ? m.status : "queued"
+          }));
+
+          if (!s.ui.day_key) s.ui.day_key = isoDayKey(now());
+          if (!s.ui.student_id) s.ui.student_id = (s.db.students[0] && s.db.students[0].id) || "s1";
+          if (!s.ui.tone) s.ui.tone = "鼓励";
+          if (!s.ui.reminder_time) s.ui.reminder_time = "21:30";
+          if (typeof s.ui.checkin_text !== "string") s.ui.checkin_text = "";
+          return s;
+        }
+
+        const getStudent = (id) => state.db.students.find((x) => x.id === id) || null;
+        const keyOf = (studentId, dayKey) => `${studentId}@${dayKey}`;
+
+        function defaultPlanForDay(student, dayKey) {
+          const dt = new Date(dayKey + "T00:00:00");
+          const dow = dt.getDay(); // 0..6
+          const isWritingDay = dow === 2 || dow === 4 || dow === 6; // Tue/Thu/Sat
+          const isMockDay = dow === 0; // Sun
+
+          const focus = new Set(student?.focus || []);
+          const wBoost = focus.has("写作") ? 10 : 0;
+          const sBoost = focus.has("口语") ? 10 : 0;
+          const lBoost = focus.has("听力") ? 10 : 0;
+          const rBoost = focus.has("阅读") ? 10 : 0;
+
+          const tasks = [];
+          if (isMockDay) {
+            tasks.push(task("听力", "套题：完整一套 + 复盘错题", 60 + lBoost, "打卡：错题清单"));
+            tasks.push(task("阅读", "套题：Passage 1-3 + 定位训练", 60 + rBoost, "打卡：定位点3条"));
+            tasks.push(task("口语", "Part2 录音 2 次 + 复盘", 30 + sBoost, "打卡：录音链接/关键词"));
+            if (isWritingDay) tasks.push(task("写作", "Task2 1 篇（限时）+ 改写 10 句", 55 + wBoost, "打卡：作文/改写"));
+            tasks.push(task("词汇", "高频同义替换 25 个", 15, "打卡：同义替换"));
+            return tasks;
+          }
+
+          tasks.push(task("听力", "精听 1 段 + 跟读", 35 + lBoost, "打卡：生词/连读点"));
+          tasks.push(task("阅读", "计时训练 2 篇 + 复盘", 35 + rBoost, "打卡：错因 3 条"));
+          if (isWritingDay) tasks.push(task("写作", "Task2 1 篇（限时 40min）", 45 + wBoost, "打卡：作文"));
+          tasks.push(task("口语", "Part1/3 问答串联 20 题", 20 + sBoost, "打卡：话题卡"));
+          tasks.push(task("词汇", "错题词/同义替换 20 个", 15, "打卡：词表"));
+          return tasks;
+        }
+
+        function task(area, title, minutes, deliverable) {
+          return { id: uid(), area, title, minutes: Math.max(5, Math.round(Number(minutes) || 0)), deliverable };
+        }
+
+        function getPlan(studentId, dayKey) {
+          const k = keyOf(studentId, dayKey);
+          const override = state.db.plan_overrides[k];
+          if (Array.isArray(override) && override.length) return override;
+          const stu = getStudent(studentId);
+          return defaultPlanForDay(stu, dayKey);
+        }
+
+        function setPlanOverride(studentId, dayKey, tasks) {
+          const k = keyOf(studentId, dayKey);
+          state.db.plan_overrides[k] = Array.isArray(tasks) ? tasks : [];
+          saveState(state);
+        }
+
+        function getLog(studentId, dayKey) {
+          return state.db.logs[keyOf(studentId, dayKey)] || null;
+        }
+
+        function setLog(studentId, dayKey, log) {
+          state.db.logs[keyOf(studentId, dayKey)] = log;
+          saveState(state);
+        }
+
+        const AREA_KEYS = [
+          { area: "听力", keys: ["听力", "listening", "listen", "l "] },
+          { area: "阅读", keys: ["阅读", "reading", "read", "r "] },
+          { area: "写作", keys: ["写作", "作文", "task1", "task2", "writing", "write", "w "] },
+          { area: "口语", keys: ["口语", "speaking", "speak", "s "] },
+          { area: "词汇", keys: ["词汇", "单词", "vocab", "vocabulary", "背词"] }
+        ];
+
+        function parseDurationToken(num, unit) {
+          const n = Number(num);
+          if (!Number.isFinite(n) || n <= 0) return 0;
+          const u = String(unit || "").toLowerCase();
+          if (u.includes("h") || u.includes("小时")) return Math.round(n * 60);
+          return Math.round(n);
+        }
+
+        function parseCheckin(text) {
+          const t = String(text || "").trim();
+          if (!t) return { minutes: {}, counts: {}, total_minutes: 0, raw: "", empty: true };
+          const lower = t.toLowerCase();
+          const minutes = {};
+          const counts = {};
+
+          const scanAreaMinutes = (area, patterns) => {
+            const rx1 = new RegExp(`(?:${patterns.join("|")})[^\\d]{0,8}(\\d{1,3})\\s*(min|m|分钟|h|小时)?`, "ig");
+            let m;
+            let best = 0;
+            while ((m = rx1.exec(lower))) {
+              const val = parseDurationToken(m[1], m[2] || "min");
+              best = Math.max(best, val);
+            }
+            if (best > 0) minutes[area] = best;
+          };
+
+          AREA_KEYS.forEach(({ area, keys }) => scanAreaMinutes(area, keys.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))));
+
+          const essayRx = /(task\s*2|task\s*1|大作文|小作文|作文|写作)[^\d]{0,10}(\d{1,2})\s*(篇|p|篇作文)?/ig;
+          let em;
+          let essay = 0;
+          while ((em = essayRx.exec(lower))) essay = Math.max(essay, Number(em[2]) || 0);
+          if (essay > 0) counts["作文"] = essay;
+          if (t.includes("一篇") || t.includes("1篇")) counts["作文"] = Math.max(counts["作文"] || 0, 1);
+
+          const wrongRx = /(错题|wrong)[^\d]{0,6}(\d{1,3})/ig;
+          let wm;
+          let wrong = 0;
+          while ((wm = wrongRx.exec(lower))) wrong = Math.max(wrong, Number(wm[2]) || 0);
+          if (wrong > 0) counts["错题"] = wrong;
+
+          const totalMin = Object.values(minutes).reduce((s, x) => s + (Number(x) || 0), 0);
+          const has = totalMin > 0 || Object.keys(counts).length > 0;
+          return { minutes, counts, total_minutes: totalMin, raw: t, empty: !has };
+        }
+
+        function inferCompletedTasks(plan, parsed) {
+          const completed = new Set();
+          plan.forEach((p) => {
+            const m = Number(parsed?.minutes?.[p.area] || 0);
+            const byTime = p.minutes ? m >= Math.round(p.minutes * 0.7) : false;
+            const byEssay = p.area === "写作" && (parsed?.counts?.["作文"] || 0) >= 1;
+            if (byTime || byEssay) completed.add(p.id);
+          });
+          return Array.from(completed);
+        }
+
+        function fmtMinutes(m) {
+          const mm = Math.max(0, Math.round(Number(m) || 0));
+          if (mm >= 120 && mm % 60 === 0) return `${mm / 60}h`;
+          return `${mm}min`;
+        }
+
+        function messageTemplates({ tone, student, dayKey, plan, parsed, completionRate, type, level, missingTasks }) {
+          const n = student?.name || "同学";
+          const d = dayLabel(dayKey);
+          const nextFocus = (student?.focus || []).slice(0, 2).join(" / ");
+          const planLine = plan
+            .slice(0, 3)
+            .map((t) => `${t.area}${t.minutes ? fmtMinutes(t.minutes) : ""}`)
+            .join(" · ");
+
+          const vibe =
+            tone === "严格"
+              ? { hi: "收到。", close: "今晚把打卡补齐。", softener: "不要拖。" }
+              : tone === "中性"
+                ? { hi: "收到～", close: "继续按节奏来。", softener: "" }
+                : { hi: "太棒了～", close: "明天继续稳住节奏。", softener: "你可以的。" };
+
+          if (type === "nudge") {
+            const lv = clamp(Number(level) || 1, 1, 3);
+            const ask = tone === "严格" ? "现在回我 1 句：完成了什么 + 各多少分钟？" : "回我 1 句：完成了什么 + 各多少分钟？";
+            const minimal =
+              tone === "严格"
+                ? "最小打卡：听力10min + 口语10min，先把链条接上。"
+                : "最小打卡也行：听力10min + 口语10min，先把链条接上。";
+            const head =
+              lv === 1 ? `${n}，${d} 还没看到打卡。` :
+              lv === 2 ? `${n}，${d} 还没打卡，我这边需要你回一句确认进度。` :
+              `${n}，已经连续没打卡了。今天先给我一个最小完成即可。`;
+            const tail = lv >= 3 ? minimal : ask;
+            return `${head}\n${tail}\n（目标：${planLine}${nextFocus ? `；重点：${nextFocus}` : ""}）`;
+          }
+
+          if (type === "praise") {
+            const total = parsed?.total_minutes ? fmtMinutes(parsed.total_minutes) : "";
+            const cr = Number.isFinite(completionRate) ? `${Math.round(completionRate * 100)}%` : "";
+            const focusLine = nextFocus ? `重点继续盯：${nextFocus}。` : "";
+            const short = tone === "严格" ? "做得不错，但还要更稳定。" : tone === "中性" ? "不错，节奏很清晰。" : "很稳，今天状态在线。";
+            return `${vibe.hi} ${short}\n${total ? `今天累计：${total}${cr ? `（完成度 ${cr}）` : ""}` : ""}\n${focusLine}\n明天目标：${planLine}`;
+          }
+
+          if (type === "partial") {
+            const total = parsed?.total_minutes ? fmtMinutes(parsed.total_minutes) : "";
+            const cr = Number.isFinite(completionRate) ? `${Math.round(completionRate * 100)}%` : "";
+            const miss = (missingTasks || []).slice(0, 2).map((x) => `${x.area}${x.minutes ? fmtMinutes(x.minutes) : ""}`).join(" · ");
+            const push =
+              tone === "严格"
+                ? "今晚补齐 1 个缺口就行。"
+                : tone === "中性"
+                  ? "今晚补齐 1 个缺口就够。"
+                  : "今天也很棒了，今晚补齐 1 个缺口就完美。";
+            return `${vibe.hi} ${total ? `累计 ${total}` : "收到打卡"}${cr ? `（完成度 ${cr}）` : ""}\n${push}${miss ? `\n优先补：${miss}` : ""}\n明天目标：${planLine}`;
+          }
+
+          if (type === "adjust") {
+            const pick = (missingTasks && missingTasks.length ? missingTasks : plan)
+              .slice(0, 2)
+              .map((x) => `- ${x.area}：${x.title}${x.minutes ? `（${fmtMinutes(x.minutes)}）` : ""}`)
+              .join("\n");
+            const ask = tone === "严格" ? "回我一句：你卡在哪？" : "回我一句：你更卡在哪？";
+            return `${n}，我把${d} 的重点收敛成 2 个动作：\n${pick || "- 先把今天的打卡补齐"}\n${ask}我再按你情况微调。`;
+          }
+
+          return `${n}，${d} 我在。`;
+        }
+
+        function queueMessage(studentId, dayKey, kind, type, text, meta) {
+          const exists = state.db.outbox.some((m) => m.student_id === studentId && m.day_key === dayKey && m.kind === kind && m.status !== "deleted");
+          if (exists) return;
+          state.db.outbox.unshift({
+            id: uid(),
+            student_id: studentId,
+            day_key: dayKey,
+            kind,
+            type,
+            meta: meta && typeof meta === "object" ? meta : null,
+            text: String(text || ""),
+            status: "queued",
+            created_at: now().toISOString()
+          });
+          saveState(state);
+        }
+
+        function dueTimeForDay(dayKey) {
+          const timeStr = String(state.ui.reminder_time || "21:30");
+          const [hh, mm] = timeStr.split(":").map((x) => Number(x));
+          const due = new Date(dayKey + "T00:00:00");
+          due.setHours(clamp(hh, 0, 23), clamp(mm, 0, 59), 0, 0);
+          return due;
+        }
+
+        function missedStreak(studentId, todayKey) {
+          // 连续未打卡天数（包含今天：若到点仍未打卡，则算今天）
+          const due = dueTimeForDay(todayKey);
+          const todayCounts = now().getTime() >= due.getTime() && !getLog(studentId, todayKey);
+          let streak = todayCounts ? 1 : 0;
+          for (let i = 1; i <= 14; i += 1) {
+            const k = shiftDayKey(todayKey, -i);
+            const log = getLog(studentId, k);
+            if (log) break;
+            streak += 1;
+          }
+          return streak;
+        }
+
+        function completionForDay(studentId, dayKey) {
+          const plan = getPlan(studentId, dayKey);
+          const log = getLog(studentId, dayKey);
+          const completed = new Set(log?.completed_ids || []);
+          const missing = plan.filter((t) => !completed.has(t.id));
+          const rate = plan.length ? completed.size / plan.length : 0;
+          return { plan, log, missing, rate };
+        }
+
+        function ensureAutoQueue(studentId, dayKey) {
+          if (String(dayKey) !== isoDayKey(now())) return; // 只对“今天”自动入队，避免翻历史日期也刷提醒
+          const stu = getStudent(studentId);
+          if (!stu) return;
+          const { plan, log, missing, rate } = completionForDay(studentId, dayKey);
+          const due = dueTimeForDay(dayKey);
+
+          if (!log && now().getTime() >= due.getTime()) {
+            const ms = missedStreak(studentId, dayKey);
+            const lv = clamp(ms, 1, 3);
+            const text = messageTemplates({ tone: state.ui.tone, student: stu, dayKey, plan, type: "nudge", level: lv });
+            queueMessage(studentId, dayKey, `nudge_l${lv}`, "nudge", text, { level: lv, missed_streak: ms });
+            return;
+          }
+
+          if (log && log.parsed && !log.parsed.empty) {
+            if (rate >= 0.85) {
+              const text = messageTemplates({ tone: state.ui.tone, student: stu, dayKey, plan, parsed: log.parsed, completionRate: rate, type: "praise" });
+              queueMessage(studentId, dayKey, "praise", "praise", text, { completion_rate: rate });
+              return;
+            }
+            if (rate >= 0.5) {
+              const text = messageTemplates({ tone: state.ui.tone, student: stu, dayKey, plan, parsed: log.parsed, completionRate: rate, type: "partial", missingTasks: missing });
+              queueMessage(studentId, dayKey, "partial", "praise", text, { completion_rate: rate });
+              return;
+            }
+            const text = messageTemplates({ tone: state.ui.tone, student: stu, dayKey, plan, parsed: log.parsed, completionRate: rate, type: "adjust", missingTasks: missing });
+            queueMessage(studentId, dayKey, "adjust", "adjust", text, { completion_rate: rate });
+          }
+        }
+
+        function weekSummary(studentId, endDayKey) {
+          const days = Array.from({ length: 7 }, (_, i) => shiftDayKey(endDayKey, -i));
+          const metrics = { totalMinutes: 0, essays: 0, checkins: 0, streak: 0 };
+
+          let streak = 0;
+          for (let i = 0; i < days.length; i += 1) {
+            const k = days[i];
+            const log = getLog(studentId, k);
+            if (log && log.parsed) {
+              metrics.checkins += 1;
+              metrics.totalMinutes += Number(log.parsed.total_minutes || 0);
+              metrics.essays += Number(log.parsed.counts?.["作文"] || 0);
+            }
+            if (i === 0) {
+              streak = log ? 1 : 0;
+            } else if (streak > 0) {
+              streak = log ? streak + 1 : streak;
+            }
+          }
+          metrics.streak = streak;
+          return metrics;
+        }
+
+        function renderStudents() {
+          const box = document.getElementById("stuList");
+          if (!box) return;
+          const dayKey = state.ui.day_key;
+          const isToday = String(dayKey) === isoDayKey(now());
+          const parts = state.db.students.map((s) => {
+            const active = s.id === state.ui.student_id;
+            const log = getLog(s.id, dayKey);
+            const plan = getPlan(s.id, dayKey);
+            const completed = log?.completed_ids ? log.completed_ids.length : 0;
+            const rate = plan.length ? Math.round((completed / plan.length) * 100) : 0;
+            const chip = log
+              ? `<span class="wda-chip wda-chip--ok">已打卡 ${rate}%</span>`
+              : (() => {
+                  if (!isToday) return `<span class="wda-chip wda-chip--warn">未打卡</span>`;
+                  const due = dueTimeForDay(dayKey);
+                  const afterDue = now().getTime() >= due.getTime();
+                  if (!afterDue) return `<span class="wda-chip">等待</span>`;
+                  const ms = missedStreak(s.id, dayKey);
+                  return `<span class="wda-chip wda-chip--danger">未打卡 · 连${escapeHtml(String(ms))}天</span>`;
+                })();
+            return `
+              <div class="wda-item ${active ? "ring-2 ring-emerald-300/30" : ""}" data-action="pickStudent" data-id="${escapeHtml(s.id)}">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <div class="font-black truncate">${escapeHtml(s.name)}</div>
+                    <div class="mt-1 text-xs text-zinc-200/60 truncate">${escapeHtml(s.wechat_tag || "")}</div>
+                  </div>
+                  <div class="shrink-0 flex flex-col items-end gap-1">
+                    ${chip}
+                    <span class="wda-chip">${escapeHtml(s.goal_band || "")}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          box.innerHTML = parts.join("");
+        }
+
+        function renderPlan() {
+          const sid = state.ui.student_id;
+          const dayKey = state.ui.day_key;
+          const stu = getStudent(sid);
+          const plan = getPlan(sid, dayKey);
+          const log = getLog(sid, dayKey);
+          const completed = new Set(log?.completed_ids || []);
+
+          const title = document.getElementById("panelTitle");
+          const sub = document.getElementById("panelSub");
+          if (title) title.textContent = `${stu?.name || "学员"} · 今日计划`;
+          if (sub) {
+            const exam = stu?.exam_date ? `考试 ${stu.exam_date}` : "";
+            const focus = (stu?.focus || []).length ? `重点 ${stu.focus.join(" / ")}` : "";
+            const right = [dayLabel(dayKey), exam, focus].filter(Boolean).join(" · ");
+            sub.textContent = right || dayLabel(dayKey);
+          }
+
+          const box = document.getElementById("planBox");
+          if (!box) return;
+          box.innerHTML = plan
+            .map((t) => {
+              const done = completed.has(t.id);
+              return `
+                <div class="wda-item" data-action="toggleTask" data-id="${escapeHtml(t.id)}">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span class="wda-chip ${done ? "wda-chip--ok" : "wda-chip--cyan"}">${escapeHtml(t.area)}</span>
+                        <span class="text-sm font-black text-zinc-100 ${done ? "line-through opacity-70" : ""}">${escapeHtml(t.title)}</span>
+                      </div>
+                      <div class="mt-1 text-xs text-zinc-200/60 leading-5">
+                        ${t.minutes ? `目标 ${escapeHtml(fmtMinutes(t.minutes))}` : ""}${t.deliverable ? ` · ${escapeHtml(t.deliverable)}` : ""}
+                      </div>
+                    </div>
+                    <div class="shrink-0">
+                      <span class="wda-chip ${done ? "wda-chip--ok" : ""}">${done ? "已完成" : "待完成"}</span>
+                    </div>
+                  </div>
+                </div>
+              `;
+            })
+            .join("");
+        }
+
+        function renderCheckin() {
+          const ta = document.querySelector("[data-action='checkinText']");
+          if (ta) ta.value = state.ui.checkin_text || "";
+
+          const chips = document.getElementById("parseChips");
+          if (!chips) return;
+          const parsed = parseCheckin(state.ui.checkin_text || "");
+          const parts = [];
+          Object.entries(parsed.minutes).forEach(([k, v]) => parts.push(`<span class="wda-chip">${escapeHtml(k)} ${escapeHtml(fmtMinutes(v))}</span>`));
+          if (parsed.counts["作文"]) parts.push(`<span class="wda-chip wda-chip--cyan">作文 ${escapeHtml(parsed.counts["作文"])}篇</span>`);
+          if (parsed.counts["错题"]) parts.push(`<span class="wda-chip wda-chip--warn">错题 ${escapeHtml(parsed.counts["错题"])}</span>`);
+          if (parsed.total_minutes) parts.push(`<span class="wda-chip wda-chip--ok">累计 ${escapeHtml(fmtMinutes(parsed.total_minutes))}</span>`);
+          chips.innerHTML = parts.length ? parts.join("") : `<span class="text-xs text-zinc-200/50">等待输入</span>`;
+        }
+
+        function renderOutbox() {
+          const sid = state.ui.student_id;
+          const dayKey = state.ui.day_key;
+          const box = document.getElementById("outbox");
+          if (!box) return;
+          const list = state.db.outbox.filter((m) => m.student_id === sid && m.day_key === dayKey && m.status !== "deleted");
+          if (!list.length) {
+            box.innerHTML = `
+              <div class="rounded-2xl border border-white/10 bg-white/5 p-3 text-xs text-zinc-200/60">
+                暂无消息。需要的话点右上角“催打卡”，或把打卡入库后自动生成“表扬”。
+              </div>
+            `;
+            return;
+          }
+          box.innerHTML = list
+            .map((m) => {
+              const levelTag = m.type === "nudge" && m.meta?.level ? ` L${m.meta.level}` : "";
+              const typeChip =
+                m.type === "nudge"
+                  ? `<span class="wda-chip wda-chip--warn">提醒${escapeHtml(levelTag)}</span>`
+                  : m.type === "praise"
+                    ? `<span class="wda-chip wda-chip--ok">反馈</span>`
+                    : `<span class="wda-chip wda-chip--cyan">调整</span>`;
+              const sentChip = m.status === "sent" ? `<span class="wda-chip wda-chip--ok">已发送</span>` : `<span class="wda-chip">待发送</span>`;
+              return `
+                <div class="wda-item" data-action="noop">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <div class="flex flex-wrap items-center gap-2">
+                        ${typeChip}
+                        ${sentChip}
+                        <span class="text-xs text-zinc-200/55">${escapeHtml(new Date(m.created_at).toLocaleString())}</span>
+                      </div>
+                      <pre class="mt-2 whitespace-pre-wrap text-sm text-zinc-100/85 leading-6">${escapeHtml(m.text)}</pre>
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        <button class="btn-secondary btn-sm" type="button" data-action="copyMsg" data-id="${escapeHtml(m.id)}">复制</button>
+                        <button class="btn-primary btn-sm" type="button" data-action="markSent" data-id="${escapeHtml(m.id)}">标记已发</button>
+                        <button class="btn-secondary btn-sm" type="button" data-action="deleteMsg" data-id="${escapeHtml(m.id)}">删除</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            })
+            .join("");
+        }
+
+        function renderWeek() {
+          const sid = state.ui.student_id;
+          const dayKey = state.ui.day_key;
+          const m = weekSummary(sid, dayKey);
+          const box = document.getElementById("weekKpis");
+          if (!box) return;
+          const items = [
+            { k: "累计", v: fmtMinutes(m.totalMinutes), cls: "wda-chip--ok" },
+            { k: "作文", v: `${m.essays}篇`, cls: "wda-chip--cyan" },
+            { k: "打卡", v: `${m.checkins}/7`, cls: m.checkins >= 5 ? "wda-chip--ok" : "wda-chip--warn" }
+          ];
+          box.innerHTML = items
+            .map((x) => `
+              <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+                <div class="text-[11px] font-black tracking-wide text-zinc-200/55">${escapeHtml(x.k)}</div>
+                <div class="mt-1 text-[18px] font-black text-zinc-100">${escapeHtml(x.v)}</div>
+                <div class="mt-2"><span class="wda-chip ${escapeHtml(x.cls)}">连续 ${escapeHtml(String(m.streak))} 天</span></div>
+              </div>
+            `)
+            .join("");
+        }
+
+        function render() {
+          const dayInput = document.querySelector("[data-action='pickDay']");
+          if (dayInput) dayInput.value = state.ui.day_key;
+          const rt = document.querySelector("[data-action='setReminderTime']");
+          if (rt) rt.value = state.ui.reminder_time || "21:30";
+          const toneSel = document.querySelector("[data-action='setTone']");
+          if (toneSel) toneSel.value = state.ui.tone || "鼓励";
+
+          ensureAutoQueue(state.ui.student_id, state.ui.day_key);
+          renderStudents();
+          renderPlan();
+          renderCheckin();
+          renderOutbox();
+          renderWeek();
+        }
+
+        function toggleTask(taskId) {
+          const sid = state.ui.student_id;
+          const dayKey = state.ui.day_key;
+          const log = getLog(sid, dayKey) || { text: "", parsed: null, completed_ids: [], saved_at: null };
+          const set = new Set(log.completed_ids || []);
+          if (set.has(taskId)) set.delete(taskId);
+          else set.add(taskId);
+          log.completed_ids = Array.from(set);
+          setLog(sid, dayKey, log);
+          render();
+        }
+
+        function regenTodayPlan() {
+          const sid = state.ui.student_id;
+          const dayKey = state.ui.day_key;
+          const stu = getStudent(sid);
+          const next = defaultPlanForDay(stu, dayKey).map((t) => ({ ...t, id: uid() }));
+          setPlanOverride(sid, dayKey, next);
+          const log = getLog(sid, dayKey);
+          if (log && log.completed_ids) {
+            log.completed_ids = [];
+            setLog(sid, dayKey, log);
+          }
+          toast("已重排今日");
+          render();
+        }
+
+        function queueManual(type) {
+          const sid = state.ui.student_id;
+          const dayKey = state.ui.day_key;
+          const stu = getStudent(sid);
+          const { plan, log, missing, rate } = completionForDay(sid, dayKey);
+          const parsed = log?.parsed || null;
+          const isToday = String(dayKey) === isoDayKey(now());
+          const ms = type === "nudge" && isToday ? missedStreak(sid, dayKey) : 1;
+          const lv = clamp(ms || 1, 1, 3);
+          const text = messageTemplates({
+            tone: state.ui.tone,
+            student: stu,
+            dayKey,
+            plan,
+            parsed,
+            completionRate: rate,
+            type,
+            level: type === "nudge" ? lv : undefined,
+            missingTasks: missing
+          });
+          const kind = type === "nudge" ? `nudge_l${lv}` : type;
+          queueMessage(sid, dayKey, kind, type, text, type === "nudge" ? { level: lv, missed_streak: ms } : { completion_rate: rate });
+          toast("已入队");
+          render();
+        }
+
+        function saveCheckin() {
+          const sid = state.ui.student_id;
+          const dayKey = state.ui.day_key;
+          const plan = getPlan(sid, dayKey);
+          const parsed = parseCheckin(state.ui.checkin_text || "");
+          if (parsed.empty) return toast("没识别到有效打卡");
+          const completed_ids = inferCompletedTasks(plan, parsed);
+          setLog(sid, dayKey, {
+            text: state.ui.checkin_text || "",
+            parsed,
+            completed_ids,
+            saved_at: now().toISOString()
+          });
+          toast("已入库");
+          render();
+        }
+
+        function fillExample() {
+          const examples = [
+            "听力45min 阅读30min 写作Task2 1篇 口语20min 错题12",
+            "listening 35min reading 40min speaking 25min vocab 15min",
+            "听力1h 阅读45min 口语20min 错题8"
+          ];
+          state.ui.checkin_text = examples[Math.floor(Math.random() * examples.length)];
+          saveState(state);
+          render();
+        }
+
+        function addStudent() {
+          const name = window.prompt("学员名字：");
+          if (!name) return;
+          const tag = window.prompt("微信备注（可空）：") || "";
+          const goal = window.prompt("目标分（可空）：") || "";
+          const exam = window.prompt("考试日期 YYYY-MM-DD（可空）：") || "";
+          const focusRaw = window.prompt("重点（用 / 分隔，例如：写作/口语）：") || "";
+          const focus = focusRaw.split(/[\/、，,\s]+/).map((x) => x.trim()).filter(Boolean).slice(0, 4);
+          const id = uid();
+          state.db.students.unshift({ id, name: name.trim(), wechat_tag: tag.trim(), goal_band: goal.trim(), exam_date: exam.trim(), focus });
+          state.ui.student_id = id;
+          saveState(state);
+          toast("已新增");
+          render();
+        }
+
+        function clearOutboxSent() {
+          state.db.outbox = state.db.outbox.map((m) => (m.status === "sent" ? { ...m, status: "deleted" } : m));
+          saveState(state);
+          toast("已清空");
+          render();
+        }
+
+        // --- events ---
+        document.addEventListener("input", (e) => {
+          const el = e.target;
+          if (!el || !el.dataset.action) return;
+          const act = el.dataset.action;
+          if (act === "checkinText") {
+            state.ui.checkin_text = el.value || "";
+            saveState(state);
+            renderCheckin();
+          }
+        });
+
+        document.addEventListener("change", (e) => {
+          const el = e.target;
+          if (!el || !el.dataset.action) return;
+          const act = el.dataset.action;
+          if (act === "pickDay") {
+            const v = String(el.value || "").trim();
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return;
+            state.ui.day_key = v;
+            saveState(state);
+            return render();
+          }
+          if (act === "setReminderTime") {
+            state.ui.reminder_time = String(el.value || "21:30");
+            saveState(state);
+            return render();
+          }
+          if (act === "setTone") {
+            state.ui.tone = String(el.value || "鼓励");
+            saveState(state);
+            return render();
+          }
+        });
+
+        document.addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-action]");
+          if (!btn) return;
+          const act = btn.dataset.action;
+          if (act === "pickStudent") {
+            state.ui.student_id = btn.dataset.id;
+            saveState(state);
+            return render();
+          }
+          if (act === "toggleTask") return toggleTask(btn.dataset.id);
+          if (act === "regenPlan") return regenTodayPlan();
+          if (act === "fillExample") return fillExample();
+          if (act === "saveCheckin") return saveCheckin();
+          if (act === "queueNudge") return queueManual("nudge");
+          if (act === "queueAdjust") return queueManual("adjust");
+          if (act === "addStudent") return addStudent();
+          if (act === "clearOutbox") return clearOutboxSent();
+          if (act === "resetDemo") {
+            localStorage.removeItem(LS_KEY);
+            state = normalizeState(loadState() || seedState());
+            saveState(state);
+            toast("已重置");
+            return render();
+          }
+          if (act === "copyMsg") {
+            const m = state.db.outbox.find((x) => x.id === btn.dataset.id);
+            if (!m) return;
+            return copyToClipboard(m.text);
+          }
+          if (act === "markSent") {
+            const m = state.db.outbox.find((x) => x.id === btn.dataset.id);
+            if (!m) return;
+            m.status = "sent";
+            saveState(state);
+            toast("已标记");
+            return render();
+          }
+          if (act === "deleteMsg") {
+            const m = state.db.outbox.find((x) => x.id === btn.dataset.id);
+            if (!m) return;
+            m.status = "deleted";
+            saveState(state);
+            toast("已删除");
+            return render();
+          }
+        });
+
+        // --- boot ---
+        let state = normalizeState(loadState() || seedState());
+        saveState(state);
+        render();
+      })();
+    </script>
+  </body>
+</html>
