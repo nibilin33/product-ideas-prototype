@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>销售入口：每个功能点 = 一段故事</title>
+    <meta name="description" content="不用讲功能清单：用销售故事把核心功能点讲清楚，并一键打开对应演示页面。" />
+    <style>
+      :root{
+        --bg:#050607;
+        --panel:rgba(255,255,255,.045);
+        --panel2:rgba(255,255,255,.028);
+        --stroke:rgba(255,255,255,.10);
+        --stroke2:rgba(255,255,255,.08);
+        --text:rgba(255,255,255,.92);
+        --muted:rgba(255,255,255,.66);
+        --muted2:rgba(255,255,255,.46);
+        --theme:#34d399;
+        --info:#22d3ee;
+        --warn:#f0b348;
+        --danger:#de4f85;
+        --r-lg:22px;
+        --r-md:16px;
+        --r-pill:999px;
+        --shadow:0 18px 46px rgba(0,0,0,.55);
+      }
+      *{ box-sizing:border-box; }
+      html,body{ margin:0; padding:0; }
+      html{ scroll-behavior:smooth; }
+      body{
+        font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+        background: linear-gradient(180deg, #070a0b 0%, var(--bg) 55%, #030405 100%);
+        color: var(--text);
+        min-height:100vh;
+        overflow-x:hidden;
+      }
+      a{ color:inherit; text-decoration:none; }
+      button{ font:inherit; }
+
+      .bg{
+        position:fixed; inset:0; pointer-events:none;
+        background:
+          radial-gradient(ellipse 1100px 640px at 50% 10%, rgba(34,211,238,.14), transparent 62%),
+          radial-gradient(circle 860px at 16% 18%, rgba(52,211,153,.10), transparent 56%),
+          radial-gradient(circle 800px at 84% 64%, rgba(222,79,133,.10), transparent 60%),
+          linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+        background-size:auto, auto, auto, 40px 40px, 40px 40px;
+        mask-image: radial-gradient(circle at 50% 18%, black 40%, transparent 80%);
+        opacity:.95;
+      }
+
+      .shell{
+        width:min(1240px, calc(100vw - 28px));
+        margin:0 auto;
+        padding:16px 0 56px;
+        position:relative;
+        z-index:1;
+      }
+
+      .topbar{
+        position:sticky; top:12px; z-index:10;
+        display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+        padding:12px 12px;
+        border:1px solid var(--stroke);
+        border-radius:var(--r-lg);
+        background: rgba(10,14,16,.62);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      }
+      .brand{ display:flex; align-items:center; gap:10px; }
+      .logo{
+        width:34px; height:34px; border-radius:12px;
+        display:grid; place-items:center;
+        background: rgba(34,211,238,.12);
+        border:1px solid rgba(34,211,238,.22);
+        box-shadow: 0 0 22px rgba(34,211,238,.12);
+        font-weight:980; letter-spacing:-.05em;
+        color: rgba(205,248,255,.98);
+      }
+      .brand-title{ font-weight:980; letter-spacing:-.03em; }
+      .brand-sub{ margin-top:1px; font-size:12px; color:var(--muted2); font-weight:850; }
+      .actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
+
+      .pill{
+        display:inline-flex; align-items:center; gap:8px;
+        padding:7px 11px;
+        border-radius: var(--r-pill);
+        border:1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.03);
+        color: rgba(255,255,255,.76);
+        font-size:12px;
+        font-weight: 880;
+        white-space: nowrap;
+      }
+      .dot{ width:7px; height:7px; border-radius:99px; background: var(--info); box-shadow: 0 0 18px rgba(34,211,238,.35); }
+
+      .btn{
+        height:40px;
+        padding:0 12px;
+        border-radius:14px;
+        border:1px solid var(--stroke2);
+        background: rgba(255,255,255,.03);
+        color: rgba(255,255,255,.86);
+        font-weight:920;
+        cursor:pointer;
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        transition: transform .18s ease, background .18s ease, border-color .18s ease;
+      }
+      .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.045); border-color: rgba(255,255,255,.14); }
+      .btn.primary{
+        border-color: rgba(34,211,238,.28);
+        background: rgba(34,211,238,.10);
+        color: rgba(205,248,255,.94);
+      }
+      .btn.theme{
+        border-color: rgba(52,211,153,.28);
+        background: rgba(52,211,153,.10);
+        color: rgba(212,255,242,.94);
+      }
+      .btn.warn{
+        border-color: rgba(240,179,72,.28);
+        background: rgba(240,179,72,.10);
+        color: rgba(255,234,198,.94);
+      }
+
+      .hero{
+        margin-top:14px;
+        border-radius: 26px;
+        border: 1px solid var(--stroke);
+        background:
+          radial-gradient(120% 90% at 16% 18%, rgba(34,211,238,.14), transparent 58%),
+          radial-gradient(90% 70% at 82% 26%, rgba(52,211,153,.10), transparent 60%),
+          rgba(255,255,255,.03);
+        box-shadow: var(--shadow);
+        padding: 18px 16px;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::after{
+        content:"";
+        position:absolute;
+        inset:-80px -120px auto auto;
+        width:280px; height:280px;
+        background: radial-gradient(circle, rgba(34,211,238,.22), transparent 62%);
+        opacity:.9;
+      }
+      .hero h1{
+        margin: 10px 0 0;
+        font-size: clamp(30px, 5.6vw, 54px);
+        line-height: 1.02;
+        letter-spacing: -.06em;
+        font-weight: 990;
+      }
+      .lead{
+        margin: 12px 0 0;
+        max-width: 980px;
+        color: rgba(255,255,255,.72);
+        font-size: 15px;
+        line-height: 1.9;
+        font-weight: 860;
+      }
+      .hero-row{
+        margin-top: 14px;
+        display:flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .layout{
+        margin-top: 14px;
+        display:grid;
+        grid-template-columns: 420px 1fr;
+        gap: 12px;
+        align-items: start;
+      }
+
+      .panel{
+        border-radius: var(--r-lg);
+        border: 1px solid var(--stroke);
+        background: var(--panel);
+        box-shadow: 0 12px 28px rgba(0,0,0,.35);
+      }
+      .panel-in{ padding: 14px; }
+
+      .section-title{
+        font-weight: 990;
+        letter-spacing:-.03em;
+        font-size: 16px;
+      }
+      .section-sub{
+        margin-top: 6px;
+        color: var(--muted);
+        font-weight: 860;
+        font-size: 12px;
+        line-height: 1.85;
+      }
+
+      .feature-list{ margin-top: 10px; display:grid; gap: 8px; }
+      .item{
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.02);
+        padding: 10px 10px;
+        cursor:pointer;
+        transition: transform .18s ease, background .18s ease, border-color .18s ease;
+      }
+      .item:hover{ transform: translateY(-1px); background: rgba(255,255,255,.03); border-color: rgba(255,255,255,.14); }
+      .item[aria-selected="true"]{
+        border-color: rgba(34,211,238,.30);
+        background: radial-gradient(110% 80% at 14% 16%, rgba(34,211,238,.12), transparent 62%), rgba(255,255,255,.03);
+        box-shadow: 0 0 0 1px rgba(34,211,238,.06);
+      }
+      .item-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+      .item-title{ font-weight: 990; letter-spacing: -.02em; font-size: 13px; }
+      .item-sub{ margin-top: 6px; color: var(--muted); font-weight: 860; font-size: 12px; line-height: 1.8; }
+      .chiprow{ margin-top: 8px; display:flex; gap:8px; flex-wrap:wrap; }
+      .chip{
+        font-size: 11px;
+        font-weight: 980;
+        padding: 6px 9px;
+        border-radius: var(--r-pill);
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(0,0,0,.18);
+        color: rgba(255,255,255,.72);
+      }
+      .chip.info{ border-color: rgba(34,211,238,.20); background: rgba(34,211,238,.08); color: rgba(205,248,255,.92); }
+      .chip.theme{ border-color: rgba(52,211,153,.20); background: rgba(52,211,153,.08); color: rgba(212,255,242,.92); }
+      .chip.warn{ border-color: rgba(240,179,72,.22); background: rgba(240,179,72,.10); color: rgba(255,234,198,.94); }
+      .chip.danger{ border-color: rgba(222,79,133,.22); background: rgba(222,79,133,.10); color: rgba(255,210,232,.94); }
+
+      .right-head{
+        display:flex;
+        align-items:flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .right-title{ font-weight: 990; letter-spacing:-.03em; font-size: 16px; }
+      .right-desc{ margin-top: 6px; color: rgba(255,255,255,.74); font-weight: 880; font-size: 13px; line-height: 1.85; max-width: 780px; }
+
+      .story{
+        margin-top: 10px;
+        border-radius: 22px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(0,0,0,.18);
+        padding: 12px;
+      }
+      .story-title{
+        font-weight: 990;
+        letter-spacing: -.02em;
+        font-size: 13px;
+      }
+      .bubbles{ margin-top: 10px; display:grid; gap: 10px; }
+      .bubble{ display:flex; gap: 10px; align-items:flex-start; }
+      .who{
+        width: 34px; height: 34px; border-radius: 12px;
+        display:grid; place-items:center;
+        font-weight: 990;
+        background: rgba(255,255,255,.04);
+        border: 1px solid rgba(255,255,255,.08);
+        color: rgba(255,255,255,.86);
+      }
+      .who.c{ background: rgba(255,255,255,.04); }
+      .who.me{ background: rgba(52,211,153,.10); border-color: rgba(52,211,153,.20); color: rgba(212,255,242,.94); }
+      .who.ai{ background: rgba(34,211,238,.10); border-color: rgba(34,211,238,.20); color: rgba(205,248,255,.94); }
+      .msg{
+        flex: 1;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(0,0,0,.18);
+        padding: 10px 10px;
+        color: rgba(255,255,255,.84);
+        font-weight: 860;
+        font-size: 12px;
+        line-height: 1.85;
+        white-space: pre-wrap;
+      }
+
+      .preview-wrap{
+        margin-top: 10px;
+        border-radius: 22px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(0,0,0,.20);
+        overflow: hidden;
+        position: relative;
+        height: 520px;
+      }
+      .preview-wrap::after{
+        content:"点击可打开完整演示";
+        position:absolute;
+        right:10px; bottom:10px;
+        padding: 6px 10px;
+        border-radius: var(--r-pill);
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(0,0,0,.28);
+        color: rgba(255,255,255,.78);
+        font-size: 11px;
+        font-weight: 980;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        pointer-events: none;
+      }
+      .preview-link{ position:absolute; inset:0; }
+      .iframe{
+        position:absolute;
+        inset:0;
+        width: 1440px;
+        height: 900px;
+        border:0;
+        transform-origin: top left;
+        transform: scale(.36);
+        opacity: .98;
+        filter: saturate(.98) contrast(1.02);
+      }
+
+      .hint{
+        margin-top: 10px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.02);
+        padding: 10px 10px;
+        color: rgba(255,255,255,.72);
+        font-weight: 860;
+        font-size: 12px;
+        line-height: 1.85;
+      }
+
+      @media (max-width: 1080px){
+        .layout{ grid-template-columns: 1fr; }
+        .preview-wrap{ height: 480px; }
+      }
+      @media (max-width: 640px){
+        .preview-wrap{ height: 420px; }
+        .iframe{ transform: scale(.30); }
+      }
+      @media (prefers-reduced-motion: reduce){
+        html{ scroll-behavior:auto; }
+        .btn,.item{ transition:none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg"></div>
+
+    <div class="shell">
+      <header class="topbar" aria-label="顶栏">
+        <div class="brand">
+          <div class="logo">S</div>
+          <div>
+            <div class="brand-title">销售入口</div>
+            <div class="brand-sub">每个功能点 = 一段可复述的销售故事</div>
+          </div>
+        </div>
+        <div class="actions">
+          <span class="pill"><span class="dot"></span> 点功能 → 看故事 → 打开演示</span>
+          <a class="btn primary" href="./jarvis_sales_agent_prototype_html.html">打开 Sales OS</a>
+          <a class="btn theme" href="./wechat_agent.html">打开 微信执行</a>
+        </div>
+      </header>
+
+      <section class="hero" aria-label="开场">
+        <h1>不要讲“功能”，讲“发生了什么”</h1>
+        <p class="lead">
+          你可以把每个功能点当成一句销售话术：<b>当客户出现某个情况</b> → <b>我们帮你怎么推进</b> → <b>推进过程中如何可控</b>。
+          下面每一项都配了一个可复述的销售故事（带对话），并能一键打开对应的演示页面。
+        </p>
+        <div class="hero-row">
+          <a class="btn primary" href="#main">从功能点开始</a>
+          <a class="btn" href="./ppt.html">我想先听 60s</a>
+        </div>
+      </section>
+
+      <div class="layout" id="main">
+        <section class="panel" aria-label="功能点列表">
+          <div class="panel-in">
+            <div class="section-title">功能点（每个都配故事）</div>
+            <div class="section-sub">你不需要解释产品结构。你只要说：当客户这样说/这样做，我们就帮你这样推进。</div>
+            <div class="feature-list" id="list"></div>
+            <div class="hint">
+              建议讲法：先选 2 个你最常遇到的场景（比如“问价/沉默/要折扣”），讲完再邀请对方点开演示页看画面。
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" aria-label="故事与演示">
+          <div class="panel-in">
+            <div class="right-head">
+              <div>
+                <div class="right-title" id="rt">当客户上来就问价：先别报价</div>
+                <div class="right-desc" id="rd">用 3 个问题分层，先判断是不是高价值机会，再决定投入多少跟进成本。</div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+                <a class="btn primary" id="openPage" href="./jarvis_sales_agent_prototype_html.html">打开演示</a>
+                <button class="btn" id="next" type="button">下一个功能点</button>
+              </div>
+            </div>
+
+            <div class="story">
+              <div class="story-title">这段故事你可以这样讲（带对话）</div>
+              <div class="bubbles" id="bubbles"></div>
+              <div class="chiprow" id="chips"></div>
+            </div>
+
+            <div class="preview-wrap" aria-label="演示缩略预览">
+              <a class="preview-link" id="previewLink" href="./jarvis_sales_agent_prototype_html.html" aria-label="打开演示"></a>
+              <iframe class="iframe" id="iframe" src="./jarvis_sales_agent_prototype_html.html" title="演示预览" loading="lazy"></iframe>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const FEATURES = [
+        {
+          id: "qualify",
+          title: "当客户上来就问价：先别报价（3 问分层）",
+          sub: "把线索分层：值不值得跟、跟到什么程度、下一步该问什么。",
+          href: "./jarvis_sales_agent_prototype_html.html",
+          pageTitle: "Sales OS（机会识别）",
+          chips: [
+            { t: "机会评分", c: "info" },
+            { t: "高价值标记", c: "theme" },
+            { t: "3 问分层", c: "warn" },
+          ],
+          bubbles: [
+            { who: "C", cls: "c", text: "你们多少钱？" },
+            {
+              who: "我",
+              cls: "me",
+              text:
+                "我先不报数字。我只问 3 个问题：\n1）你这次最想解决什么？\n2）你希望什么时候见到结果？\n3）预算大概在什么区间？\n\n因为先分层，才能决定我投入多少精力推进你。",
+            },
+            {
+              who: "AI",
+              cls: "ai",
+              text:
+                "系统把这条线索打上「高价值机会」或「低优先级」。\n你不用拍脑袋：机会评分 + 风险提醒会告诉你“值不值得跟”。",
+            },
+          ],
+        },
+        {
+          id: "anchor",
+          title: "当客户只聊价格：用价值锚定把对话拉回目标",
+          sub: "不打价格战：先讲差异化价值，再把对话推进到“约电话/看方案”。",
+          href: "./jarvis_sales_agent_prototype_html.html",
+          pageTitle: "Sales OS（价值锚定）",
+          chips: [
+            { t: "价值锚定", c: "theme" },
+            { t: "异议处理", c: "warn" },
+            { t: "可发送话术", c: "info" },
+          ],
+          bubbles: [
+            { who: "C", cls: "c", text: "别讲那么多，你就说能便宜多少？" },
+            {
+              who: "我",
+              cls: "me",
+              text:
+                "我理解你先关心价格。但我们这类项目差异不在“便宜”，在两点：\n1）动作拆解能不能落地；2）过程能不能复盘出结果。\n你更在意哪一个？我按你的目标给你一个 10 分钟的方案大纲，你再决定值不值。",
+            },
+            { who: "AI", cls: "ai", text: "系统给你 2 轮「价值锚定」话术 + 下一步 CTA（约电话/要资料），避免对话停在“价格”。" },
+          ],
+        },
+        {
+          id: "control",
+          title: "当客户要折扣/要承诺：高风险动作必须审批（可控自动化）",
+          sub: "该自动的自动；不该自动的必须审批或人工确认，避免越界与失控。",
+          href: "./jarvis_sales_agent_prototype_html.html",
+          pageTitle: "Sales OS（审批流程）",
+          chips: [
+            { t: "风险识别", c: "warn" },
+            { t: "审批流程", c: "danger" },
+            { t: "可控自动化", c: "info" },
+          ],
+          bubbles: [
+            { who: "C", cls: "c", text: "你能保证效果吗？不行就给我打个折。" },
+            { who: "我", cls: "me", text: "折扣和承诺属于高风险动作：我可以继续推进，但必须先走审批或我手动确认。" },
+            { who: "AI", cls: "ai", text: "系统识别关键词后，把“折扣/承诺”锁进审批；允许自动发：案例、价值提醒、约时间等低风险动作。" },
+          ],
+        },
+        {
+          id: "rhythm",
+          title: "当客户沉默：用低干扰跟进节奏，不靠记忆",
+          sub: "成交靠节奏：今天该跟谁、发什么、发到哪一步，系统帮你排好队。",
+          href: "./jarvis_sales_agent_prototype_html.html",
+          pageTitle: "Sales OS（跟进队列）",
+          chips: [
+            { t: "跟进队列", c: "info" },
+            { t: "价值提醒", c: "warn" },
+            { t: "不刷屏", c: "theme" },
+          ],
+          bubbles: [
+            { who: "C", cls: "c", text: "（已读不回）" },
+            { who: "我", cls: "me", text: "我不想尬追，也不想忘了。我要的是：不打扰但不丢单的节奏。" },
+            { who: "AI", cls: "ai", text: "系统给你 D1/D3/D7 的低干扰跟进：先约时间，再补案例，再做价值提醒。你每天 10 分钟按队列做完就行。" },
+          ],
+        },
+        {
+          id: "wechat",
+          title: "把动作落在微信里：可发送话术 + 可控流程",
+          sub: "功能不是“生成文本”，而是“帮你把动作发出去并跟到底”。",
+          href: "./wechat_agent.html",
+          pageTitle: "微信执行（话术/场景/流程）",
+          chips: [
+            { t: "场景化话术", c: "info" },
+            { t: "跟进提醒", c: "warn" },
+            { t: "可发送", c: "theme" },
+          ],
+          bubbles: [
+            { who: "C", cls: "c", text: "我考虑下吧。" },
+            { who: "我", cls: "me", text: "我不想再“那你考虑下”。我需要一句能推进到下一步的微信话术。" },
+            { who: "AI", cls: "ai", text: "系统把话术做成可发送模块：价值提醒、约时间、补充案例；同时给你下一步动作按钮，避免对话断掉。" },
+          ],
+        },
+      ];
+
+      const byId = (id) => document.getElementById(id);
+      const esc = (s) =>
+        String(s)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;");
+
+      let active = 0;
+
+      function chipHtml(list){
+        return (list || [])
+          .map((c) => `<span class="chip ${esc(c.c || "")}">${esc(c.t || "")}</span>`)
+          .join("");
+      }
+
+      function renderList(){
+        const root = byId("list");
+        root.innerHTML = FEATURES.map((f, i) => {
+          const selected = i === active;
+          return `
+            <div class="item" tabindex="0" role="option" aria-selected="${selected}" data-i="${i}">
+              <div class="item-top">
+                <div>
+                  <div class="item-title">${esc(f.title)}</div>
+                  <div class="item-sub">${esc(f.sub)}</div>
+                </div>
+                <span class="pill">#${i + 1}</span>
+              </div>
+              <div class="chiprow">${chipHtml(f.chips)}</div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function renderRight(){
+        const f = FEATURES[active];
+        byId("rt").textContent = f.title;
+        byId("rd").textContent = f.sub;
+
+        const open = byId("openPage");
+        open.href = f.href;
+        open.textContent = `打开演示：${f.pageTitle}`;
+
+        const link = byId("previewLink");
+        link.href = f.href;
+
+        const iframe = byId("iframe");
+        iframe.src = f.href;
+        iframe.title = f.pageTitle;
+
+        const bubbles = byId("bubbles");
+        bubbles.innerHTML = (f.bubbles || [])
+          .map((b) => `
+            <div class="bubble">
+              <div class="who ${esc(b.cls || "")}">${esc(b.who || "")}</div>
+              <div class="msg">${esc(b.text || "")}</div>
+            </div>
+          `)
+          .join("");
+
+        byId("chips").innerHTML = chipHtml(f.chips);
+      }
+
+      function setActive(i){
+        active = Math.max(0, Math.min(FEATURES.length - 1, i));
+        renderList();
+        renderRight();
+      }
+
+      function bind(){
+        renderList();
+        renderRight();
+
+        byId("next").addEventListener("click", () => setActive(active + 1));
+
+        byId("list").addEventListener("click", (e) => {
+          const el = e.target.closest("[data-i]");
+          if (!el) return;
+          setActive(parseInt(el.getAttribute("data-i"), 10));
+        });
+
+        byId("list").addEventListener("keydown", (e) => {
+          if (e.key !== "Enter" && e.key !== " ") return;
+          const el = e.target.closest("[data-i]");
+          if (!el) return;
+          e.preventDefault();
+          setActive(parseInt(el.getAttribute("data-i"), 10));
+        });
+      }
+
+      bind();
+    </script>
+  </body>
+</html>
