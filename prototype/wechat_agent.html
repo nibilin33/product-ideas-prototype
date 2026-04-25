@@ -513,6 +513,63 @@
         box-shadow: 0 18px 36px rgba(0, 0, 0, 0.6);
       }
 
+      .wda-feedback-card {
+        border-radius: 18px;
+        padding: 12px;
+        border: 1px solid rgba(52, 211, 153, 0.18);
+        background: radial-gradient(120% 85% at 12% 0%, rgba(52, 211, 153, 0.12), transparent 62%),
+          rgba(255, 255, 255, 0.035);
+      }
+
+      .wda-feedback-q {
+        font-size: 13px;
+        line-height: 1.55;
+        font-weight: 900;
+        color: rgba(244, 244, 245, 0.94);
+      }
+
+      .wda-feedback-meta {
+        margin-top: 4px;
+        font-size: 11px;
+        line-height: 1.5;
+        color: rgba(244, 244, 245, 0.55);
+      }
+
+      .wda-feedback-actions {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .wda-feedback-btn {
+        min-height: 34px;
+        padding: 0 11px;
+        border-radius: 9999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(244, 244, 245, 0.88);
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .wda-feedback-btn:hover {
+        border-color: rgba(52, 211, 153, 0.28);
+        background: rgba(52, 211, 153, 0.1);
+      }
+
+      .wda-feedback-value {
+        margin-top: 10px;
+        border-radius: 14px;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.18);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        font-size: 11px;
+        line-height: 1.6;
+        color: rgba(244, 244, 245, 0.62);
+      }
+
       .wda-input,
       .wda-select,
       .wda-textarea {
@@ -676,8 +733,8 @@
 
         <!-- 主 tabs -->
         <div class="mt-2 flex items-end justify-center gap-12">
-          <button type="button" class="main-tab text-2xl font-black text-zinc-200/85">AI工作台</button>
-          <button type="button" class="main-tab active text-2xl font-black text-zinc-200/85">成交助手</button>
+          <button type="button" class="main-tab text-2xl font-black text-zinc-200/85" data-action="mainTab" data-sec="onboarding">教会 AI</button>
+          <button type="button" class="main-tab active text-2xl font-black text-zinc-200/85" data-action="mainTab" data-sec="radar">成交助手</button>
         </div>
 
         <!-- Header / KPIs -->
@@ -967,6 +1024,14 @@
             prefs: {
               persona: "私域商家",
               followup: { enabled: true, auto_queue: true, demo_send: false },
+              tuning: { key: "", label: "", effect: "", updated_at: "", lesson_count: 18 },
+              clone: {
+                tone_sample: "",
+                store_info: "",
+                signature_style: "",
+                completed: false,
+                updated_at: ""
+              },
               safety: { never_auto_send: true, never_mass_message: true, never_auto_add: true, require_confirm: true, local_first: true }
             },
             db: { leads, tasks, outbox: [], store_days: {} }
@@ -979,12 +1044,18 @@
           s.prefs = s.prefs && typeof s.prefs === "object" ? s.prefs : {};
           s.prefs.safety = s.prefs.safety && typeof s.prefs.safety === "object" ? s.prefs.safety : {};
           s.prefs.followup = s.prefs.followup && typeof s.prefs.followup === "object" ? s.prefs.followup : { enabled: true, auto_queue: true, demo_send: false };
+          s.prefs.tuning = s.prefs.tuning && typeof s.prefs.tuning === "object" ? s.prefs.tuning : { key: "", label: "", effect: "", updated_at: "" };
+          s.prefs.clone = s.prefs.clone && typeof s.prefs.clone === "object" ? s.prefs.clone : { tone_sample: "", store_info: "", signature_style: "", completed: false, updated_at: "" };
 
           s.db = s.db && typeof s.db === "object" ? s.db : {};
           s.db.leads = Array.isArray(s.db.leads) ? s.db.leads : [];
           s.db.tasks = Array.isArray(s.db.tasks) ? s.db.tasks : [];
           s.db.outbox = Array.isArray(s.db.outbox) ? s.db.outbox : [];
           s.db.store_days = s.db.store_days && typeof s.db.store_days === "object" ? s.db.store_days : {};
+          s.db.feedback_events = Array.isArray(s.db.feedback_events) ? s.db.feedback_events : [];
+          s.db.leads.forEach((l) => {
+            l.feedback = l.feedback && typeof l.feedback === "object" ? l.feedback : {};
+          });
 
           // migrate older "copilot" fields (if any)
           if (!("followup_lead_id" in s.ui) && "copilot_lead_id" in s.ui) s.ui.followup_lead_id = s.ui.copilot_lead_id;
@@ -998,6 +1069,14 @@
           if (typeof s.prefs.followup.enabled !== "boolean") s.prefs.followup.enabled = true;
           if (typeof s.prefs.followup.auto_queue !== "boolean") s.prefs.followup.auto_queue = true;
           if (typeof s.prefs.followup.demo_send !== "boolean") s.prefs.followup.demo_send = false;
+          if (typeof s.prefs.tuning.key !== "string") s.prefs.tuning.key = "";
+          if (typeof s.prefs.tuning.label !== "string") s.prefs.tuning.label = "";
+          if (typeof s.prefs.tuning.effect !== "string") s.prefs.tuning.effect = "";
+          if (typeof s.prefs.tuning.lesson_count !== "number") s.prefs.tuning.lesson_count = 18;
+          if (typeof s.prefs.clone.tone_sample !== "string") s.prefs.clone.tone_sample = "";
+          if (typeof s.prefs.clone.store_info !== "string") s.prefs.clone.store_info = "";
+          if (typeof s.prefs.clone.signature_style !== "string") s.prefs.clone.signature_style = "";
+          if (typeof s.prefs.clone.completed !== "boolean") s.prefs.clone.completed = false;
 
           return s;
         }
@@ -1146,6 +1225,74 @@
           return `${d}天`;
         }
 
+        function silentHours(lead) {
+          return (now().getTime() - new Date(lead.last_touch_at).getTime()) / 3600 / 1000;
+        }
+
+        function shouldAskFeedback(lead) {
+          const fb = lead.feedback || {};
+          if (fb.status === "won" || fb.status === "lost") return false;
+          if (fb.status === "no_response" && silentHours(lead) < 120) return false;
+          if (fb.next_prompt_at && new Date(fb.next_prompt_at).getTime() > now().getTime()) return false;
+          return silentHours(lead) >= 12;
+        }
+
+        function feedbackSummary(lead) {
+          const fb = lead.feedback || {};
+          if (fb.status === "won") return `已成交${fb.amount_range ? " · " + fb.amount_range : ""}`;
+          if (fb.status === "lost") return `未成交${fb.loss_reason ? " · " + fb.loss_reason : ""}`;
+          if (fb.status === "following") return "还在跟进 · 3天后再问";
+          if (fb.status === "no_response") return "未响应 · 弱负信号 0.3，仍可补标";
+          return "";
+        }
+
+        function renderFeedbackPrompt(lead, { compact = false } = {}) {
+          const summary = feedbackSummary(lead);
+          const canStillAsk = shouldAskFeedback(lead);
+          if (summary) {
+            const meta =
+              lead.feedback?.status === "won" ? "正样本 · 已标注实际价值" :
+              lead.feedback?.status === "lost" ? "负样本 · 已记录失败原因" :
+              lead.feedback?.status === "no_response" ? "弱负信号 · 按 0.3 权重降权" :
+              "延迟标注 · 3 天后再问一次";
+            if (canStillAsk && lead.feedback?.status === "no_response") {
+              const age = Math.round(silentHours(lead));
+              return `
+                <div class="wda-feedback-card ${compact ? "mt-2" : ""}">
+                  <div class="wda-feedback-q">${escapeHtml(lead.name)}那边后来有结果吗？</div>
+                  <div class="wda-feedback-meta">已先按弱负信号记录 · 对话沉默 ${escapeHtml(age)} 小时 · 仍可一键补标</div>
+                  <div class="wda-feedback-actions">
+                    <button class="wda-feedback-btn" type="button" data-action="feedbackOutcome" data-id="${escapeHtml(lead.id)}" data-outcome="won">✅ 成交了</button>
+                    <button class="wda-feedback-btn" type="button" data-action="feedbackOutcome" data-id="${escapeHtml(lead.id)}" data-outcome="lost">❌ 没成交</button>
+                    <button class="wda-feedback-btn" type="button" data-action="feedbackOutcome" data-id="${escapeHtml(lead.id)}" data-outcome="following">⏳ 还在跟进</button>
+                  </div>
+                  <div class="wda-feedback-value">商家补点一下，会覆盖弱信号，写成更准确的正/负样本。</div>
+                </div>
+              `;
+            }
+            return `
+              <div class="wda-feedback-card">
+                <div class="wda-feedback-q">${escapeHtml(lead.name)} 的结果已记录</div>
+                <div class="wda-feedback-meta">${escapeHtml(summary)} · ${escapeHtml(meta)}</div>
+              </div>
+            `;
+          }
+          if (!shouldAskFeedback(lead)) return "";
+          const age = Math.round(silentHours(lead));
+          return `
+            <div class="wda-feedback-card ${compact ? "mt-2" : ""}">
+              <div class="wda-feedback-q">${escapeHtml(lead.name)}那边有消息吗？</div>
+              <div class="wda-feedback-meta">对话沉默 ${escapeHtml(age)} 小时后自动追问 · 3 步以内结束</div>
+              <div class="wda-feedback-actions">
+                <button class="wda-feedback-btn" type="button" data-action="feedbackOutcome" data-id="${escapeHtml(lead.id)}" data-outcome="won">✅ 成交了</button>
+                <button class="wda-feedback-btn" type="button" data-action="feedbackOutcome" data-id="${escapeHtml(lead.id)}" data-outcome="lost">❌ 没成交</button>
+                <button class="wda-feedback-btn" type="button" data-action="feedbackOutcome" data-id="${escapeHtml(lead.id)}" data-outcome="following">⏳ 还在跟进</button>
+              </div>
+              <div class="wda-feedback-value">商家点一下，系统会顺手完成结果标注、失败归因和下一轮跟进节奏。</div>
+            </div>
+          `;
+        }
+
         function renderKpis() {
           const leads = state.db.leads;
           const top3 = [...leads].sort((a, b) => computeScore(b) - computeScore(a)).slice(0, 3);
@@ -1160,11 +1307,81 @@
           document.getElementById("wdaKpiRebuy").textContent = String(rebuy);
         }
 
+        function feedbackPendingLeads() {
+          return [...state.db.leads]
+            .filter((l) => shouldAskFeedback(l))
+            .sort((a, b) => silentHours(b) - silentHours(a));
+        }
+
+        function renderFeedbackBoard() {
+          const pending = feedbackPendingLeads();
+          const recent = [...(state.db.feedback_events || [])].slice(-3).reverse();
+          if (!pending.length && !recent.length) return "";
+          return `
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">待标注反馈</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">不是额外填表。沉默 12-16 小时后，系统顺手问一句，商家点一下就结束。</div>
+                </div>
+                <span class="wda-chip wda-chip--cyan">${escapeHtml(pending.length)} 个待确认</span>
+              </div>
+              <div class="mt-3 grid gap-2">
+                ${pending.length ? pending.slice(0, 3).map((l) => renderFeedbackPrompt(l)).join("") : `
+                  <div class="rounded-2xl border border-white/10 bg-white/5 p-3 text-xs text-zinc-200/60">
+                    暂无待确认结果。系统会在客户对话沉默后自动出现。
+                  </div>
+                `}
+              </div>
+              ${recent.length ? `
+                <div class="mt-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div class="text-xs font-black text-zinc-200/60">最近写入模型</div>
+                  <div class="mt-2 grid gap-1">
+                    ${recent.map((e) => {
+                      const lead = getLead(e.lead_id);
+                      return `<div class="text-xs text-zinc-200/60 leading-5">• ${escapeHtml(lead ? lead.name : "客户")}：${escapeHtml(e.model_note || e.status || "")}</div>`;
+                    }).join("")}
+                  </div>
+                </div>
+              ` : ``}
+            </div>
+          `;
+        }
+
+        function applySilentFeedbackSignals() {
+          let changed = false;
+          state.db.leads.forEach((lead) => {
+            const fb = lead.feedback || {};
+            if (fb.status) return;
+            if (silentHours(lead) < 84) return;
+            lead.feedback = {
+              status: "no_response",
+              updated_at: nowISO(),
+              weak_weight: 0.3
+            };
+            state.db.feedback_events.push({
+              id: uid(),
+              lead_id: lead.id,
+              status: "no_response",
+              model_label: "weak_negative",
+              model_weight: 0.3,
+              model_note: "商家未响应反馈请求：按弱负信号处理，降低这类线索/话术权重。",
+              created_at: nowISO()
+            });
+            changed = true;
+          });
+          if (changed) saveState(state);
+        }
+
         function setSec(sec) {
-          const allowedSecs = new Set(["radar", "customers", "tasks", "copilot", "safety"]);
+          const allowedSecs = new Set(["onboarding", "radar", "customers", "tasks", "copilot", "safety"]);
           state.ui.sec = allowedSecs.has(sec) ? sec : "radar";
           saveState(state);
           document.querySelectorAll("#wdaSeg [data-sec]").forEach((b) => b.classList.toggle("active", b.dataset.sec === state.ui.sec));
+          document.querySelectorAll(".main-tab[data-sec]").forEach((b) => {
+            const isDeal = state.ui.sec !== "onboarding" && b.dataset.sec === "radar";
+            b.classList.toggle("active", b.dataset.sec === state.ui.sec || isDeal);
+          });
           render();
         }
 
@@ -1228,6 +1445,8 @@
                 </div>
               </div>
             </div>
+
+            ${renderFeedbackBoard()}
 
 	            <div class="gstroke p-4">
 	              <div class="flex items-start justify-between gap-3">
@@ -1317,9 +1536,9 @@
               <div class="flex items-start justify-between gap-3">
                 <div>
                   <div class="text-base font-black">客户库</div>
-                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">阶段 · 标签 · 备注</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">由微信对话自动识别客户、阶段和标签。</div>
                 </div>
-                <button class="btn-secondary btn-sm" type="button" data-action="newLead">新增客户</button>
+                <span class="wda-chip wda-chip--cyan">自动沉淀</span>
               </div>
 
               <div class="mt-3 grid gap-2">
@@ -1367,9 +1586,9 @@
               <div class="flex items-start justify-between gap-3">
                 <div>
                   <div class="text-base font-black">跟进清单</div>
-                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">把下一步写成待办。</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">系统根据客户意向、沉默时间和未完成动作自动生成。</div>
                 </div>
-                <button class="btn-primary btn-sm" type="button" data-action="quickTask">添加待办</button>
+                <span class="wda-chip wda-chip--cyan">自动生成</span>
               </div>
               <div class="mt-3 flex flex-wrap gap-2">
                 <span class="wda-chip wda-chip--danger">逾期 ${escapeHtml(counts.overdue)}</span>
@@ -1413,6 +1632,7 @@
           const inbound = String(state.ui.followup_inbound || "");
           const plan = state.ui.followup_plan && state.ui.followup_plan.lead_id === lead.id ? state.ui.followup_plan : null;
           const follow = state.prefs.followup || { enabled: true, auto_queue: true, demo_send: false };
+          const tuning = state.prefs.tuning || {};
           const demoSendAllowed = !state.prefs.safety.never_auto_send;
           const demoSend = !!follow.demo_send && demoSendAllowed;
 
@@ -1422,7 +1642,7 @@
 
           const renderOutbox = () => {
             if (!outbox.length) {
-              return `<div class="text-xs text-zinc-200/55">暂无队列。</div>`;
+              return `<div class="rounded-2xl border border-dashed border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-200/55">暂无待发送内容。生成后会出现在这里。</div>`;
             }
             return outbox.slice(0, 10).map((m) => {
               const leadName = (getLead(m.lead_id)?.name || "客户");
@@ -1447,82 +1667,272 @@
               `;
             }).join("");
           };
+          const planNow = plan?.items?.[0] || null;
+          const planLater = plan?.items?.slice(1) || [];
 
           return `
             <div class="gstroke p-4">
               <div class="flex items-start justify-between gap-3">
                 <div>
-                  <div class="text-base font-black">自动回复</div>
-                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">收到消息后自动回复，并安排 2 次跟进（进入队列）。</div>
+                  <div class="text-base font-black">自动跟进</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">把一条客户微信，变成“现在怎么回 + 后面怎么跟”。</div>
                 </div>
                 <div class="flex flex-wrap gap-2 justify-end">
                   <span class="wda-chip ${follow.enabled ? "wda-chip--ok" : "wda-chip--warn"}">${follow.enabled ? "已开启" : "已关闭"}</span>
                   <button class="btn-secondary btn-sm" type="button" data-action="toggleFollowupEnabled">${follow.enabled ? "关闭" : "开启"}</button>
-                  <button class="btn-secondary btn-sm" type="button" data-action="followupReset">清空</button>
                 </div>
               </div>
 
-              <div class="mt-3 grid gap-2">
-                <div class="grid gap-1">
-                  <div class="text-xs font-black text-zinc-200/60">跟进对象</div>
-                  <select class="wda-select" data-action="followupLead">
-                    ${state.db.leads.map((l) => `<option value="${escapeHtml(l.id)}"${l.id === lead.id ? " selected" : ""}>${escapeHtml(l.name)} · ${escapeHtml(l.alias)}（${escapeHtml(l.stage)}）</option>`).join("")}
-                  </select>
-                </div>
-
-                <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
-                  <div class="text-xs font-black text-zinc-200/60">线索摘要</div>
-                  <div class="mt-2 text-sm text-zinc-100/80 leading-6">${escapeHtml(lead.last_summary)}</div>
-                  <div class="mt-2 flex flex-wrap gap-2">
-                    ${(lead.tags || []).slice(0, 3).map((t) => `<span class="wda-chip">${escapeHtml(t)}</span>`).join("")}
-                    <span class="wda-chip wda-chip--cyan">下一步：${escapeHtml(lead.next_best_action)}</span>
-                  </div>
-                </div>
-
-                <textarea class="wda-textarea" placeholder="对方发来的一句话（用于自动回复）" data-action="followupInbound">${escapeHtml(inbound)}</textarea>
-
-                <div class="flex flex-wrap gap-2">
-                  <button class="btn-secondary btn-sm" type="button" data-action="followupSimInbound">模拟收到</button>
-                  <button class="btn-secondary btn-sm" type="button" data-action="toggleFollowupAutoQueue">${follow.auto_queue ? "自动入队：开" : "自动入队：关"}</button>
-                  <button class="btn-secondary btn-sm" type="button" data-action="toggleFollowupDemoSend" ${demoSendAllowed ? "" : "disabled"}>${demoSendAllowed ? (demoSend ? "自动发送(演示)：开" : "自动发送(演示)：关") : "自动发送：已禁用"}</button>
-                </div>
-
-                <div class="flex flex-wrap gap-2">
-                  <button class="btn-primary btn-sm" type="button" data-action="followupGenerate">生成回复+跟进</button>
-                  <button class="btn-primary btn-sm" type="button" data-action="followupEnqueue">加入队列</button>
-                  <button class="btn-secondary btn-sm" type="button" data-action="outboxClear">清空待发送</button>
-                </div>
-
-                ${plan ? `
-                  <div class="gstroke p-3">
-                    <div class="text-xs font-black text-zinc-200/60">跟进计划</div>
-                    <div class="mt-2 grid gap-2">
-                      ${plan.items.map((it) => `
-                        <div class="wda-item" data-action="copyText" data-text="${escapeHtml(it.text)}">
-                          <div class="text-xs font-black text-zinc-200/55">${escapeHtml(it.label)}</div>
-                          <div class="mt-1 text-sm text-zinc-100/85 leading-6 whitespace-pre-wrap">${escapeHtml(it.text)}</div>
-                          <div class="mt-2 flex flex-wrap gap-2">
-                            <span class="wda-chip wda-chip--ok">点击复制</span>
-                            <span class="wda-chip">${escapeHtml(it.delay_h === 0 ? "现在" : `+${it.delay_h}h`)}</span>
-                          </div>
-                        </div>
-                      `).join("")}
-                    </div>
-                    <div class="mt-2 text-xs text-zinc-200/55">入队后会出现在下面的“发送队列”。</div>
-                  </div>
-                ` : `
-                  <div class="text-xs text-zinc-200/55 leading-5">用法：粘贴一句对方消息 → 生成 → 入队（自动回复 + 2 次跟进）。</div>
-                `}
-
-                <div class="gstroke p-3">
+              <div class="mt-4 grid gap-3">
+                <div class="rounded-3xl border border-white/10 bg-white/[0.04] p-3">
                   <div class="flex items-start justify-between gap-3">
                     <div>
-                      <div class="text-xs font-black text-zinc-200/60">发送队列</div>
-                      <div class="mt-1 text-xs text-zinc-200/55">默认不代发；可在安全边界里关闭“不自动发送”后开启演示自动发送。</div>
+                      <div class="text-xs font-black text-zinc-200/60">1. 收到客户消息</div>
+                      <div class="mt-1 text-sm font-black text-zinc-100">先选客户，再放入对方刚发来的话。</div>
+                    </div>
+                    <button class="btn-secondary btn-sm" type="button" data-action="followupSimInbound">模拟收到</button>
+                  </div>
+                  <div class="mt-3 grid gap-2">
+                    <select class="wda-select" data-action="followupLead" aria-label="选择跟进对象">
+                      ${state.db.leads.map((l) => `<option value="${escapeHtml(l.id)}"${l.id === lead.id ? " selected" : ""}>${escapeHtml(l.name)} · ${escapeHtml(l.alias)}（${escapeHtml(l.stage)}）</option>`).join("")}
+                    </select>
+                    <div class="rounded-2xl border border-white/10 bg-black/16 p-3">
+                      <div class="text-xs font-black text-zinc-200/60">系统已识别</div>
+                      <div class="mt-1 text-sm text-zinc-100/80 leading-6">${escapeHtml(lead.last_summary)}</div>
+                      <div class="mt-2 flex flex-wrap gap-2">
+                        ${(lead.tags || []).slice(0, 3).map((t) => `<span class="wda-chip">${escapeHtml(t)}</span>`).join("")}
+                        <span class="wda-chip wda-chip--cyan">下一步：${escapeHtml(lead.next_best_action)}</span>
+                      </div>
+                    </div>
+                    <textarea class="wda-textarea min-h-[92px]" placeholder="粘贴客户刚发来的微信，例如：你们20人团餐大概多少钱？有没有包间？" data-action="followupInbound">${escapeHtml(inbound)}</textarea>
+                  </div>
+                </div>
+
+                <div class="rounded-3xl border border-white/10 bg-white/[0.04] p-3">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="text-xs font-black text-zinc-200/60">2. AI 先回一句</div>
+                      <div class="mt-1 text-sm font-black text-zinc-100">先把客户接住，再问清人数、时间、预算。</div>
+                    </div>
+                    <button class="btn-primary btn-sm" type="button" data-action="followupGenerate">生成</button>
+                  </div>
+                  ${planNow ? `
+                    <div class="mt-3 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-3">
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                          <div class="text-xs font-black text-emerald-100/90">${escapeHtml(planNow.label)}</div>
+                          <div class="mt-1 text-sm text-zinc-100/86 leading-6 whitespace-pre-wrap">${escapeHtml(planNow.text)}</div>
+                        </div>
+                        <button class="btn-secondary btn-sm shrink-0" type="button" data-action="copyText" data-text="${escapeHtml(planNow.text)}">复制</button>
+                      </div>
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        <button class="btn-secondary btn-sm" type="button" data-action="tuneAssistant" data-tune="lower_high_price">别总推高价套餐</button>
+                        <button class="btn-secondary btn-sm" type="button" data-action="tuneAssistant" data-tune="less_deposit_pressure">少催定金</button>
+                      </div>
+                      ${tuning.key ? `<div class="mt-2 text-xs font-black text-emerald-100/80">已记住：${escapeHtml(tuning.effect)}</div>` : ``}
+                    </div>
+                  ` : `
+                    <div class="mt-3 rounded-2xl border border-dashed border-white/10 bg-black/16 p-3 text-xs text-zinc-200/55 leading-5">还没生成。粘贴客户消息后点“生成”，这里会出现第一条建议回复。</div>
+                  `}
+                </div>
+
+                <div class="rounded-3xl border border-white/10 bg-white/[0.04] p-3">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="text-xs font-black text-zinc-200/60">3. 没回复再提醒</div>
+                      <div class="mt-1 text-sm font-black text-zinc-100">如果客户沉默，系统按时间继续提醒。</div>
+                    </div>
+                    <button class="btn-primary btn-sm" type="button" data-action="followupEnqueue">加入队列</button>
+                  </div>
+                  <div class="mt-3 grid gap-2">
+                    ${planLater.length ? planLater.map((it) => `
+                      <div class="rounded-2xl border border-white/10 bg-black/16 p-3">
+                        <div class="flex items-center justify-between gap-2">
+                          <div class="text-xs font-black text-zinc-200/60">${escapeHtml(it.label)}</div>
+                          <span class="wda-chip">${escapeHtml(it.delay_h === 0 ? "现在" : `+${it.delay_h}h`)}</span>
+                        </div>
+                        <div class="mt-2 text-sm text-zinc-100/80 leading-6 whitespace-pre-wrap">${escapeHtml(it.text)}</div>
+                      </div>
+                    `).join("") : `<div class="rounded-2xl border border-dashed border-white/10 bg-black/16 p-3 text-xs text-zinc-200/55 leading-5">生成后会出现两条后续提醒，例如 4 小时后、24 小时后。</div>`}
+                  </div>
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <button class="btn-secondary btn-sm" type="button" data-action="toggleFollowupAutoQueue">${follow.auto_queue ? "自动入队：开" : "自动入队：关"}</button>
+                    <button class="btn-secondary btn-sm" type="button" data-action="toggleFollowupDemoSend" ${demoSendAllowed ? "" : "disabled"}>${demoSendAllowed ? (demoSend ? "自动发送演示：开" : "自动发送演示：关") : "自动发送：已禁用"}</button>
+                  </div>
+                </div>
+
+                <div class="rounded-3xl border border-white/10 bg-white/[0.04] p-3">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="text-xs font-black text-zinc-200/60">4. 待发送队列</div>
+                      <div class="mt-1 text-xs text-zinc-200/55">默认不代发；老板确认后标记已发。</div>
+                    </div>
+                    <div class="flex flex-wrap justify-end gap-2">
+                      <button class="btn-secondary btn-sm" type="button" data-action="outboxClear">清空待发送</button>
+                      <button class="btn-secondary btn-sm" type="button" data-action="followupReset">重置当前消息</button>
                     </div>
                   </div>
-                  <div class="mt-2 grid gap-2">
+                  <div class="mt-3 grid gap-2">
                     ${renderOutbox()}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        function renderOnboarding() {
+          const clone = state.prefs.clone || {};
+          const tuning = state.prefs.tuning || {};
+          const learnedCount = Math.max(0, Number(tuning.lesson_count || 0)) + (state.db.feedback_events || []).length;
+          const priceStyleText =
+            tuning.price_style === "low_first" ? "问价格时先给最低可选方案" :
+            tuning.price_style === "value_first" ? "问价格时先聊价值，再给价格区间" :
+            tuning.price_style === "visit_first" ? "问价格时先确认场景，再报价" :
+            "问价格时还在学习你的偏好";
+          const tuneText = tuning.key === "lower_high_price" ? "少推高价套餐，优先中档稳妥方案" :
+            tuning.key === "less_deposit_pressure" ? "少催定金，先确认时间/人数/预算" :
+            "团建客户重点看人数、包间和预算";
+          const styleOptions = ["直接一点", "热情一点", "熟人语气", "少点套路", "可以带emoji"];
+          const aiBubble = (content, extra = "") => `
+            <div class="flex items-start gap-2 ${extra}">
+              <div class="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-emerald-300/30 bg-emerald-300/15 text-[11px] font-black text-emerald-100">AI</div>
+              <div class="max-w-[86%] rounded-[18px] rounded-tl-md border border-white/10 bg-white/6 px-3 py-2 text-sm text-zinc-100/88 leading-6 shadow-[0_14px_40px_rgba(0,0,0,.16)]">${content}</div>
+            </div>
+          `;
+          const bossBubble = (content) => `
+            <div class="flex items-start justify-end gap-2">
+              <div class="max-w-[88%] rounded-[18px] rounded-tr-md border border-cyan-300/20 bg-cyan-300/10 px-3 py-2 text-sm text-zinc-100/88 leading-6">${content}</div>
+              <div class="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-cyan-300/25 bg-cyan-300/12 text-[11px] font-black text-cyan-100">老板</div>
+            </div>
+          `;
+          return `
+            <div class="gstroke p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-base font-black">训练我的微信助手</div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">像带新员工一样，通过几句对话，让它学会你的店和你的说话方式。</div>
+                </div>
+                ${clone.completed ? `<span class="wda-chip wda-chip--ok">已学会</span>` : `<span class="wda-chip wda-chip--warn">待学习</span>`}
+              </div>
+
+              <div class="mt-4 rounded-3xl border border-white/10 bg-white/[0.04] p-3">
+                <div class="text-xs font-black text-zinc-200/60">成长进度</div>
+                <div class="mt-2 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-3">
+                  <div class="text-sm font-black text-zinc-100 leading-6">
+                    你已经教了我 ${escapeHtml(String(learnedCount))} 件事，我越来越了解你的风格了。
+                  </div>
+                  <div class="mt-1 text-xs text-zinc-200/60 leading-5">
+                    还有一些场景我没把握，明天继续问你一个问题。
+                  </div>
+                </div>
+                <div class="mt-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div class="text-xs font-black text-zinc-200/60">根据你的指导，我现在知道：</div>
+                  <div class="mt-2 grid gap-1 text-xs text-zinc-200/70 leading-5">
+                    <div>· ${escapeHtml(priceStyleText)}</div>
+                    <div>· ${escapeHtml(tuneText)}</div>
+                    <div>· 跟进间隔不少于 2 天，别让客户觉得被催</div>
+                    <div>· 说话可以随意一点，适当带点 emoji</div>
+                  </div>
+                  <div class="mt-2 text-xs text-zinc-200/50 leading-5">这些是你教我的，随时可以调整。</div>
+                </div>
+              </div>
+
+              <div class="mt-4 rounded-3xl border border-white/10 bg-white/[0.04] p-3">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="text-xs font-black text-zinc-200/60">今天教我一点点</div>
+                    <div class="mt-1 text-sm font-black text-zinc-100">客户问价格时，你更希望我怎么回？</div>
+                    <div class="mt-1 text-xs text-zinc-200/55 leading-5">像带员工一样，每天教一个小习惯，第二天话术就会变。</div>
+                  </div>
+                  ${tuning.price_style ? `<span class="wda-chip wda-chip--ok">已学习</span>` : `<span class="wda-chip wda-chip--warn">待训练</span>`}
+                </div>
+                <div class="mt-3 grid gap-2">
+                  <button class="wda-item text-left" type="button" data-action="trainPriceStyle" data-style="low_first">
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <div class="font-black text-zinc-100">先报最低价</div>
+                        <div class="mt-1 text-xs text-zinc-200/60 leading-5">适合价格敏感客户，先降低决策门槛。</div>
+                      </div>
+                      ${tuning.price_style === "low_first" ? `<span class="wda-chip wda-chip--ok">当前偏好</span>` : `<span class="wda-chip">选择</span>`}
+                    </div>
+                  </button>
+                  <button class="wda-item text-left" type="button" data-action="trainPriceStyle" data-style="value_first">
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <div class="font-black text-zinc-100">先介绍价值</div>
+                        <div class="mt-1 text-xs text-zinc-200/60 leading-5">先讲菜品、分量、服务和稳定性，再报价。</div>
+                      </div>
+                      ${tuning.price_style === "value_first" ? `<span class="wda-chip wda-chip--ok">当前偏好</span>` : `<span class="wda-chip">选择</span>`}
+                    </div>
+                  </button>
+                  <button class="wda-item text-left" type="button" data-action="trainPriceStyle" data-style="visit_first">
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <div class="font-black text-zinc-100">引导到店再报价</div>
+                        <div class="mt-1 text-xs text-zinc-200/60 leading-5">先确认人数、时间和场景，避免空泛报价。</div>
+                      </div>
+                      ${tuning.price_style === "visit_first" ? `<span class="wda-chip wda-chip--ok">当前偏好</span>` : `<span class="wda-chip">选择</span>`}
+                    </div>
+                  </button>
+                </div>
+                ${tuning.price_style_effect ? `
+                  <div class="mt-3 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-3">
+                    <div class="text-xs font-black text-emerald-100/90">第二天 AI 已学习</div>
+                    <div class="mt-1 text-sm font-black text-zinc-100">${escapeHtml(tuning.price_style_effect)}</div>
+                    <div class="mt-1 text-xs text-zinc-200/60 leading-5">老板会感觉：这不是工具，是我带出来的员工。</div>
+                  </div>
+                ` : ``}
+              </div>
+
+              <div class="mt-4 rounded-3xl border border-white/10 bg-black/18 p-3">
+                <div class="grid gap-3">
+                  ${aiBubble(`
+                    <div class="text-xs font-black text-emerald-100/90">微信助手</div>
+                    <div class="mt-1">老板，我先像新员工入职一样问你几个问题。问完之后，我回微信会更像你，也知道哪些话不能乱说。</div>
+                  `)}
+
+                  ${aiBubble(`客户问团餐、包间、订桌的时候，你平时第一句话会怎么接？`)}
+
+                  ${bossBubble(`
+                    <div class="text-xs font-black text-cyan-100/80">老板回复</div>
+                    <div class="mt-1 text-sm text-zinc-100/85">${clone.tone_sample ? escapeHtml(clone.tone_sample) : "在下面输入一句你平时的回复，我会照着这个语气学。"}</div>
+                  `)}
+
+                  ${aiBubble(`收到。那客户最常问的基础信息有哪些？比如人均、包间、停车、发票、营业时间。`)}
+
+                  ${bossBubble(`
+                    <div class="text-xs font-black text-cyan-100/80">店里常用信息</div>
+                    <textarea class="wda-textarea mt-2 min-h-[108px]" placeholder="例如：人均 68-98；有2个包间；可开发票；停车在商场B2；团餐建议提前一天订。" data-action="cloneStoreInfo">${escapeHtml(clone.store_info || "")}</textarea>
+                  `)}
+
+                  ${aiBubble(`最后一个问题：我回复客户时，语气更像哪种你？可以多选。`)}
+
+                  ${bossBubble(`
+                    <div class="flex flex-wrap gap-2">
+                      ${styleOptions.map((x) => `
+                        <button class="btn-pill ${String(clone.signature_style || "").includes(x) ? "btn-pill--cyan" : ""}" type="button" data-action="cloneStylePick" data-style="${escapeHtml(x)}">${escapeHtml(x)}</button>
+                      `).join("")}
+                    </div>
+                    <div class="mt-2 text-xs text-zinc-200/55">当前：${escapeHtml(clone.signature_style || "还没选择")}</div>
+                  `)}
+
+                  ${clone.completed ? aiBubble(`
+                    <div class="text-xs font-black text-emerald-100/90">我学到了</div>
+                    <div class="mt-1">之后我会优先用你的语气回复客户，先用你给过的基础信息；遇到价格、档期、包间不确定，会先问清楚再继续。</div>
+                    <div class="mt-2 text-xs text-zinc-200/60">这些内容会进入后续的“生成回复 + 跟进提醒”。</div>
+                  `, "animate-[fadeIn_.25s_ease]") : aiBubble(`填完上面几句，点一下完成，我就把这次问询记进我的回复习惯里。`)}
+
+                  <div class="rounded-2xl border border-cyan-300/25 bg-cyan-300/10 p-3">
+                    <div class="mb-2 flex items-center justify-between gap-2">
+                      <div class="text-xs font-black text-cyan-100/85">老板输入</div>
+                      <div class="text-[11px] text-zinc-200/50">当前问题：客户问团餐/包间，你怎么回？</div>
+                    </div>
+                    <textarea class="wda-textarea min-h-[96px] border-cyan-300/25 bg-black/25" placeholder="直接输入你平时会发给客户的话，比如：姐，20人团餐没问题，我先按你人数给你配两档，省得你来回选。" data-action="cloneToneSample">${escapeHtml(clone.tone_sample || "")}</textarea>
+                    <div class="mt-2 flex justify-end gap-2">
+                      <button class="btn-primary btn-sm" type="button" data-action="saveClone">发送并完成问询</button>
+                      <button class="btn-secondary btn-sm" type="button" data-action="cloneDemoInbound">用它试回一句</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1564,9 +1974,11 @@
         }
 
         function render() {
+          applySilentFeedbackSignals();
           const root = document.getElementById("wdaPanelRoot");
           const sec = state.ui.sec || "radar";
           const html =
+            sec === "onboarding" ? renderOnboarding() :
             sec === "radar" ? renderRadar() :
             sec === "customers" ? renderCustomers() :
             sec === "tasks" ? renderTasks() :
@@ -1647,6 +2059,17 @@
           const stage = String(lead.stage || "");
           const inbound = String(inboundText || "").trim();
           const action = String(lead.next_best_action || "").trim();
+          const tuning = state.prefs.tuning || {};
+          const clone = state.prefs.clone || {};
+          const tuningHint = tuning.key ? `\n\n老板偏好：${tuning.label}。本次回复已按这个偏好调整。` : "";
+          const priceStyleHint =
+            tuning.price_style === "low_first" ? "\n\n老板训练：客户问价格时，先给最低可选方案，再补充升级选择。" :
+            tuning.price_style === "value_first" ? "\n\n老板训练：客户问价格时，先解释套餐价值、菜品分量和服务，再给价格区间。" :
+            tuning.price_style === "visit_first" ? "\n\n老板训练：客户问价格时，先引导确认人数/到店时间/场景，再报价。" :
+            "";
+          const cloneHint = clone.completed
+            ? `\n\n老板分身：按老板常用语气回复。说话风格：${clone.signature_style || "自然、直接、像熟人聊天"}。店铺基础信息：${clone.store_info || "按现有门店信息回答"}。老板原话样本：${clone.tone_sample || "先礼貌接住，再给清楚下一步"}。`
+            : "";
 
           const keyword =
             inbound.includes("包间") ? "包间/档期" :
@@ -1656,12 +2079,13 @@
             inbound.includes("开票") || inbound.includes("发票") ? "发票" :
             "安排";
 
-          const replyNow =
+          const replyNowBase =
             stage.includes("预订待定金") ? `${name}，收到～我先帮你看下档期。\n关于${keyword}我给你两种方案：\n1）先把包间预留，定金确认后锁档\n2）不方便付定金的话我也先帮你留到今晚\n你这边大概几点、多少人？` :
             stage.includes("菜单确认") ? `${name}，可以的～我把规则和菜单建议一次发你：\n- ${action}\n你们大概多少人、有没有忌口？我按人数给你 2 档更稳的菜单。` :
             stage.includes("到店意向") ? `${name}，收到～\n- 停车/位置我发你指引\n- 为了不排队，建议先把时间/人数定一下\n你预计几点到、几个人？` :
             stage.includes("复购") ? `${name}，安排～我按你上次的口味偏好给你配一份更稳的推荐。\n你这次偏清淡还是想试试微辣？` :
             `${name}，收到～我先把关键信息确认一下：时间/人数/是否包间。\n确认后我就按 ${action} 帮你安排好。`;
+          const replyNow = replyNowBase + tuningHint + priceStyleHint + cloneHint;
 
           const fu4h =
             stage.includes("预订待定金") ? `${name}，我刚确认了包间档期。\n如果你方便，我建议先付定金锁档，我这边就帮你把包间预留好。\n你要不要我把定金规则和两档套餐一起发你？` :
@@ -1746,6 +2170,112 @@
           saveState(state);
           toast(before === state.db.outbox.length ? "无待发送" : "已清空待发送");
           render();
+        }
+
+        function recordFeedback({ leadId, status, amountRange = "", lossReason = "" }) {
+          const lead = getLead(leadId);
+          if (!lead) return;
+          const at = nowISO();
+          const nextPromptAt = status === "following" ? new Date(now().getTime() + 3 * 86400000).toISOString() : "";
+          lead.feedback = {
+            status,
+            amount_range: amountRange,
+            loss_reason: lossReason,
+            updated_at: at,
+            next_prompt_at: nextPromptAt
+          };
+
+          const modelSignal =
+            status === "won" ? { label: "positive", weight: 1, note: "成交 + 金额：这套对话与话术写入正样本，标注实际价值。" } :
+            status === "lost" ? { label: "negative", weight: 1, note: `未成交 + ${lossReason || "未知原因"}：写入负样本，用于优化应对话术。` } :
+            { label: "delayed", weight: 0.6, note: "还在跟进：延迟标注，3 天后再问一次。" };
+
+          state.db.feedback_events.push({
+            id: uid(),
+            lead_id: leadId,
+            status,
+            amount_range: amountRange,
+            loss_reason: lossReason,
+            model_label: modelSignal.label,
+            model_weight: modelSignal.weight,
+            model_note: modelSignal.note,
+            created_at: at
+          });
+
+          if (status === "won") {
+            lead.stage = "已成交";
+            if (amountRange === "< ¥2000") lead.value_estimate = Math.max(Number(lead.value_estimate) || 0, 1800);
+            if (amountRange === "¥2000-5000") lead.value_estimate = Math.max(Number(lead.value_estimate) || 0, 3500);
+            if (amountRange === "> ¥5000") lead.value_estimate = Math.max(Number(lead.value_estimate) || 0, 6800);
+          }
+          if (status === "lost") lead.stage = "已流失";
+          if (status === "following") {
+            const exists = state.db.tasks.some((t) => t.lead_id === leadId && t.kind === "feedback_retry" && t.status !== "done");
+            if (!exists) {
+              state.db.tasks.push({
+                id: uid(),
+                lead_id: leadId,
+                title: "3天后确认这单是否成交",
+                due_at: nextPromptAt,
+                status: "planned",
+                kind: "feedback_retry"
+              });
+            }
+          }
+
+          saveState(state);
+          closeModal();
+          toast(status === "won" ? "已记录成交结果" : status === "lost" ? "已记录未成交原因" : "已延后，3天后再问");
+          render();
+          if (state.ui.drawer_open && state.ui.selected_lead_id === leadId) openLead(leadId);
+        }
+
+        function openFeedbackOutcome(leadId, outcome) {
+          const lead = getLead(leadId);
+          if (!lead) return;
+          if (outcome === "following") {
+            recordFeedback({ leadId, status: "following" });
+            return;
+          }
+          if (outcome === "won") {
+            openModal({
+              title: `${lead.name} 成交了`,
+              bodyHtml: `
+                <div class="grid gap-3">
+                  <div class="gstroke p-3">
+                    <div class="text-sm font-black text-zinc-100">太棒了！大概消费多少？</div>
+                    <div class="mt-2 text-xs text-zinc-200/55 leading-5">只点一下即可，金额会写入这套对话的实际价值。</div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    ${["< ¥2000", "¥2000-5000", "> ¥5000", "跳过"].map((x) => `
+                      <button class="btn-secondary btn-sm" type="button" data-action="feedbackAmount" data-id="${escapeHtml(leadId)}" data-amount="${escapeHtml(x)}">${escapeHtml(x)}</button>
+                    `).join("")}
+                  </div>
+                  <div class="wda-feedback-value">写入模型：成交 + 金额 → 正样本，标注这套话术的实际价值。</div>
+                </div>
+              `,
+              footHtml: `<button class="btn-secondary btn-sm" type="button" data-action="closeModal">取消</button>`
+            });
+            return;
+          }
+          openModal({
+            title: `${lead.name} 没成交`,
+            bodyHtml: `
+              <div class="grid gap-3">
+                <div class="gstroke p-3">
+                  <div class="text-sm font-black text-zinc-100">知道是什么原因吗？</div>
+                  <div class="mt-2 text-xs text-zinc-200/55 leading-5">原因会帮系统识别你店里最常见的成交卡点。</div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  ${["价格/最低消费", "档期不合适", "去别家了", "自己取消", "不知道"].map((x) => `
+                    <button class="btn-secondary btn-sm" type="button" data-action="feedbackLossReason" data-id="${escapeHtml(leadId)}" data-reason="${escapeHtml(x)}">${escapeHtml(x)}</button>
+                  `).join("")}
+                </div>
+                <div class="wda-feedback-value">写入模型：未成交 + 原因 → 负样本，用于优化下次应对话术。</div>
+              </div>
+            `,
+            footHtml: `<button class="btn-secondary btn-sm" type="button" data-action="closeModal">取消</button>`
+          });
         }
 
         function genAdviceForLead(id) {
@@ -1917,10 +2447,11 @@
                     <button class="btn-primary btn-sm" type="button" data-action="genAdvice" data-id="${escapeHtml(id)}">生成话术</button>
                     <button class="btn-secondary btn-sm" type="button" data-action="openFollowup" data-id="${escapeHtml(id)}">自动跟进</button>
                     <button class="btn-secondary btn-sm" type="button" data-action="markTouched" data-id="${escapeHtml(id)}">标记已跟进</button>
-                    <button class="btn-secondary btn-sm" type="button" data-action="addTaskForLead" data-id="${escapeHtml(id)}">加待办</button>
                   </div>
-                  <div class="mt-2 text-xs text-zinc-200/55 leading-5">仅建议，不代发。</div>
+                  <div class="mt-2 text-xs text-zinc-200/55 leading-5">待办会由系统根据对话自动生成；这里仅建议，不代发。</div>
                 </div>
+
+                ${renderFeedbackPrompt(lead)}
 
                 <div class="gstroke p-3">
                   <div class="text-xs font-black text-zinc-200/60">关键信号（证据链）</div>
@@ -2014,83 +2545,6 @@
           });
         }
 
-        function quickTask() {
-          openModal({
-            title: "新建待办",
-            bodyHtml: `
-              <div class="grid gap-3">
-                <div class="gstroke p-3">
-                  <div class="text-xs font-black text-zinc-200/60">选择客户</div>
-                  <select class="wda-select" id="qtLead">
-                    ${state.db.leads.map((l) => `<option value="${escapeHtml(l.id)}">${escapeHtml(l.name)} · ${escapeHtml(l.alias)}</option>`).join("")}
-                  </select>
-                </div>
-                <div class="gstroke p-3">
-                  <div class="text-xs font-black text-zinc-200/60">待办内容</div>
-                  <input id="qtTitle" class="wda-input" placeholder="例如：发报价单 + 约电话" />
-                  <div class="mt-2 text-xs text-zinc-200/55">写成“动作 + 结果”。</div>
-                </div>
-              </div>
-            `,
-            footHtml: `
-              <button class="btn-secondary btn-sm" type="button" data-action="closeModal">取消</button>
-              <button class="btn-primary btn-sm" type="button" data-action="saveQuickTask">保存</button>
-            `
-          });
-        }
-
-        function addTaskForLead(leadId) {
-          const lead = getLead(leadId);
-          if (!lead) return;
-          openModal({
-            title: "加待办（对这个客户）",
-            bodyHtml: `
-              <div class="grid gap-3">
-                <div class="gstroke p-3">
-                  <div class="text-xs font-black text-zinc-200/60">客户</div>
-                  <div class="mt-2 text-sm font-black text-zinc-100/85">${escapeHtml(lead.name)} · ${escapeHtml(lead.alias)}</div>
-                  <div class="mt-1 text-xs text-zinc-200/55">阶段：${escapeHtml(lead.stage)} · 下一步：${escapeHtml(lead.next_best_action)}</div>
-                </div>
-                <div class="gstroke p-3">
-                  <div class="text-xs font-black text-zinc-200/60">待办内容</div>
-                  <input id="ltTitle" class="wda-input" placeholder="例如：发对比方案 + 让对方确认哪档" />
-                  <div class="mt-2 text-xs text-zinc-200/55">尽量写清“明确答复”。</div>
-                </div>
-              </div>
-            `,
-            footHtml: `
-              <button class="btn-secondary btn-sm" type="button" data-action="closeModal">取消</button>
-              <button class="btn-primary btn-sm" type="button" data-action="saveLeadTask" data-id="${escapeHtml(leadId)}">保存</button>
-            `
-          });
-        }
-
-        function newLead() {
-          openModal({
-            title: "新增客户",
-            bodyHtml: `
-              <div class="grid gap-3">
-                <div class="gstroke p-3">
-                  <div class="text-xs font-black text-zinc-200/60">名字</div>
-                  <input id="nlName" class="wda-input" placeholder="例如：赵女士" />
-                </div>
-                <div class="gstroke p-3">
-                  <div class="text-xs font-black text-zinc-200/60">场景</div>
-                  <input id="nlAlias" class="wda-input" placeholder="例如：包间预订 / 生日宴 / 团建" />
-                </div>
-                <div class="gstroke p-3">
-                  <div class="text-xs font-black text-zinc-200/60">预估金额</div>
-                  <input id="nlValue" type="number" class="wda-input" placeholder="例如：3000" />
-                </div>
-              </div>
-            `,
-            footHtml: `
-              <button class="btn-secondary btn-sm" type="button" data-action="closeModal">取消</button>
-              <button class="btn-primary btn-sm" type="button" data-action="saveNewLead">保存</button>
-            `
-          });
-        }
-
         function followupGenerate() {
           const lead = getLead(state.ui.followup_lead_id) || state.db.leads[0];
           let inbound = String(state.ui.followup_inbound || "").trim();
@@ -2163,6 +2617,182 @@
           saveState(state);
           render();
           toast(state.prefs.followup.demo_send ? "自动发送(演示)：已开启" : "自动发送(演示)：已关闭");
+        }
+
+        function tuneAssistant(key) {
+          const presets = {
+            lower_high_price: {
+              label: "别总推高价套餐",
+              effect: "已降低高价套餐推荐频率 40%，优先给中档稳妥方案。"
+            },
+            less_deposit_pressure: {
+              label: "少一点催定金",
+              effect: "已降低定金催促强度，先确认时间/人数/预算后再提醒锁档。"
+            }
+          };
+          const p = presets[key];
+          if (!p) return;
+          state.prefs.tuning = {
+            key,
+            label: p.label,
+            effect: p.effect,
+            updated_at: nowISO(),
+            lesson_count: Math.max(0, Number(state.prefs.tuning?.lesson_count || 0)) + 1,
+            price_style: state.prefs.tuning?.price_style || "",
+            price_style_label: state.prefs.tuning?.price_style_label || "",
+            price_style_effect: state.prefs.tuning?.price_style_effect || "",
+            price_style_updated_at: state.prefs.tuning?.price_style_updated_at || ""
+          };
+          saveState(state);
+          render();
+          toast(`第二天 AI：${p.effect}`, 2400);
+        }
+
+        function trainPriceStyle(style) {
+          const presets = {
+            low_first: {
+              label: "客户问价格时先报最低价",
+              effect: "已把价格回复调整为：先给最低可选方案，再补充升级选择。"
+            },
+            value_first: {
+              label: "客户问价格时先介绍价值",
+              effect: "已把价格回复调整为：先讲菜品分量、服务和稳定性，再给价格区间。"
+            },
+            visit_first: {
+              label: "客户问价格时引导到店再报价",
+              effect: "已把价格回复调整为：先确认人数、时间和场景，再给更准确报价。"
+            }
+          };
+          const p = presets[style];
+          if (!p) return;
+          state.prefs.tuning = {
+            ...(state.prefs.tuning || {}),
+            price_style: style,
+            price_style_label: p.label,
+            price_style_effect: p.effect,
+            price_style_updated_at: nowISO(),
+            lesson_count: Math.max(0, Number(state.prefs.tuning?.lesson_count || 0)) + 1
+          };
+          saveState(state);
+          render();
+          toast(`第二天 AI：${p.effect}`, 2600);
+        }
+
+        function openOnboarding() {
+          const clone = state.prefs.clone || {};
+          openModal({
+            title: "新员工入职问询",
+            bodyHtml: `
+              <div class="grid gap-3">
+                <div class="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-3">
+                  <div class="text-xs font-black text-emerald-100/90">微信助手</div>
+                  <div class="mt-1 text-sm text-zinc-100/85 leading-6">老板，我先问 3 个问题。问清楚以后，我以后回微信就更像你，也不容易乱答。</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div class="text-xs font-black text-zinc-200/60">微信助手：客户问团餐/包间时，你平时会怎么回？</div>
+                  <textarea id="obTone" class="wda-textarea mt-2" placeholder="例如：姐，20人团餐没问题，我先按你人数给你配两档，省得你来回选。">${escapeHtml(clone.tone_sample || "")}</textarea>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div class="text-xs font-black text-zinc-200/60">微信助手：客户常问的基础信息有哪些？</div>
+                  <textarea id="obInfo" class="wda-textarea mt-2" placeholder="例如：人均 68-98；有2个包间；可开发票；停车在商场B2；团餐建议提前一天订。">${escapeHtml(clone.store_info || "")}</textarea>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div class="text-xs font-black text-zinc-200/60">微信助手：我说话更像哪种风格？</div>
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    ${["直接一点", "热情一点", "熟人语气", "少点套路", "可以带emoji"].map((x) => `
+                      <button class="btn-pill ${String(clone.signature_style || "").includes(x) ? "btn-pill--cyan" : ""}" type="button" data-action="onboardingStylePick" data-style="${escapeHtml(x)}">${escapeHtml(x)}</button>
+                    `).join("")}
+                  </div>
+                  <input id="obStyle" type="hidden" value="${escapeHtml(clone.signature_style || "")}" />
+                  <div class="mt-2 text-xs text-zinc-200/55" id="obStyleText">当前：${escapeHtml(clone.signature_style || "还没选择")}</div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-3">
+                  <div class="text-xs font-black text-zinc-200/60">入职后我会记住</div>
+                  <div class="mt-2 text-xs text-zinc-200/65 leading-5">· 你的常用说法<br />· 门店价格/包间/发票/停车等基础信息<br />· 遇到不确定问题先问清楚，不乱答</div>
+                </div>
+              </div>
+            `,
+            footHtml: `
+              <button class="btn-secondary btn-sm" type="button" data-action="closeModal">先不填</button>
+              <button class="btn-primary btn-sm" type="button" data-action="saveOnboarding">完成入职</button>
+            `
+          });
+        }
+
+        function onboardingStylePick(style) {
+          const input = document.getElementById("obStyle");
+          const text = document.getElementById("obStyleText");
+          if (!input) return;
+          const parts = String(input.value || "").split("、").map((x) => x.trim()).filter(Boolean);
+          const idx = parts.indexOf(style);
+          if (idx >= 0) parts.splice(idx, 1);
+          else parts.push(style);
+          input.value = parts.join("、");
+          if (text) text.textContent = "当前：" + (input.value || "还没选择");
+          document.querySelectorAll("[data-action='onboardingStylePick']").forEach((b) => {
+            b.classList.toggle("btn-pill--cyan", parts.includes(b.dataset.style));
+          });
+        }
+
+        function saveOnboarding() {
+          const tone = String(document.getElementById("obTone")?.value || "").trim();
+          const info = String(document.getElementById("obInfo")?.value || "").trim();
+          const style = String(document.getElementById("obStyle")?.value || "").trim();
+          if (!tone || !info || !style) return toast("先回答完 3 个入职问题");
+          state.prefs.clone = {
+            ...(state.prefs.clone || {}),
+            tone_sample: tone,
+            store_info: info,
+            signature_style: style,
+            completed: true,
+            updated_at: nowISO()
+          };
+          state.prefs.tuning.lesson_count = Math.max(0, Number(state.prefs.tuning?.lesson_count || 0)) + 3;
+          saveState(state);
+          closeModal();
+          render();
+          toast("入职完成：微信助手已记住你的说法");
+        }
+
+        function cloneStylePick(style) {
+          const clone = state.prefs.clone || {};
+          const parts = String(clone.signature_style || "").split("、").map((x) => x.trim()).filter(Boolean);
+          const idx = parts.indexOf(style);
+          if (idx >= 0) parts.splice(idx, 1);
+          else parts.push(style);
+          state.prefs.clone = {
+            ...clone,
+            signature_style: parts.join("、"),
+            updated_at: nowISO()
+          };
+          saveState(state);
+          render();
+        }
+
+        function saveClone() {
+          const clone = state.prefs.clone || {};
+          const tone = String(clone.tone_sample || "").trim();
+          const info = String(clone.store_info || "").trim();
+          const style = String(clone.signature_style || "").trim();
+          if (!tone || !info || !style) return toast("先补齐语气样本、基础信息和说话风格");
+          state.prefs.clone = {
+            ...clone,
+            completed: true,
+            updated_at: nowISO()
+          };
+          state.prefs.tuning.lesson_count = Math.max(0, Number(state.prefs.tuning?.lesson_count || 0)) + 3;
+          saveState(state);
+          render();
+          toast("已生成老板微信分身");
+        }
+
+        function cloneDemoInbound() {
+          const lead = getLead(state.ui.followup_lead_id) || state.db.leads[0];
+          state.ui.followup_inbound = `客户问：你们20人团餐大概多少钱？有没有包间？`;
+          state.ui.followup_plan = buildAutoFollowupPlan({ lead, inboundText: state.ui.followup_inbound });
+          saveState(state);
+          render();
+          toast("已用老板分身生成一条示例回复");
         }
 
         function toggleSafety(key) {
@@ -2240,6 +2870,8 @@
           const btn = e.target.closest("[data-action]");
           if (!btn) return;
           const act = btn.dataset.action;
+          if (act === "tuneAssistant") e.stopPropagation();
+          if (act === "mainTab") return setSec(btn.dataset.sec || "radar");
           if (act === "openLead") return openLead(btn.dataset.id);
           if (act === "closeDrawer") return closeDrawer();
           if (act === "openSettings") return openSettings();
@@ -2259,9 +2891,6 @@
           if (act === "taskDone") return taskDone(btn.dataset.task);
           if (act === "taskSnooze") return taskSnooze(btn.dataset.task);
           if (act === "copyText") return copyToClipboard(btn.dataset.text);
-          if (act === "quickTask") return quickTask();
-          if (act === "addTaskForLead") return addTaskForLead(btn.dataset.id);
-          if (act === "newLead") return newLead();
           if (act === "followupGenerate") return followupGenerate();
           if (act === "followupEnqueue") return followupEnqueue();
           if (act === "followupReset") return followupReset();
@@ -2269,9 +2898,20 @@
           if (act === "toggleFollowupEnabled") return toggleFollowupEnabled();
           if (act === "toggleFollowupAutoQueue") return toggleFollowupAutoQueue();
           if (act === "toggleFollowupDemoSend") return toggleFollowupDemoSend();
+          if (act === "tuneAssistant") return tuneAssistant(btn.dataset.tune);
+          if (act === "trainPriceStyle") return trainPriceStyle(btn.dataset.style);
+          if (act === "openOnboarding") return openOnboarding();
+          if (act === "onboardingStylePick") return onboardingStylePick(btn.dataset.style);
+          if (act === "saveOnboarding") return saveOnboarding();
+          if (act === "cloneStylePick") return cloneStylePick(btn.dataset.style);
+          if (act === "saveClone") return saveClone();
+          if (act === "cloneDemoInbound") return cloneDemoInbound();
           if (act === "outboxMarkSent") return outboxMarkSent(btn.dataset.msg);
           if (act === "outboxCancel") return outboxCancel(btn.dataset.msg);
           if (act === "outboxClear") return outboxClearQueued();
+          if (act === "feedbackOutcome") return openFeedbackOutcome(btn.dataset.id, btn.dataset.outcome);
+          if (act === "feedbackAmount") return recordFeedback({ leadId: btn.dataset.id, status: "won", amountRange: btn.dataset.amount === "跳过" ? "" : btn.dataset.amount });
+          if (act === "feedbackLossReason") return recordFeedback({ leadId: btn.dataset.id, status: "lost", lossReason: btn.dataset.reason });
           if (act === "toggleSafety") return toggleSafety(btn.dataset.key);
           if (act === "resetAll") return resetAll();
           if (act === "rebuyNudge") {
@@ -2298,55 +2938,6 @@
             closeModal();
             toast("已保存设置");
             return;
-          }
-          if (act === "saveQuickTask") {
-            const leadId = document.getElementById("qtLead")?.value;
-            const title = String(document.getElementById("qtTitle")?.value || "").trim();
-            if (!leadId || !title) return toast("请选客户并填写内容");
-            state.db.tasks.push({ id: uid(), lead_id: leadId, title, due_at: now().toISOString(), status: "due" });
-            saveState(state);
-            closeModal();
-            toast("已添加待办");
-            render();
-            return setSec("tasks");
-          }
-          if (act === "saveLeadTask") {
-            const leadId = btn.dataset.id;
-            const title = String(document.getElementById("ltTitle")?.value || "").trim();
-            if (!title) return toast("请输入待办内容");
-            state.db.tasks.push({ id: uid(), lead_id: leadId, title, due_at: now().toISOString(), status: "due" });
-            saveState(state);
-            closeModal();
-            toast("已添加待办");
-            render();
-            return openLead(leadId);
-          }
-          if (act === "saveNewLead") {
-            const name = String(document.getElementById("nlName")?.value || "").trim();
-            const alias = String(document.getElementById("nlAlias")?.value || "").trim();
-            const value = Number(document.getElementById("nlValue")?.value || 0);
-            if (!name || !alias) return toast("请填写名字与场景");
-            state.db.leads.unshift({
-              id: uid(),
-              name,
-              alias,
-              stage: "新客咨询",
-              tags: ["待评估"],
-              value_estimate: value || 0,
-              last_touch_at: now().toISOString(),
-              channel: "好友",
-              signals: [{ k: "新客咨询", w: 1 }],
-              notes: "",
-              chat_evidence: [],
-              last_summary: "新客咨询：需要确认时间/人数/预算与偏好。",
-              next_best_action: "问时间/人数 + 发菜单/定位",
-              risk: "新客不跟进会去别家"
-            });
-            saveState(state);
-            closeModal();
-            toast("已新增客户");
-            render();
-            return setSec("customers");
           }
           if (act === "saveLeadEdit") {
             const id = btn.dataset.id;
@@ -2381,6 +2972,18 @@
           }
           if (act === "followupInbound") {
             state.ui.followup_inbound = el.value || "";
+            saveState(state);
+            return;
+          }
+          if (act === "cloneToneSample") {
+            state.prefs.clone.tone_sample = el.value || "";
+            state.prefs.clone.completed = false;
+            saveState(state);
+            return;
+          }
+          if (act === "cloneStoreInfo") {
+            state.prefs.clone.store_info = el.value || "";
+            state.prefs.clone.completed = false;
             saveState(state);
             return;
           }
