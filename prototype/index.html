@@ -962,6 +962,200 @@
         background: rgba(222, 79, 133, 0.14);
       }
 
+      /* AI chat mock */
+      .ai-chat-mock {
+        margin: 18px 0 16px;
+        border-radius: 20px;
+        background:
+          radial-gradient(circle at 16% 8%, rgba(52, 211, 153, 0.14), transparent 34%),
+          linear-gradient(180deg, rgba(9, 19, 21, 0.96), rgba(5, 9, 11, 0.98));
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 14px;
+        display: grid;
+        gap: 12px;
+        box-shadow: 0 18px 38px rgba(0, 0, 0, 0.22);
+      }
+
+      .acm-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .acm-title {
+        font-size: 13px;
+        font-weight: 900;
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .acm-status {
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: rgba(52, 211, 153, 0.13);
+        color: #9cf6da;
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .acm-row {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+      }
+
+      .acm-customer {
+        justify-content: flex-end;
+      }
+
+      .acm-customer .acm-bubble {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--ink);
+        border-radius: 18px 18px 6px 18px;
+        max-width: 78%;
+        padding: 11px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.7;
+      }
+
+      .acm-intent {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 2px 0 2px 38px;
+        flex-wrap: wrap;
+      }
+
+      .acm-badge {
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .acm-badge-hot {
+        background: rgba(240, 179, 72, 0.16);
+        color: #ffd797;
+      }
+
+      .acm-label {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .acm-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(52, 211, 153, 0.95), rgba(34, 211, 238, 0.95));
+        color: #04110d;
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        font-weight: 900;
+        flex: 0 0 auto;
+      }
+
+      .acm-ai .acm-bubble {
+        background: rgba(52, 211, 153, 0.1);
+        border: 1px solid rgba(52, 211, 153, 0.2);
+        color: var(--ink);
+        border-radius: 18px 18px 18px 6px;
+        max-width: 82%;
+        padding: 12px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.7;
+      }
+
+      .acm-actions {
+        display: flex;
+        gap: 10px;
+        padding-top: 4px;
+      }
+
+      .acm-send {
+        flex: 1;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--brand), #22d3ee);
+        color: #04110d;
+        font-size: 13px;
+        font-weight: 900;
+        border: none;
+        cursor: pointer;
+      }
+
+      .acm-alt {
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .auto-flow {
+        display: grid;
+        gap: 12px;
+      }
+
+      .auto-step {
+        position: relative;
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 12px;
+        padding: 14px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.045);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .auto-step:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        left: 30px;
+        bottom: -12px;
+        width: 1px;
+        height: 12px;
+        background: linear-gradient(180deg, rgba(52, 211, 153, 0.45), transparent);
+      }
+
+      .auto-num {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(52, 211, 153, 0.14);
+        color: #9cf6da;
+        font-size: 13px;
+        font-weight: 950;
+      }
+
+      .auto-step strong {
+        display: block;
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .auto-step span {
+        display: block;
+        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.58);
+        font-size: 12px;
+        line-height: 1.65;
+        font-weight: 700;
+      }
+
       .module-actions {
         margin-top: 18px;
         display: flex;
@@ -1415,6 +1609,19 @@
           font-size: 12px;
         }
 
+        .ai-chat-mock {
+          padding: 12px;
+        }
+
+        .acm-actions {
+          flex-direction: column;
+        }
+
+        .acm-send,
+        .acm-alt {
+          width: 100%;
+        }
+
         .report,
         .chat-card {
           padding: 14px;
@@ -1842,27 +2049,50 @@
             <div class="story-dot">午</div>
             <div class="story-card">
               <div class="story-time">中午 13:40</div>
-              <h3>中午，客户来了但容易漏</h3>
+              <h3>中午，客户来了，AI 已经替你想好怎么回</h3>
               <p class="story-lead">
-                高峰期一忙，微信咨询、团餐意向、老客回访很容易被放过去。
+                高峰期根本没空一条条看消息。AI 读完客户的话，自动判断意向、生成专属回复，老板一键确认就发出去。
               </p>
               <div class="quote-box">
                 <p>
-                  谁该先跟，下一句怎么回，别再全靠记。
+                  客户等不起，AI 替你 3 秒出回复，高峰期也不会漏单。
                 </p>
               </div>
 
               <div class="module-grid">
                 <div class="module-panel">
                   <div class="module-name">微信成交助手 · 餐饮私域版</div>
-                  <h4>把该跟的客户排出来</h4>
+                  <h4>AI 读消息、判意向、出话术，老板一键发</h4>
                   <p>
-                    先分清谁值得跟、什么时候跟、下一句怎么说，老板照着清单处理。
+                    客户发来消息，AI 立即识别是团餐采购、散客咨询还是老客复购，针对每一条生成对应话术，不需要老板想字眼。
                   </p>
+
+                  <div class="ai-chat-mock">
+                    <div class="acm-top">
+                      <div class="acm-title">微信成交助手</div>
+                      <div class="acm-status">AI 正在生成回复</div>
+                    </div>
+                    <div class="acm-row acm-customer">
+                      <div class="acm-bubble">你们有没有团餐？20 个人，周五午餐</div>
+                    </div>
+                    <div class="acm-intent">
+                      <span class="acm-badge acm-badge-hot">🎯 高意向 · 团餐采购</span>
+                      <span class="acm-label">AI 已识别</span>
+                    </div>
+                    <div class="acm-row acm-ai">
+                      <div class="acm-avatar">AI</div>
+                      <div class="acm-bubble">您好！20 人团餐完全没问题～我们有专属套餐，人均 38 元起，周五午餐位置还有空。需要我给您发菜单和报价吗？</div>
+                    </div>
+                    <div class="acm-actions">
+                      <button class="acm-send">一键发送 →</button>
+                      <button class="acm-alt">换一条话术</button>
+                    </div>
+                  </div>
+
                   <ul class="chat-list">
-                    <li>客户先分轻重</li>
-                    <li>回复给出建议</li>
-                    <li>每天生成跟进清单</li>
+                    <li>客户意向自动识别，高 / 中 / 低优先分组</li>
+                    <li>每条消息秒出专属话术，不靠临场想字</li>
+                    <li>沉默客户自动触发二次提醒</li>
                   </ul>
                   <div class="module-actions">
                     <a class="btn btn-primary" href="./wechat_agent.html">打开微信成交助手</a>
@@ -1870,26 +2100,45 @@
                   <div class="demo-preview">
                     <div class="demo-head">
                       <strong>点开前先看一眼</strong>
-                      <span>看看客户怎么分轻重、怎么排队跟</span>
+                      <span>看看 AI 怎么识别客户、生成回复、提醒跟进</span>
                     </div>
                     <div class="demo-frame-wrap">
                       <iframe class="demo-frame" src="./wechat_agent.html" title="微信成交助手预览" loading="lazy"></iframe>
                     </div>
-                    <div class="demo-foot">能看到客户分组、待办提醒和跟进节奏。</div>
+                    <div class="demo-foot">能看到客户分组、自动回复建议、待办提醒和跟进节奏。</div>
                   </div>
                 </div>
 
                 <div class="module-panel">
-                  <div class="module-name">你会得到什么</div>
-                  <ul class="flow-list">
-                    <li>谁更值得跟</li>
-                    <li>下一句怎么回</li>
-                    <li>哪些人别漏掉</li>
-                  </ul>
+                  <div class="module-name">自动化流程</div>
+                  <div class="auto-flow">
+                    <div class="auto-step">
+                      <div class="auto-num">1</div>
+                      <div>
+                        <strong>客户发消息</strong>
+                        <span>AI 读完内容，识别团餐、散客、老客等类型。</span>
+                      </div>
+                    </div>
+                    <div class="auto-step">
+                      <div class="auto-num">2</div>
+                      <div>
+                        <strong>自动出回复</strong>
+                        <span>按客户意向生成专属话术，老板可一键发送。</span>
+                      </div>
+                    </div>
+                    <div class="auto-step">
+                      <div class="auto-num">3</div>
+                      <div>
+                        <strong>沉默再提醒</strong>
+                        <span>客户没回、老板没处理，自动进入跟进清单。</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="module-name" style="margin-top:18px">你会得到什么</div>
                   <ul class="result-list">
-                    <li>每天有一张跟进清单</li>
-                    <li>高意向客户优先提醒</li>
-                    <li>回复不再全靠临场想</li>
+                    <li>忙的时候客户也不会等太久</li>
+                    <li>回复质量稳定，不靠发挥</li>
+                    <li>每条消息都有记录，不再漏单</li>
                   </ul>
                 </div>
               </div>
