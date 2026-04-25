@@ -26,4 +26,4 @@ jobs:
           tcb login --apiKeyId ${{ secrets.TENCENT_CLOUD_API_KEY }} --apiKey ${{ secrets.TENCENT_CLOUD_API_SECRET }}
       - name: Cloud Upload
         run: |
-          tcb hosting deploy ./prototype / -e lique-8gutx0qy1cd73fe2
+          tcb hosting deploy ./prototype /prototype -e lique-8gutx0qy1cd73fe2
