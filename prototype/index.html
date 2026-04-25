@@ -3,613 +3,1869 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>销售入口：每个功能点 = 一段故事</title>
-    <meta name="description" content="不用讲功能清单：用销售故事把核心功能点讲清楚，并一键打开对应演示页面。" />
+    <title>餐饮老板的一天｜帮老板把店管明白的 AI 工具</title>
+    <meta
+      name="description"
+      content="用一个餐饮老板的一天，讲清楚这套工具怎么帮你看生意、跟客户、做复盘。"
+    />
     <style>
-      :root{
-        --bg:#050607;
-        --panel:rgba(255,255,255,.045);
-        --panel2:rgba(255,255,255,.028);
-        --stroke:rgba(255,255,255,.10);
-        --stroke2:rgba(255,255,255,.08);
-        --text:rgba(255,255,255,.92);
-        --muted:rgba(255,255,255,.66);
-        --muted2:rgba(255,255,255,.46);
-        --theme:#34d399;
-        --info:#22d3ee;
-        --warn:#f0b348;
-        --danger:#de4f85;
-        --r-lg:22px;
-        --r-md:16px;
-        --r-pill:999px;
-        --shadow:0 18px 46px rgba(0,0,0,.55);
+      :root {
+        --bg: #050607;
+        --paper: rgba(255, 255, 255, 0.045);
+        --ink: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.68);
+        --line: rgba(255, 255, 255, 0.1);
+        --line-strong: rgba(255, 255, 255, 0.16);
+        --brand: #34d399;
+        --brand-deep: #22c55e;
+        --gold: #f0b348;
+        --green: #34d399;
+        --red: #de4f85;
+        --shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+        --radius-xl: 28px;
+        --radius-lg: 18px;
+        --radius-md: 12px;
+        --max: 1180px;
       }
-      *{ box-sizing:border-box; }
-      html,body{ margin:0; padding:0; }
-      html{ scroll-behavior:smooth; }
-      body{
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
         font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-        background: linear-gradient(180deg, #070a0b 0%, var(--bg) 55%, #030405 100%);
-        color: var(--text);
-        min-height:100vh;
-        overflow-x:hidden;
-      }
-      a{ color:inherit; text-decoration:none; }
-      button{ font:inherit; }
-
-      .bg{
-        position:fixed; inset:0; pointer-events:none;
+        color: var(--ink);
         background:
-          radial-gradient(ellipse 1100px 640px at 50% 10%, rgba(34,211,238,.14), transparent 62%),
-          radial-gradient(circle 860px at 16% 18%, rgba(52,211,153,.10), transparent 56%),
-          radial-gradient(circle 800px at 84% 64%, rgba(222,79,133,.10), transparent 60%),
-          linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-        background-size:auto, auto, auto, 40px 40px, 40px 40px;
-        mask-image: radial-gradient(circle at 50% 18%, black 40%, transparent 80%);
-        opacity:.95;
+          radial-gradient(ellipse 1100px 640px at 50% 10%, rgba(34, 211, 238, 0.14), transparent 62%),
+          radial-gradient(circle 860px at 16% 18%, rgba(52, 211, 153, 0.1), transparent 56%),
+          radial-gradient(circle 800px at 84% 64%, rgba(222, 79, 133, 0.1), transparent 60%),
+          linear-gradient(180deg, #070a0b 0%, var(--bg) 55%, #030405 100%);
       }
 
-      .shell{
-        width:min(1240px, calc(100vw - 28px));
-        margin:0 auto;
-        padding:16px 0 56px;
-        position:relative;
-        z-index:1;
+      a {
+        color: inherit;
+        text-decoration: none;
       }
 
-      .topbar{
-        position:sticky; top:12px; z-index:10;
-        display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
-        padding:12px 12px;
-        border:1px solid var(--stroke);
-        border-radius:var(--r-lg);
-        background: rgba(10,14,16,.62);
+      button {
+        font: inherit;
+      }
+
+      .shell {
+        width: min(var(--max), calc(100vw - 28px));
+        margin: 0 auto;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 12px;
+        z-index: 20;
+        margin: 14px auto 0;
+        width: min(var(--max), calc(100vw - 28px));
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(10, 14, 16, 0.72);
         backdrop-filter: blur(18px);
-        box-shadow: 0 12px 34px rgba(0,0,0,.35);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
       }
-      .brand{ display:flex; align-items:center; gap:10px; }
-      .logo{
-        width:34px; height:34px; border-radius:12px;
-        display:grid; place-items:center;
-        background: rgba(34,211,238,.12);
-        border:1px solid rgba(34,211,238,.22);
-        box-shadow: 0 0 22px rgba(34,211,238,.12);
-        font-weight:980; letter-spacing:-.05em;
-        color: rgba(205,248,255,.98);
-      }
-      .brand-title{ font-weight:980; letter-spacing:-.03em; }
-      .brand-sub{ margin-top:1px; font-size:12px; color:var(--muted2); font-weight:850; }
-      .actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
 
-      .pill{
-        display:inline-flex; align-items:center; gap:8px;
-        padding:7px 11px;
-        border-radius: var(--r-pill);
-        border:1px solid rgba(255,255,255,.08);
-        background: rgba(255,255,255,.03);
-        color: rgba(255,255,255,.76);
-        font-size:12px;
-        font-weight: 880;
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #22d3ee, #34d399);
+        color: #fff;
+        font-weight: 900;
+        box-shadow: 0 12px 24px rgba(34, 211, 238, 0.22);
+      }
+
+      .brand-title {
+        font-size: 15px;
+        font-weight: 900;
+      }
+
+      .brand-sub {
+        margin-top: 2px;
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .nav-link,
+      .btn {
+        height: 40px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 850;
         white-space: nowrap;
       }
-      .dot{ width:7px; height:7px; border-radius:99px; background: var(--info); box-shadow: 0 0 18px rgba(34,211,238,.35); }
 
-      .btn{
-        height:40px;
-        padding:0 12px;
-        border-radius:14px;
-        border:1px solid var(--stroke2);
-        background: rgba(255,255,255,.03);
-        color: rgba(255,255,255,.86);
-        font-weight:920;
-        cursor:pointer;
-        display:inline-flex;
-        align-items:center;
-        gap:8px;
-        transition: transform .18s ease, background .18s ease, border-color .18s ease;
-      }
-      .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.045); border-color: rgba(255,255,255,.14); }
-      .btn.primary{
-        border-color: rgba(34,211,238,.28);
-        background: rgba(34,211,238,.10);
-        color: rgba(205,248,255,.94);
-      }
-      .btn.theme{
-        border-color: rgba(52,211,153,.28);
-        background: rgba(52,211,153,.10);
-        color: rgba(212,255,242,.94);
-      }
-      .btn.warn{
-        border-color: rgba(240,179,72,.28);
-        background: rgba(240,179,72,.10);
-        color: rgba(255,234,198,.94);
+      .nav-link {
+        color: var(--muted);
       }
 
-      .hero{
-        margin-top:14px;
-        border-radius: 26px;
-        border: 1px solid var(--stroke);
-        background:
-          radial-gradient(120% 90% at 16% 18%, rgba(34,211,238,.14), transparent 58%),
-          radial-gradient(90% 70% at 82% 26%, rgba(52,211,153,.10), transparent 60%),
-          rgba(255,255,255,.03);
-        box-shadow: var(--shadow);
-        padding: 18px 16px;
+      .nav-link:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .btn {
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .btn-primary {
+        color: #04110d;
+        background: linear-gradient(135deg, var(--brand), #22d3ee);
+        box-shadow: 0 18px 36px rgba(52, 211, 153, 0.22);
+      }
+
+      .btn-soft {
+        color: var(--ink);
+        border-color: var(--line);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .hero {
+        padding: 40px 0 28px;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+        gap: 28px;
+        align-items: stretch;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--line);
+        color: rgba(205, 248, 255, 0.94);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .hero-copy h1 {
+        margin: 16px 0 0;
+        font-size: clamp(34px, 6vw, 62px);
+        line-height: 1.05;
+        letter-spacing: 0;
+        font-weight: 930;
+      }
+
+      .hero-copy p {
+        margin: 16px 0 0;
+        max-width: 720px;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.85;
+        font-weight: 700;
+      }
+
+      .hero-actions {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .hero-points {
+        margin-top: 22px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .point {
+        min-height: 92px;
+        padding: 16px;
+        border-radius: var(--radius-lg);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
+      }
+
+      .point-kicker {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 900;
+      }
+
+      .point strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .hero-scene {
         position: relative;
         overflow: hidden;
-      }
-      .hero::after{
-        content:"";
-        position:absolute;
-        inset:-80px -120px auto auto;
-        width:280px; height:280px;
-        background: radial-gradient(circle, rgba(34,211,238,.22), transparent 62%);
-        opacity:.9;
-      }
-      .hero h1{
-        margin: 10px 0 0;
-        font-size: clamp(30px, 5.6vw, 54px);
-        line-height: 1.02;
-        letter-spacing: -.06em;
-        font-weight: 990;
-      }
-      .lead{
-        margin: 12px 0 0;
-        max-width: 980px;
-        color: rgba(255,255,255,.72);
-        font-size: 15px;
-        line-height: 1.9;
-        font-weight: 860;
-      }
-      .hero-row{
-        margin-top: 14px;
-        display:flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        align-items: center;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--line);
+        background:
+          radial-gradient(120% 90% at 16% 18%, rgba(34, 211, 238, 0.12), transparent 58%),
+          radial-gradient(90% 70% at 82% 26%, rgba(52, 211, 153, 0.1), transparent 60%),
+          rgba(255, 255, 255, 0.03);
+        box-shadow: var(--shadow);
+        min-height: 100%;
+        padding: 20px;
       }
 
-      .layout{
-        margin-top: 14px;
-        display:grid;
-        grid-template-columns: 420px 1fr;
-        gap: 12px;
-        align-items: start;
+      .scene-photo {
+        position: relative;
+        min-height: 320px;
+        border-radius: 20px;
+        background:
+          radial-gradient(circle at 18% 18%, rgba(34, 211, 238, 0.22), transparent 24%),
+          radial-gradient(circle at 82% 22%, rgba(52, 211, 153, 0.2), transparent 26%),
+          linear-gradient(180deg, rgba(13, 34, 40, 0.96) 0%, rgba(10, 22, 27, 0.98) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        overflow: hidden;
       }
 
-      .panel{
-        border-radius: var(--r-lg);
-        border: 1px solid var(--stroke);
-        background: var(--panel);
-        box-shadow: 0 12px 28px rgba(0,0,0,.35);
-      }
-      .panel-in{ padding: 14px; }
-
-      .section-title{
-        font-weight: 990;
-        letter-spacing:-.03em;
-        font-size: 16px;
-      }
-      .section-sub{
-        margin-top: 6px;
-        color: var(--muted);
-        font-weight: 860;
-        font-size: 12px;
-        line-height: 1.85;
+      .scene-photo::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        background-size: 34px 34px;
+        opacity: 0.55;
       }
 
-      .feature-list{ margin-top: 10px; display:grid; gap: 8px; }
-      .item{
+      .scene-photo::after {
+        content: "";
+        position: absolute;
+        inset: 18px;
         border-radius: 18px;
-        border: 1px solid rgba(255,255,255,.08);
-        background: rgba(255,255,255,.02);
-        padding: 10px 10px;
-        cursor:pointer;
-        transition: transform .18s ease, background .18s ease, border-color .18s ease;
+        background:
+          radial-gradient(circle at 84% 24%, rgba(34, 211, 238, 0.18), transparent 18%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
       }
-      .item:hover{ transform: translateY(-1px); background: rgba(255,255,255,.03); border-color: rgba(255,255,255,.14); }
-      .item[aria-selected="true"]{
-        border-color: rgba(34,211,238,.30);
-        background: radial-gradient(110% 80% at 14% 16%, rgba(34,211,238,.12), transparent 62%), rgba(255,255,255,.03);
-        box-shadow: 0 0 0 1px rgba(34,211,238,.06);
-      }
-      .item-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-      .item-title{ font-weight: 990; letter-spacing: -.02em; font-size: 13px; }
-      .item-sub{ margin-top: 6px; color: var(--muted); font-weight: 860; font-size: 12px; line-height: 1.8; }
-      .chiprow{ margin-top: 8px; display:flex; gap:8px; flex-wrap:wrap; }
-      .chip{
-        font-size: 11px;
-        font-weight: 980;
-        padding: 6px 9px;
-        border-radius: var(--r-pill);
-        border: 1px solid rgba(255,255,255,.08);
-        background: rgba(0,0,0,.18);
-        color: rgba(255,255,255,.72);
-      }
-      .chip.info{ border-color: rgba(34,211,238,.20); background: rgba(34,211,238,.08); color: rgba(205,248,255,.92); }
-      .chip.theme{ border-color: rgba(52,211,153,.20); background: rgba(52,211,153,.08); color: rgba(212,255,242,.92); }
-      .chip.warn{ border-color: rgba(240,179,72,.22); background: rgba(240,179,72,.10); color: rgba(255,234,198,.94); }
-      .chip.danger{ border-color: rgba(222,79,133,.22); background: rgba(222,79,133,.10); color: rgba(255,210,232,.94); }
 
-      .right-head{
-        display:flex;
-        align-items:flex-start;
+      .scene-overlay {
+        position: absolute;
+        inset: 18px;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        align-items: start;
+        gap: 12px;
+      }
+
+      .scene-panel {
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(4, 10, 12, 0.48);
+        backdrop-filter: blur(8px);
+        padding: 14px;
+      }
+
+      .scene-panel.tall {
+        display: grid;
+        gap: 10px;
+      }
+
+      .scene-kicker {
+        font-size: 11px;
+        font-weight: 900;
+        color: rgba(205, 248, 255, 0.84);
+      }
+
+      .scene-panel strong {
+        display: block;
+        margin-top: 6px;
+        font-size: 18px;
+        line-height: 1.35;
+      }
+
+      .scene-caption {
+        margin-top: 6px;
+        color: rgba(255, 255, 255, 0.62);
+        font-size: 12px;
+        line-height: 1.7;
+        font-weight: 700;
+      }
+
+      .scene-bars {
+        display: grid;
+        gap: 8px;
+      }
+
+      .scene-bar {
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+      }
+
+      .scene-bar > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #22d3ee, #34d399);
+      }
+
+      .scene-note {
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        font-size: 12px;
+        line-height: 1.65;
+        font-weight: 800;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .scene-side {
+        display: grid;
+        gap: 10px;
+        align-content: start;
+      }
+
+      .scene-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 10px;
+        border-radius: 999px;
+        width: fit-content;
+        background: rgba(52, 211, 153, 0.12);
+        color: rgba(212, 255, 242, 0.94);
+        border: 1px solid rgba(52, 211, 153, 0.16);
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .scene-todo {
+        display: grid;
+        gap: 8px;
+      }
+
+      .scene-todo-item {
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .scene-todo-item strong {
+        display: block;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .scene-todo-item span {
+        display: block;
+        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.62);
+        font-size: 11px;
+        line-height: 1.6;
+        font-weight: 700;
+      }
+
+      .scene-stack {
+        margin-top: 14px;
+        padding: 0 12px 12px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .report,
+      .chat-card {
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(8, 12, 14, 0.82);
+        border: 1px solid var(--line);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .report-head,
+      .chat-head {
+        display: flex;
+        align-items: center;
         justify-content: space-between;
         gap: 10px;
-        flex-wrap: wrap;
       }
-      .right-title{ font-weight: 990; letter-spacing:-.03em; font-size: 16px; }
-      .right-desc{ margin-top: 6px; color: rgba(255,255,255,.74); font-weight: 880; font-size: 13px; line-height: 1.85; max-width: 780px; }
 
-      .story{
-        margin-top: 10px;
-        border-radius: 22px;
-        border: 1px solid rgba(255,255,255,.08);
-        background: rgba(0,0,0,.18);
-        padding: 12px;
+      .report-title,
+      .chat-title {
+        font-size: 14px;
+        font-weight: 900;
       }
-      .story-title{
-        font-weight: 990;
-        letter-spacing: -.02em;
+
+      .status {
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .status.green {
+        background: rgba(52, 211, 153, 0.12);
+        color: var(--green);
+      }
+
+      .status.gold {
+        background: rgba(240, 179, 72, 0.14);
+        color: #ffd797;
+      }
+
+      .status.red {
+        background: rgba(222, 79, 133, 0.12);
+        color: var(--red);
+      }
+
+      .mini-list {
+        margin: 12px 0 0;
+        display: grid;
+        gap: 10px;
+      }
+
+      .mini-item {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      }
+
+      .mini-item:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .mini-item strong {
+        display: block;
         font-size: 13px;
       }
-      .bubbles{ margin-top: 10px; display:grid; gap: 10px; }
-      .bubble{ display:flex; gap: 10px; align-items:flex-start; }
-      .who{
-        width: 34px; height: 34px; border-radius: 12px;
-        display:grid; place-items:center;
-        font-weight: 990;
-        background: rgba(255,255,255,.04);
-        border: 1px solid rgba(255,255,255,.08);
-        color: rgba(255,255,255,.86);
-      }
-      .who.c{ background: rgba(255,255,255,.04); }
-      .who.me{ background: rgba(52,211,153,.10); border-color: rgba(52,211,153,.20); color: rgba(212,255,242,.94); }
-      .who.ai{ background: rgba(34,211,238,.10); border-color: rgba(34,211,238,.20); color: rgba(205,248,255,.94); }
-      .msg{
-        flex: 1;
-        border-radius: 16px;
-        border: 1px solid rgba(255,255,255,.08);
-        background: rgba(0,0,0,.18);
-        padding: 10px 10px;
-        color: rgba(255,255,255,.84);
-        font-weight: 860;
+
+      .mini-item span {
+        display: block;
+        margin-top: 4px;
         font-size: 12px;
-        line-height: 1.85;
-        white-space: pre-wrap;
+        color: var(--muted);
+        line-height: 1.7;
+        font-weight: 700;
       }
 
-      .preview-wrap{
-        margin-top: 10px;
-        border-radius: 22px;
-        border: 1px solid rgba(255,255,255,.08);
-        background: rgba(0,0,0,.20);
-        overflow: hidden;
+      .section {
+        padding: 26px 0;
+      }
+
+      .section-head {
+        max-width: 760px;
+      }
+
+      .section-label {
+        color: rgba(212, 255, 242, 0.94);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .section-head h2 {
+        margin: 10px 0 0;
+        font-size: clamp(28px, 4vw, 42px);
+        line-height: 1.16;
+        font-weight: 930;
+      }
+
+      .section-head p {
+        margin: 14px 0 0;
+        color: var(--muted);
+        line-height: 1.9;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .timeline {
+        margin-top: 28px;
         position: relative;
-        height: 520px;
-      }
-      .preview-wrap::after{
-        content:"点击可打开完整演示";
-        position:absolute;
-        right:10px; bottom:10px;
-        padding: 6px 10px;
-        border-radius: var(--r-pill);
-        border: 1px solid rgba(255,255,255,.10);
-        background: rgba(0,0,0,.28);
-        color: rgba(255,255,255,.78);
-        font-size: 11px;
-        font-weight: 980;
-        letter-spacing: .06em;
-        text-transform: uppercase;
-        pointer-events: none;
-      }
-      .preview-link{ position:absolute; inset:0; }
-      .iframe{
-        position:absolute;
-        inset:0;
-        width: 1440px;
-        height: 900px;
-        border:0;
-        transform-origin: top left;
-        transform: scale(.36);
-        opacity: .98;
-        filter: saturate(.98) contrast(1.02);
+        display: grid;
+        gap: 22px;
       }
 
-      .hint{
-        margin-top: 10px;
-        border-radius: 18px;
-        border: 1px solid rgba(255,255,255,.08);
-        background: rgba(255,255,255,.02);
-        padding: 10px 10px;
-        color: rgba(255,255,255,.72);
-        font-weight: 860;
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 19px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, rgba(34, 211, 238, 0.18), rgba(52, 211, 153, 0.26));
+      }
+
+      .story-block {
+        position: relative;
+        display: grid;
+        grid-template-columns: 56px minmax(0, 1fr);
+        gap: 18px;
+      }
+
+      .story-dot {
+        position: relative;
+        z-index: 1;
+        width: 40px;
+        height: 40px;
+        margin-top: 6px;
+        border-radius: 50%;
+        background: #0c1316;
+        border: 2px solid rgba(34, 211, 238, 0.3);
+        box-shadow: 0 0 0 8px rgba(5, 6, 7, 0.9);
+        display: grid;
+        place-items: center;
         font-size: 12px;
-        line-height: 1.85;
+        font-weight: 900;
+        color: rgba(205, 248, 255, 0.94);
       }
 
-      @media (max-width: 1080px){
-        .layout{ grid-template-columns: 1fr; }
-        .preview-wrap{ height: 480px; }
+      .story-card {
+        padding: 24px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
       }
-      @media (max-width: 640px){
-        .preview-wrap{ height: 420px; }
-        .iframe{ transform: scale(.30); }
+
+      .story-time {
+        color: rgba(212, 255, 242, 0.94);
+        font-size: 13px;
+        font-weight: 900;
       }
-      @media (prefers-reduced-motion: reduce){
-        html{ scroll-behavior:auto; }
-        .btn,.item{ transition:none; }
+
+      .story-card h3 {
+        margin: 8px 0 0;
+        font-size: 30px;
+        line-height: 1.2;
+        font-weight: 920;
+      }
+
+      .story-lead {
+        margin-top: 12px;
+        color: var(--muted);
+        line-height: 1.9;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .quote-box {
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+      }
+
+      .quote-box p {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.8;
+        font-weight: 850;
+      }
+
+      .module-grid {
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 18px;
+      }
+
+      .module-panel {
+        padding: 18px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--line);
+      }
+
+      .module-name {
+        font-size: 12px;
+        color: rgba(205, 248, 255, 0.94);
+        font-weight: 900;
+      }
+
+      .module-panel h4 {
+        margin: 10px 0 0;
+        font-size: 24px;
+        line-height: 1.35;
+        font-weight: 920;
+      }
+
+      .module-panel p {
+        margin: 10px 0 0;
+        font-size: 15px;
+        line-height: 1.85;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .task-list,
+      .chat-list,
+      .flow-list,
+      .result-list {
+        margin: 16px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+      }
+
+      .task-list li,
+      .chat-list li,
+      .flow-list li,
+      .result-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
+        line-height: 1.7;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .task-list li::before,
+      .chat-list li::before,
+      .flow-list li::before,
+      .result-list li::before {
+        flex: 0 0 auto;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .task-list li::before {
+        content: "做";
+        color: rgba(212, 255, 242, 0.94);
+        background: rgba(52, 211, 153, 0.14);
+      }
+
+      .chat-list li::before {
+        content: "聊";
+        color: #ffd797;
+        background: rgba(240, 179, 72, 0.16);
+      }
+
+      .flow-list li::before {
+        content: "环";
+        color: var(--green);
+        background: rgba(52, 211, 153, 0.16);
+      }
+
+      .result-list li::before {
+        content: "得";
+        color: var(--red);
+        background: rgba(222, 79, 133, 0.14);
+      }
+
+      .module-actions {
+        margin-top: 18px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .demo-preview {
+        margin-top: 18px;
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.03);
+        overflow: hidden;
+      }
+
+      .demo-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .demo-head strong {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .demo-head span {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .demo-frame-wrap {
+        --demo-scale: 0.48;
+        position: relative;
+        height: 320px;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.24);
+      }
+
+      .demo-frame {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 1440px;
+        height: 960px;
+        border: 0;
+        transform: translate(-50%, -50%) scale(var(--demo-scale));
+        transform-origin: center center;
+        pointer-events: none;
+        opacity: 0.98;
+      }
+
+      .demo-foot {
+        padding: 12px 16px 14px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.7;
+        font-weight: 700;
+      }
+
+      .status-strip {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .status-card {
+        padding: 14px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
+      }
+
+      .status-card em {
+        font-style: normal;
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 900;
+      }
+
+      .status-card strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 15px;
+        line-height: 1.55;
+      }
+
+      .loop-band {
+        margin-top: 18px;
+        padding: 28px;
+        border-radius: 28px;
+        background: linear-gradient(135deg, rgba(10, 16, 19, 0.94), rgba(8, 11, 14, 0.98));
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+
+      .loop-title {
+        font-size: 30px;
+        font-weight: 930;
+      }
+
+      .loop-sub {
+        margin-top: 10px;
+        max-width: 760px;
+        color: var(--muted);
+        line-height: 1.85;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .loop-grid {
+        margin-top: 22px;
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .loop-step {
+        padding: 18px 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
+        min-height: 156px;
+      }
+
+      .loop-step .num {
+        display: inline-flex;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        background: rgba(52, 211, 153, 0.14);
+        color: rgba(212, 255, 242, 0.94);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .loop-step strong {
+        display: block;
+        margin-top: 14px;
+        font-size: 18px;
+      }
+
+      .loop-step span {
+        display: block;
+        margin-top: 10px;
+        color: var(--muted);
+        line-height: 1.75;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .relation-grid,
+      .audience-grid,
+      .cta-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .relation-grid {
+        margin-top: 22px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .relation-card,
+      .audience-card,
+      .cta-card {
+        padding: 22px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+      }
+
+      .relation-card h3,
+      .audience-card h3,
+      .cta-card h3 {
+        margin: 12px 0 0;
+        font-size: 24px;
+        line-height: 1.3;
+        font-weight: 920;
+      }
+
+      .relation-card p,
+      .audience-card p,
+      .cta-card p {
+        margin: 12px 0 0;
+        color: var(--muted);
+        line-height: 1.85;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(52, 211, 153, 0.12);
+        color: rgba(212, 255, 242, 0.94);
+        font-size: 11px;
+        font-weight: 900;
+      }
+
+      .audience-grid {
+        margin-top: 22px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .cta-wrap {
+        padding: 8px 0 56px;
+      }
+
+      .cta-banner {
+        padding: 34px;
+        border-radius: 30px;
+        background:
+          radial-gradient(circle at 10% 10%, rgba(34, 211, 238, 0.14), transparent 34%),
+          linear-gradient(135deg, rgba(10, 16, 19, 0.96), rgba(7, 10, 12, 0.98));
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+
+      .cta-banner h2 {
+        margin: 10px 0 0;
+        font-size: clamp(30px, 4vw, 46px);
+        line-height: 1.18;
+        font-weight: 930;
+      }
+
+      .cta-banner p {
+        margin: 14px 0 0;
+        max-width: 760px;
+        color: var(--muted);
+        line-height: 1.9;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .cta-grid {
+        margin-top: 24px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .cta-card {
+        min-height: 180px;
+      }
+
+      .cta-card .btn {
+        margin-top: 18px;
+      }
+
+      .footer-note {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      @media (max-width: 1080px) {
+        .hero-grid,
+        .module-grid,
+        .relation-grid,
+        .audience-grid,
+        .cta-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-points,
+        .status-strip,
+        .loop-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .demo-frame-wrap {
+          height: 280px;
+          --demo-scale: 0.42;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .shell,
+        .topbar {
+          width: min(var(--max), calc(100vw - 20px));
+        }
+
+        .topbar {
+          top: 8px;
+          margin-top: 10px;
+          padding: 12px;
+          border-radius: 22px;
+          align-items: flex-start;
+        }
+
+        .brand {
+          width: 100%;
+        }
+
+        .nav {
+          width: 100%;
+          gap: 8px;
+        }
+
+        .nav-link {
+          height: 36px;
+          padding: 0 12px;
+          font-size: 11px;
+        }
+
+        .nav .btn {
+          width: 100%;
+          height: 44px;
+          font-size: 14px;
+        }
+
+        .hero {
+          padding: 22px 0 20px;
+        }
+
+        .hero-copy h1 {
+          font-size: 34px;
+          line-height: 1.12;
+        }
+
+        .hero-copy p,
+        .section-head p,
+        .story-lead,
+        .loop-sub,
+        .cta-banner p {
+          font-size: 14px;
+          line-height: 1.78;
+        }
+
+        .section-label,
+        .module-name,
+        .point-kicker,
+        .scene-kicker,
+        .status-card em,
+        .demo-head span,
+        .demo-foot,
+        .footer-note {
+          font-size: 11px;
+        }
+
+        .hero-actions .btn {
+          width: 100%;
+          min-height: 46px;
+          font-size: 14px;
+        }
+
+        .point {
+          min-height: auto;
+        }
+
+        .hero-scene {
+          padding: 14px;
+        }
+
+        .hero-points,
+        .status-strip,
+        .loop-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .scene-stack {
+          padding: 0;
+        }
+
+        .story-card {
+          padding: 18px;
+        }
+
+        .story-block {
+          grid-template-columns: 42px minmax(0, 1fr);
+          gap: 12px;
+        }
+
+        .story-dot {
+          width: 32px;
+          height: 32px;
+          font-size: 11px;
+        }
+
+        .timeline::before {
+          left: 15px;
+        }
+
+        .story-card h3,
+        .module-panel h4,
+        .relation-card h3,
+        .audience-card h3,
+        .cta-card h3,
+        .loop-title,
+        .section-head h2,
+        .cta-banner h2 {
+          font-size: 24px;
+          line-height: 1.24;
+        }
+
+        .quote-box {
+          padding: 16px;
+        }
+
+        .quote-box p {
+          font-size: 15px;
+          line-height: 1.75;
+        }
+
+        .module-panel,
+        .relation-card,
+        .audience-card,
+        .cta-card,
+        .loop-step,
+        .status-card {
+          padding: 16px;
+        }
+
+        .task-list li,
+        .chat-list li,
+        .flow-list li,
+        .result-list li {
+          padding: 12px;
+          font-size: 12px;
+        }
+
+        .report,
+        .chat-card {
+          padding: 14px;
+        }
+
+        .report-title,
+        .chat-title,
+        .demo-head strong {
+          font-size: 13px;
+        }
+
+        .mini-item strong,
+        .scene-todo-item strong,
+        .status-card strong,
+        .loop-step strong {
+          font-size: 14px;
+        }
+
+        .mini-item span,
+        .scene-caption,
+        .scene-note,
+        .scene-todo-item span,
+        .loop-step span,
+        .relation-card p,
+        .audience-card p,
+        .cta-card p {
+          font-size: 12px;
+        }
+
+        .report-head,
+        .chat-head,
+        .mini-item,
+        .demo-head {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .mini-item .status {
+          margin-top: 4px;
+        }
+
+        .scene-photo {
+          min-height: 420px;
+        }
+
+        .scene-overlay {
+          grid-template-columns: 1fr;
+        }
+
+        .demo-frame-wrap {
+          height: 220px;
+          --demo-scale: 0.32;
+        }
+
+        .scene-panel strong {
+          font-size: 16px;
+        }
+
+        .scene-side {
+          grid-template-columns: 1fr;
+        }
+
+        .relation-grid,
+        .audience-grid,
+        .cta-grid {
+          gap: 14px;
+        }
+
+        .cta-card {
+          min-height: auto;
+        }
+
+        .cta-banner,
+        .loop-band {
+          padding: 22px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .shell,
+        .topbar {
+          width: calc(100vw - 16px);
+        }
+
+        .brand-mark {
+          width: 38px;
+          height: 38px;
+          border-radius: 12px;
+        }
+
+        .brand-title {
+          font-size: 13px;
+        }
+
+        .brand-sub {
+          font-size: 10px;
+          line-height: 1.5;
+        }
+
+        .hero-copy h1 {
+          font-size: 28px;
+          line-height: 1.14;
+        }
+
+        .eyebrow,
+        .tag,
+        .status,
+        .scene-chip {
+          font-size: 10px;
+        }
+
+        .nav-link,
+        .btn,
+        .hero-actions .btn,
+        .nav .btn {
+          font-size: 13px;
+        }
+
+        .section-head h2,
+        .story-card h3,
+        .module-panel h4,
+        .relation-card h3,
+        .audience-card h3,
+        .cta-card h3,
+        .loop-title,
+        .cta-banner h2 {
+          font-size: 22px;
+        }
+
+        .hero-copy p,
+        .section-head p,
+        .story-lead,
+        .loop-sub,
+        .cta-banner p,
+        .module-panel p {
+          font-size: 13px;
+          line-height: 1.72;
+        }
+
+        .quote-box p {
+          font-size: 14px;
+        }
+
+        .task-list li,
+        .chat-list li,
+        .flow-list li,
+        .result-list li,
+        .mini-item span,
+        .scene-caption,
+        .scene-note,
+        .scene-todo-item span,
+        .loop-step span,
+        .relation-card p,
+        .audience-card p,
+        .cta-card p,
+        .demo-head span,
+        .demo-foot,
+        .footer-note {
+          font-size: 11px;
+        }
+
+        .report-title,
+        .chat-title,
+        .demo-head strong,
+        .mini-item strong,
+        .scene-panel strong,
+        .scene-todo-item strong,
+        .status-card strong,
+        .loop-step strong {
+          font-size: 13px;
+        }
+
+        .story-block {
+          grid-template-columns: 1fr;
+        }
+
+        .story-dot {
+          margin-top: 0;
+          box-shadow: none;
+        }
+
+        .timeline::before {
+          display: none;
+        }
+
+        .story-card,
+        .loop-band,
+        .cta-banner {
+          border-radius: 20px;
+        }
+
+        .scene-photo {
+          min-height: 440px;
+        }
+
+        .scene-overlay {
+          inset: 12px;
+        }
+
+        .scene-photo::after {
+          inset: 12px;
+        }
+
+        .demo-frame-wrap {
+          height: 196px;
+          --demo-scale: 0.28;
+        }
+
+        .loop-step {
+          min-height: auto;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        .btn {
+          transition: none;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="bg"></div>
+    <header class="topbar" aria-label="导航">
+      <div class="brand">
+        <div class="brand-mark">餐</div>
+        <div>
+          <div class="brand-title">餐饮老板的一天</div>
+          <div class="brand-sub">不是讲功能，是讲这套工具每天怎么帮你把店管好</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a class="nav-link" href="#day-story">老板的一天</a>
+        <a class="nav-link" href="#loop">怎么一步步跑起来</a>
+        <a class="nav-link" href="#fit">适合谁用</a>
+        <a class="btn btn-primary" href="#cta">看这套工具怎么帮老板过一天</a>
+      </nav>
+    </header>
 
-    <div class="shell">
-      <header class="topbar" aria-label="顶栏">
-        <div class="brand">
-          <div class="logo">S</div>
-          <div>
-            <div class="brand-title">销售入口</div>
-            <div class="brand-sub">每个功能点 = 一段可复述的销售故事</div>
+    <main class="shell">
+      <section class="hero" aria-label="首屏">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <span class="eyebrow">餐饮老板的一天</span>
+            <h1>餐饮老板每天都很忙，但真正缺的，是一个能帮你看生意、跟客户、做复盘的帮手</h1>
+            <p>
+              从日常经营、客户跟进到晚上复盘，这套工具不跟你讲一堆看不懂的图表，而是直接告诉你: 今天先做什么，哪些客户别漏掉，明天该往哪里调。
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#day-story">看这套工具怎么帮老板过一天</a>
+              <a class="btn btn-soft" href="#cta">领一份餐饮经营诊断</a>
+            </div>
+            <div class="hero-points" aria-label="价值概览">
+              <div class="point">
+                <div class="point-kicker">早上</div>
+                <strong>今天该推什么、该停什么，打开就能看到</strong>
+              </div>
+              <div class="point">
+                <div class="point-kicker">中午</div>
+                <strong>微信里谁该先回、怎么回，不用再靠脑子记</strong>
+              </div>
+              <div class="point">
+                <div class="point-kicker">晚上</div>
+                <strong>今天到底赚在哪、亏在哪，晚上复盘能看明白</strong>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="actions">
-          <span class="pill"><span class="dot"></span> 点功能 → 看故事 → 打开演示</span>
-          <a class="btn primary" href="./jarvis_sales_agent_prototype_html.html">打开 Sales OS</a>
-          <a class="btn theme" href="./wechat_agent.html">打开 微信执行</a>
-        </div>
-      </header>
 
-      <section class="hero" aria-label="开场">
-        <h1>不要讲“功能”，讲“发生了什么”</h1>
-        <p class="lead">
-          你可以把每个功能点当成一句销售话术：<b>当客户出现某个情况</b> → <b>我们帮你怎么推进</b> → <b>推进过程中如何可控</b>。
-          下面每一项都配了一个可复述的销售故事（带对话），并能一键打开对应的演示页面。
-        </p>
-        <div class="hero-row">
-          <a class="btn primary" href="#main">从功能点开始</a>
-          <a class="btn" href="./ppt.html">我想先听 60s</a>
+          <div class="hero-scene" aria-label="老板日报场景">
+            <div class="scene-photo">
+              <div class="scene-overlay" aria-hidden="true">
+                <div class="scene-panel tall">
+                  <div>
+                    <div class="scene-kicker">老板今日经营盘面</div>
+                    <strong>今天先做团餐回访，再停掉低转化活动</strong>
+                    <div class="scene-caption">不讲复杂分析，先告诉老板今天该先做哪几件事。</div>
+                  </div>
+                  <div class="scene-bars">
+                    <div class="scene-bar"><span style="width: 78%"></span></div>
+                    <div class="scene-bar"><span style="width: 52%"></span></div>
+                    <div class="scene-bar"><span style="width: 66%"></span></div>
+                  </div>
+                  <div class="scene-note">提醒: 下午 3 点后优先跟进 6 个有意向的团餐客户，这时候最容易谈下来。</div>
+                </div>
+                <div class="scene-side">
+                  <div class="scene-chip">今日待办 3 项</div>
+                  <div class="scene-todo">
+                    <div class="scene-todo-item">
+                      <strong>团餐客户二次确认</strong>
+                      <span>高意向 6 人</span>
+                    </div>
+                    <div class="scene-todo-item">
+                      <strong>停掉午市低转化券</strong>
+                      <span>避免继续压利润</span>
+                    </div>
+                    <div class="scene-todo-item">
+                      <strong>老客复购微信回访</strong>
+                      <span>沉默 30 天以上 18 人</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="scene-stack">
+              <div class="report">
+                <div class="report-head">
+                  <div class="report-title">今日老板日报</div>
+                  <span class="status green">建议先做 3 件事</span>
+                </div>
+                <div class="mini-list">
+                  <div class="mini-item">
+                    <div>
+                      <strong>先停掉低转化活动</strong>
+                      <span>午市第二件半价曝光高，但核销低，继续做只会压利润。</span>
+                    </div>
+                    <span class="status red">要调整</span>
+                  </div>
+                  <div class="mini-item">
+                    <div>
+                      <strong>把团餐客户今天跟完</strong>
+                      <span>有 6 个高意向客户下午 3 点后最容易成交，别拖到明天。</span>
+                    </div>
+                    <span class="status gold">高意向</span>
+                  </div>
+                  <div class="mini-item">
+                    <div>
+                      <strong>老客复购要补一条微信</strong>
+                      <span>沉默 30 天以上的老客 18 人，今晚发回访券最合适。</span>
+                    </div>
+                    <span class="status green">可执行</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="chat-card">
+                <div class="chat-head">
+                  <div class="chat-title">老板提示</div>
+                  <span class="status gold">老板看得懂</span>
+                </div>
+                <div class="mini-list">
+                  <div class="mini-item">
+                    <div>
+                      <strong>不是数据太少，是动作太散</strong>
+                      <span>你现在最缺的不是报表，是谁来提醒你今天先做什么。</span>
+                    </div>
+                  </div>
+                  <div class="mini-item">
+                    <div>
+                      <strong>不是客户不问，是没人跟到底</strong>
+                      <span>微信里问过的人都在，只是以前没有人把他们捞出来。</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <div class="layout" id="main">
-        <section class="panel" aria-label="功能点列表">
-          <div class="panel-in">
-            <div class="section-title">功能点（每个都配故事）</div>
-            <div class="section-sub">你不需要解释产品结构。你只要说：当客户这样说/这样做，我们就帮你这样推进。</div>
-            <div class="feature-list" id="list"></div>
-            <div class="hint">
-              建议讲法：先选 2 个你最常遇到的场景（比如“问价/沉默/要折扣”），讲完再邀请对方点开演示页看画面。
-            </div>
-          </div>
-        </section>
+      <section class="section" id="day-story" aria-labelledby="story-title">
+        <div class="section-head">
+          <div class="section-label">老板的一天</div>
+          <h2 id="story-title">从早到晚看一遍，你就知道这套工具每天能帮你分担什么</h2>
+          <p>
+            开店最怕的不是忙，是忙了一天还是不知道先做什么、客户该跟谁、明天该怎么改。下面就按一个老板真实的一天来讲，看这套工具到底能帮上什么忙。
+          </p>
+        </div>
 
-        <section class="panel" aria-label="故事与演示">
-          <div class="panel-in">
-            <div class="right-head">
-              <div>
-                <div class="right-title" id="rt">当客户上来就问价：先别报价</div>
-                <div class="right-desc" id="rd">用 3 个问题分层，先判断是不是高价值机会，再决定投入多少跟进成本。</div>
+        <div class="timeline">
+          <article class="story-block">
+            <div class="story-dot">早</div>
+            <div class="story-card">
+              <div class="story-time">早上 08:30</div>
+              <h3>不知道今天该怎么经营</h3>
+              <p class="story-lead">
+                老板打开后台，数据很多，但脑子更乱: 今天要推什么菜？哪个活动该停？哪些客户该回访？店铺问题到底出在哪？以前看了一堆数字，最后还是凭感觉做决定。
+              </p>
+              <div class="quote-box">
+                <p>
+                  今天最该做哪三件事？<br />
+                  先别让我看图表，先告诉我人话。
+                </p>
               </div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-                <a class="btn primary" id="openPage" href="./jarvis_sales_agent_prototype_html.html">打开演示</a>
-                <button class="btn" id="next" type="button">下一个功能点</button>
-              </div>
-            </div>
 
-            <div class="story">
-              <div class="story-title">这段故事你可以这样讲（带对话）</div>
-              <div class="bubbles" id="bubbles"></div>
-              <div class="chiprow" id="chips"></div>
-            </div>
-
-            <div class="preview-wrap" aria-label="演示缩略预览">
-              <a class="preview-link" id="previewLink" href="./jarvis_sales_agent_prototype_html.html" aria-label="打开演示"></a>
-              <iframe class="iframe" id="iframe" src="./jarvis_sales_agent_prototype_html.html" title="演示预览" loading="lazy"></iframe>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-
-    <script>
-      const FEATURES = [
-        {
-          id: "qualify",
-          title: "当客户上来就问价：先别报价（3 问分层）",
-          sub: "把线索分层：值不值得跟、跟到什么程度、下一步该问什么。",
-          href: "./jarvis_sales_agent_prototype_html.html",
-          pageTitle: "Sales OS（机会识别）",
-          chips: [
-            { t: "机会评分", c: "info" },
-            { t: "高价值标记", c: "theme" },
-            { t: "3 问分层", c: "warn" },
-          ],
-          bubbles: [
-            { who: "C", cls: "c", text: "你们多少钱？" },
-            {
-              who: "我",
-              cls: "me",
-              text:
-                "我先不报数字。我只问 3 个问题：\n1）你这次最想解决什么？\n2）你希望什么时候见到结果？\n3）预算大概在什么区间？\n\n因为先分层，才能决定我投入多少精力推进你。",
-            },
-            {
-              who: "AI",
-              cls: "ai",
-              text:
-                "系统把这条线索打上「高价值机会」或「低优先级」。\n你不用拍脑袋：机会评分 + 风险提醒会告诉你“值不值得跟”。",
-            },
-          ],
-        },
-        {
-          id: "anchor",
-          title: "当客户只聊价格：用价值锚定把对话拉回目标",
-          sub: "不打价格战：先讲差异化价值，再把对话推进到“约电话/看方案”。",
-          href: "./jarvis_sales_agent_prototype_html.html",
-          pageTitle: "Sales OS（价值锚定）",
-          chips: [
-            { t: "价值锚定", c: "theme" },
-            { t: "异议处理", c: "warn" },
-            { t: "可发送话术", c: "info" },
-          ],
-          bubbles: [
-            { who: "C", cls: "c", text: "别讲那么多，你就说能便宜多少？" },
-            {
-              who: "我",
-              cls: "me",
-              text:
-                "我理解你先关心价格。但我们这类项目差异不在“便宜”，在两点：\n1）动作拆解能不能落地；2）过程能不能复盘出结果。\n你更在意哪一个？我按你的目标给你一个 10 分钟的方案大纲，你再决定值不值。",
-            },
-            { who: "AI", cls: "ai", text: "系统给你 2 轮「价值锚定」话术 + 下一步 CTA（约电话/要资料），避免对话停在“价格”。" },
-          ],
-        },
-        {
-          id: "control",
-          title: "当客户要折扣/要承诺：高风险动作必须审批（可控自动化）",
-          sub: "该自动的自动；不该自动的必须审批或人工确认，避免越界与失控。",
-          href: "./jarvis_sales_agent_prototype_html.html",
-          pageTitle: "Sales OS（审批流程）",
-          chips: [
-            { t: "风险识别", c: "warn" },
-            { t: "审批流程", c: "danger" },
-            { t: "可控自动化", c: "info" },
-          ],
-          bubbles: [
-            { who: "C", cls: "c", text: "你能保证效果吗？不行就给我打个折。" },
-            { who: "我", cls: "me", text: "折扣和承诺属于高风险动作：我可以继续推进，但必须先走审批或我手动确认。" },
-            { who: "AI", cls: "ai", text: "系统识别关键词后，把“折扣/承诺”锁进审批；允许自动发：案例、价值提醒、约时间等低风险动作。" },
-          ],
-        },
-        {
-          id: "rhythm",
-          title: "当客户沉默：用低干扰跟进节奏，不靠记忆",
-          sub: "成交靠节奏：今天该跟谁、发什么、发到哪一步，系统帮你排好队。",
-          href: "./jarvis_sales_agent_prototype_html.html",
-          pageTitle: "Sales OS（跟进队列）",
-          chips: [
-            { t: "跟进队列", c: "info" },
-            { t: "价值提醒", c: "warn" },
-            { t: "不刷屏", c: "theme" },
-          ],
-          bubbles: [
-            { who: "C", cls: "c", text: "（已读不回）" },
-            { who: "我", cls: "me", text: "我不想尬追，也不想忘了。我要的是：不打扰但不丢单的节奏。" },
-            { who: "AI", cls: "ai", text: "系统给你 D1/D3/D7 的低干扰跟进：先约时间，再补案例，再做价值提醒。你每天 10 分钟按队列做完就行。" },
-          ],
-        },
-        {
-          id: "wechat",
-          title: "把动作落在微信里：可发送话术 + 可控流程",
-          sub: "功能不是“生成文本”，而是“帮你把动作发出去并跟到底”。",
-          href: "./wechat_agent.html",
-          pageTitle: "微信执行（话术/场景/流程）",
-          chips: [
-            { t: "场景化话术", c: "info" },
-            { t: "跟进提醒", c: "warn" },
-            { t: "可发送", c: "theme" },
-          ],
-          bubbles: [
-            { who: "C", cls: "c", text: "我考虑下吧。" },
-            { who: "我", cls: "me", text: "我不想再“那你考虑下”。我需要一句能推进到下一步的微信话术。" },
-            { who: "AI", cls: "ai", text: "系统把话术做成可发送模块：价值提醒、约时间、补充案例；同时给你下一步动作按钮，避免对话断掉。" },
-          ],
-        },
-      ];
-
-      const byId = (id) => document.getElementById(id);
-      const esc = (s) =>
-        String(s)
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;");
-
-      let active = 0;
-
-      function chipHtml(list){
-        return (list || [])
-          .map((c) => `<span class="chip ${esc(c.c || "")}">${esc(c.t || "")}</span>`)
-          .join("");
-      }
-
-      function renderList(){
-        const root = byId("list");
-        root.innerHTML = FEATURES.map((f, i) => {
-          const selected = i === active;
-          return `
-            <div class="item" tabindex="0" role="option" aria-selected="${selected}" data-i="${i}">
-              <div class="item-top">
-                <div>
-                  <div class="item-title">${esc(f.title)}</div>
-                  <div class="item-sub">${esc(f.sub)}</div>
+              <div class="module-grid">
+                <div class="module-panel">
+                  <div class="module-name">商业模式工作台 · 餐饮运营版</div>
+                  <h4>它像一个懂经营的人，先帮你看清楚今天的问题到底出在哪</h4>
+                  <p>
+                    不是跟你讲什么模型，而是直接告诉你: 你现在是客人来得少、下单不够、老客回头少，还是评价出了问题。看明白以后，下一步该做什么也会一起给出来。
+                  </p>
+                  <ul class="task-list">
+                    <li>先告诉你今天重点看什么，不用自己翻半天</li>
+                    <li>帮你判断问题更像客流少、转化低、复购弱，还是口碑差</li>
+                    <li>顺手给出建议: 推哪道菜、停哪个活动、先回访谁</li>
+                    <li>看完就能去做，不会停在“看懂了但没动”</li>
+                  </ul>
+                  <div class="module-actions">
+                    <a class="btn btn-primary" href="./business.html">打开商业模式工作台</a>
+                  </div>
+                  <div class="demo-preview">
+                    <div class="demo-head">
+                      <strong>点开前先看一眼</strong>
+                      <span>老板一眼能看到今天先抓什么</span>
+                    </div>
+                    <div class="demo-frame-wrap">
+                      <iframe class="demo-frame" src="./business.html" title="商业模式工作台预览" loading="lazy"></iframe>
+                    </div>
+                    <div class="demo-foot">这里能直接看到经营诊断、问题定位和今天该做的动作，不用光靠文字想象。</div>
+                  </div>
                 </div>
-                <span class="pill">#${i + 1}</span>
+
+                <div class="module-panel">
+                  <div class="module-name">用完这一段，你能得到什么</div>
+                  <ul class="flow-list">
+                    <li>先看出问题在哪</li>
+                    <li>再知道为什么会这样</li>
+                    <li>马上知道今天先做什么</li>
+                    <li>做完以后第二天还能继续看结果</li>
+                  </ul>
+                  <div class="status-strip">
+                    <div class="status-card">
+                      <em>以前</em>
+                      <strong>看了很多数据，还是不知道先做什么</strong>
+                    </div>
+                    <div class="status-card">
+                      <em>现在</em>
+                      <strong>打开后台就知道今天先抓哪件事</strong>
+                    </div>
+                    <div class="status-card">
+                      <em>以前</em>
+                      <strong>活动好不好，全靠感觉猜</strong>
+                    </div>
+                    <div class="status-card">
+                      <em>现在</em>
+                      <strong>该停还是该继续做，心里更有数</strong>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="chiprow">${chipHtml(f.chips)}</div>
             </div>
-          `;
-        }).join("");
-      }
+          </article>
 
-      function renderRight(){
-        const f = FEATURES[active];
-        byId("rt").textContent = f.title;
-        byId("rd").textContent = f.sub;
+          <article class="story-block">
+            <div class="story-dot">午</div>
+            <div class="story-card">
+              <div class="story-time">中午 13:40</div>
+              <h3>客户问了很多，但没人跟进</h3>
+              <p class="story-lead">
+                午饭高峰后，微信里来了很多咨询: 有人问团餐，有人问优惠，有人只是随便看看。老板忙着出餐，等想起来回复时，客户已经没兴趣了。以前靠脑子记，最后总有客户漏掉。
+              </p>
+              <div class="quote-box">
+                <p>
+                  以前靠老板自己记，现在工具帮你记。<br />
+                  以前靠感觉回复，现在有人提醒你下一句怎么接。
+                </p>
+              </div>
 
-        const open = byId("openPage");
-        open.href = f.href;
-        open.textContent = `打开演示：${f.pageTitle}`;
+              <div class="module-grid">
+                <div class="module-panel">
+                  <div class="module-name">微信成交助手 · 餐饮私域版</div>
+                  <h4>它不是只会回消息，而是会帮你把客户一单一单跟下去</h4>
+                  <p>
+                    重点不是自动回复，而是帮你分清谁值得跟、什么时候该跟、下一句该怎么说。客户一来，先分轻重，再排顺序，老板每天照着清单回就行。
+                  </p>
+                  <ul class="chat-list">
+                    <li>帮你分出来: 是随便问问，还是值得马上跟</li>
+                    <li>先帮你分好新客、老客、团餐、高意向这些类型</li>
+                    <li>不知道怎么接话时，会给你更顺的回复建议</li>
+                    <li>该回访的时候会提醒你，每天还有一张跟进清单</li>
+                  </ul>
+                  <div class="module-actions">
+                    <a class="btn btn-primary" href="./wechat_agent.html">打开微信成交助手</a>
+                  </div>
+                  <div class="demo-preview">
+                    <div class="demo-head">
+                      <strong>点开前先看一眼</strong>
+                      <span>看看客户怎么分轻重、怎么排队跟</span>
+                    </div>
+                    <div class="demo-frame-wrap">
+                      <iframe class="demo-frame" src="./wechat_agent.html" title="微信成交助手预览" loading="lazy"></iframe>
+                    </div>
+                    <div class="demo-foot">不用脑补“跟进助手”长什么样，直接能看到客户分组、待办提醒和跟进节奏。</div>
+                  </div>
+                </div>
 
-        const link = byId("previewLink");
-        link.href = f.href;
-
-        const iframe = byId("iframe");
-        iframe.src = f.href;
-        iframe.title = f.pageTitle;
-
-        const bubbles = byId("bubbles");
-        bubbles.innerHTML = (f.bubbles || [])
-          .map((b) => `
-            <div class="bubble">
-              <div class="who ${esc(b.cls || "")}">${esc(b.who || "")}</div>
-              <div class="msg">${esc(b.text || "")}</div>
+                <div class="module-panel">
+                  <div class="module-name">用完这一段，你能得到什么</div>
+                  <ul class="flow-list">
+                    <li>客户一来，先分轻重</li>
+                    <li>谁更容易成交，一眼能看出来</li>
+                    <li>该跟的人不会漏掉</li>
+                    <li>最后哪些人能成，心里更有底</li>
+                  </ul>
+                  <ul class="result-list">
+                    <li>以前客户流失了不知道，现在每天有一张跟进清单</li>
+                    <li>以前回复靠感觉，现在系统会提示更容易成交的话术</li>
+                    <li>以前忙起来顾不上，现在高意向客户不会再被漏掉</li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          `)
-          .join("");
+          </article>
 
-        byId("chips").innerHTML = chipHtml(f.chips);
-      }
+          <article class="story-block">
+            <div class="story-dot">晚</div>
+            <div class="story-card">
+              <div class="story-time">晚上 22:10</div>
+              <h3>今天做得好不好，不知道</h3>
+              <p class="story-lead">
+                忙了一天，老板只知道今天很累，但不知道为什么赚得多、为什么少、明天该怎么改。很多店的问题不是今天没努力，而是每天重复犯同样的错，却没有一个地方帮你把经验留下来。
+              </p>
+              <div class="quote-box">
+                <p>
+                  忙一天不怕，怕的是忙完了，还是不知道明天怎么改。
+                </p>
+              </div>
 
-      function setActive(i){
-        active = Math.max(0, Math.min(FEATURES.length - 1, i));
-        renderList();
-        renderRight();
-      }
+              <div class="module-grid">
+                <div class="module-panel">
+                  <div class="module-name">模拟开店训练舱 · 每日经营轨迹</div>
+                  <h4>它像一个练手的地方，让你少走弯路，少花冤枉钱</h4>
+                  <p>
+                    今天做了什么，结果怎么变，哪一步对了，哪一步要改，都会留下来。不是让你空想，而是帮你慢慢把经营感觉练出来。
+                  </p>
+                  <ul class="task-list">
+                    <li>把你今天做过的事都按顺序记下来</li>
+                    <li>看这些动作对客流、下单和利润有什么影响</li>
+                    <li>帮你看哪一步做对了，哪一步别再继续</li>
+                    <li>顺手告诉你明天先改什么</li>
+                  </ul>
+                  <div class="module-actions">
+                    <a class="btn btn-primary" href="./store_simulator.html">打开模拟开店训练舱</a>
+                  </div>
+                  <div class="demo-preview">
+                    <div class="demo-head">
+                      <strong>点开前先看一眼</strong>
+                      <span>看看一天做下来，结果怎么被记下来</span>
+                    </div>
+                    <div class="demo-frame-wrap">
+                      <iframe class="demo-frame" src="./store_simulator.html" title="模拟开店训练舱预览" loading="lazy"></iframe>
+                    </div>
+                    <div class="demo-foot">这里能看到每天的经营变化和复盘结果，用户更容易明白“用了以后会看到什么”。</div>
+                  </div>
+                </div>
 
-      function bind(){
-        renderList();
-        renderRight();
+                <div class="module-panel">
+                  <div class="module-name">用完这一段，你能得到什么</div>
+                  <ul class="flow-list">
+                    <li>今天怎么做，有记录</li>
+                    <li>做完以后，结果看得见</li>
+                    <li>哪里做对，哪里做错，能复盘</li>
+                    <li>明天不再从头猜</li>
+                  </ul>
+                  <div class="status-strip">
+                    <div class="status-card">
+                      <em>以前</em>
+                      <strong>只知道今天累，不知道哪里赚了钱</strong>
+                    </div>
+                    <div class="status-card">
+                      <em>现在</em>
+                      <strong>知道哪一步带来了客流和利润</strong>
+                    </div>
+                    <div class="status-card">
+                      <em>以前</em>
+                      <strong>明天继续凭感觉试</strong>
+                    </div>
+                    <div class="status-card">
+                      <em>现在</em>
+                      <strong>第二天该怎么调，心里会更清楚</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
 
-        byId("next").addEventListener("click", () => setActive(active + 1));
+      <section class="section" id="loop" aria-labelledby="loop-title">
+        <div class="loop-band">
+          <div class="section-label">最关键的一屏</div>
+          <div class="loop-title" id="loop-title">看清问题、知道怎么做、客户有人跟，店里的经营才会越做越顺</div>
+          <div class="loop-sub">
+            开店最怕的不是没数据，而是每天都在重复犯同样的错。这套东西的价值，就是让你今天做的每一步，明天都能接得上。
+          </div>
+          <div class="loop-grid">
+            <div class="loop-step">
+              <span class="num">1</span>
+              <strong>发现问题</strong>
+              <span>先知道今天是流量问题、转化问题，还是复购问题。</span>
+            </div>
+            <div class="loop-step">
+              <span class="num">2</span>
+              <strong>看明白原因</strong>
+              <span>把复杂数据讲成人话，不用自己瞎猜。</span>
+            </div>
+            <div class="loop-step">
+              <span class="num">3</span>
+              <strong>知道先做什么</strong>
+              <span>告诉你今天该推什么、该停什么、该先跟谁。</span>
+            </div>
+            <div class="loop-step">
+              <span class="num">4</span>
+              <strong>店里照着去做</strong>
+              <span>动作落到微信、活动和门店现场，不再停在报表里。</span>
+            </div>
+            <div class="loop-step">
+              <span class="num">5</span>
+              <strong>结果留下来</strong>
+              <span>客户有没有成交、活动有没有效果，后面都查得到。</span>
+            </div>
+            <div class="loop-step">
+              <span class="num">6</span>
+              <strong>第二天接着调</strong>
+              <span>每天不是重新开始，而是顺着昨天的结果继续往前走。</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        byId("list").addEventListener("click", (e) => {
-          const el = e.target.closest("[data-i]");
-          if (!el) return;
-          setActive(parseInt(el.getAttribute("data-i"), 10));
-        });
+      <section class="section" aria-labelledby="relation-title">
+        <div class="section-head">
+          <div class="section-label">这套工具怎么配合着用</div>
+          <h2 id="relation-title">这三部分配合起来，才是一套真正能落到店里的经营方法</h2>
+          <p>
+            合在一起，就是先想明白，再做明白，再把客户接住。不是看起来热闹，而是真能落到每天经营里。
+          </p>
+        </div>
 
-        byId("list").addEventListener("keydown", (e) => {
-          if (e.key !== "Enter" && e.key !== " ") return;
-          const el = e.target.closest("[data-i]");
-          if (!el) return;
-          e.preventDefault();
-          setActive(parseInt(el.getAttribute("data-i"), 10));
-        });
-      }
+        <div class="relation-grid">
+          <article class="relation-card">
+            <span class="tag">先把判断练出来</span>
+            <h3>模拟开店训练舱</h3>
+            <p>先把经营感觉练出来，知道不同活动、菜品和节奏会带来什么结果。</p>
+            <a class="btn btn-soft" href="./store_simulator.html">查看训练舱</a>
+          </article>
 
-      bind();
-    </script>
+          <article class="relation-card">
+            <span class="tag">帮你看清店里问题</span>
+            <h3>商业模式工作台</h3>
+            <p>店里的真实情况一进来，就帮你看出问题在哪，下一步该怎么做。</p>
+            <a class="btn btn-soft" href="./business.html">查看工作台</a>
+          </article>
+
+          <article class="relation-card">
+            <span class="tag">把该跟的客户跟住</span>
+            <h3>微信成交助手</h3>
+            <p>把客户按轻重缓急排好，提醒你什么时候跟、怎么跟，尽量别把单子漏掉。</p>
+            <a class="btn btn-soft" href="./wechat_agent.html">查看微信助手</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="fit" aria-labelledby="fit-title">
+        <div class="section-head">
+          <div class="section-label">适合谁用</div>
+          <h2 id="fit-title">这不是给人看看热闹的，是给真正在店里忙的人用的</h2>
+          <p>
+            所以这里尽量不讲术语。真正会用它的人，往往不是天天看产品网站的人，而是天天在店里忙、没空绕弯子的人。
+          </p>
+        </div>
+
+        <div class="audience-grid">
+          <article class="audience-card">
+            <span class="tag">开店老板</span>
+            <h3>每天很忙，但总觉得生意没抓住重点</h3>
+            <p>想知道今天先做什么，不想看了一堆数字以后还得自己猜。</p>
+          </article>
+          <article class="audience-card">
+            <span class="tag">门店运营</span>
+            <h3>店里有活动、有私域，但执行总是断</h3>
+            <p>需要有人把每天的事排成清单，把客户跟进这件事接起来。</p>
+          </article>
+          <article class="audience-card">
+            <span class="tag">准备开新店的人</span>
+            <h3>想少走弯路，先练判断，再真上手</h3>
+            <p>想在真花钱之前，先把一些经营判断练明白，别边亏边学。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section cta-wrap" id="cta" aria-labelledby="cta-title">
+        <div class="cta-banner">
+          <div class="section-label">现在就该看一眼</div>
+          <h2 id="cta-title">如果你店里也常遇到这些情况，可以先看看这套东西适不适合你</h2>
+          <p>
+            店里不是没数据，是看完还是不知道怎么办。客户不是没来过，是来过以后没人接着跟。忙了一天，说不清今天到底赚在哪、亏在哪。与其再换一个表，不如先看看这套方法适不适合你的店。
+          </p>
+
+          <div class="cta-grid">
+            <article class="cta-card">
+              <h3>让我看看我的店适不适合</h3>
+              <p>先看看你店里的情况，再判断这套东西值不值得上。</p>
+              <a class="btn btn-primary" href="./ppt.html">先听 60 秒讲解</a>
+            </article>
+
+            <article class="cta-card">
+              <h3>领一份餐饮经营诊断</h3>
+              <p>先看你的问题更像客流、下单、复购，还是客户跟进出了问题。</p>
+              <a class="btn btn-primary" href="./business.html">先看看店里问题</a>
+            </article>
+
+            <article class="cta-card">
+              <h3>加微信，体验一次老板日报</h3>
+              <p>看看每天会怎么提醒你先做哪几件事，再决定要不要上手。</p>
+              <a class="btn btn-primary" href="./wechat_agent.html">体验微信助手</a>
+            </article>
+
+            <article class="cta-card">
+              <h3>看看怎么帮我把客户跟住</h3>
+              <p>不讲概念，直接看客户怎么分轻重、怎么回访、怎么排成清单。</p>
+              <a class="btn btn-primary" href="./store_simulator.html">看模拟开店训练舱</a>
+            </article>
+          </div>
+
+          <div class="footer-note">
+            这页不是让你马上注册的，而是想让你先看明白: 你店里的问题在哪，这套东西能帮到哪一步。
+          </div>
+        </div>
+      </section>
+    </main>
   </body>
 </html>

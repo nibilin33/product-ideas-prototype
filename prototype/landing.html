@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI餐饮经营军师｜高转化落地页</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #fff8ef;
+      color: #2b1d13;
+      line-height: 1.65;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .page {
+      overflow: hidden;
+    }
+
+    .section {
+      padding: 72px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #ffe9c8;
+      color: #9a4a00;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 720px;
+      display: flex;
+      align-items: center;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 181, 92, 0.35), transparent 30%),
+        radial-gradient(circle at 85% 20%, rgba(255, 74, 74, 0.18), transparent 32%),
+        linear-gradient(135deg, #fff7e8 0%, #fff1dc 48%, #ffe2be 100%);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 72px);
+      line-height: 1.08;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 span {
+      color: #e64016;
+    }
+
+    .hero-subtitle {
+      font-size: 22px;
+      color: #5d4030;
+      margin-bottom: 32px;
+      max-width: 620px;
+    }
+
+    .hero-points {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 34px;
+    }
+
+    .hero-point {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .check {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #12b76a;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      font-size: 16px;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      padding: 0 24px;
+      border-radius: 999px;
+      font-size: 18px;
+      font-weight: 800;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f04438, #f97316);
+      color: #fff;
+      box-shadow: 0 16px 34px rgba(240, 68, 56, 0.28);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 38px rgba(240, 68, 56, 0.34);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: #6b2b0f;
+      border: 1px solid #ffd7a3;
+    }
+
+    .hero-note {
+      margin-top: 18px;
+      color: #7a5a42;
+      font-size: 14px;
+    }
+
+    .phone-card {
+      position: relative;
+      background: #20130c;
+      border-radius: 38px;
+      padding: 18px;
+      box-shadow: 0 28px 70px rgba(79, 35, 12, 0.28);
+      transform: rotate(2deg);
+    }
+
+    .phone-screen {
+      background: #fffaf3;
+      border-radius: 28px;
+      padding: 22px;
+      min-height: 560px;
+    }
+
+    .phone-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-weight: 800;
+      color: #3a2417;
+    }
+
+    .profit-card {
+      background: linear-gradient(135deg, #ff4d2e, #ff9f1c);
+      color: #fff;
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 16px 34px rgba(255, 102, 38, 0.24);
+    }
+
+    .profit-card .label {
+      font-size: 15px;
+      opacity: 0.92;
+      margin-bottom: 8px;
+    }
+
+    .profit-card .money {
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .mini-card {
+      background: #fff;
+      border: 1px solid #f5d8b1;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .mini-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 17px;
+    }
+
+    .mini-card p {
+      color: #77553e;
+      font-size: 15px;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+
+    .section-title h2 {
+      font-size: clamp(32px, 4vw, 52px);
+      line-height: 1.15;
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+    }
+
+    .section-title p {
+      font-size: 20px;
+      color: #70513b;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .pain-card {
+      background: #fff;
+      border: 1px solid #f3d7b5;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 12px 28px rgba(111, 67, 28, 0.06);
+    }
+
+    .pain-icon {
+      font-size: 36px;
+      margin-bottom: 14px;
+    }
+
+    .pain-card h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .pain-card p {
+      color: #755742;
+      font-size: 16px;
+    }
+
+    .story-section {
+      background: #2a160c;
+      color: #fff;
+    }
+
+    .story-section .section-title p {
+      color: #ffdcb5;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 28px;
+    }
+
+    .story-card {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 28px;
+      align-items: stretch;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 32px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+    }
+
+    .story-time {
+      color: #ffb45c;
+      font-weight: 900;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .story-copy h3 {
+      font-size: 32px;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .story-copy p {
+      color: #f9dfc2;
+      font-size: 18px;
+      margin-bottom: 18px;
+    }
+
+    .result-box {
+      background: #fff4e6;
+      color: #3b2414;
+      border-radius: 22px;
+      padding: 20px;
+      margin-top: 18px;
+    }
+
+    .result-box strong {
+      color: #e64016;
+      font-size: 24px;
+    }
+
+    .demo-panel {
+      background: #fffaf3;
+      color: #2b1d13;
+      border-radius: 26px;
+      padding: 22px;
+      min-height: 100%;
+    }
+
+    .demo-title {
+      font-weight: 900;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .step-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .step {
+      display: flex;
+      gap: 12px;
+      background: #fff;
+      border: 1px solid #f2d5ae;
+      border-radius: 18px;
+      padding: 14px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #f97316;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .step strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .step span {
+      color: #755742;
+      font-size: 14px;
+    }
+
+    .loop-section {
+      background: #fff;
+    }
+
+    .loop-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .loop-card {
+      background: #fff8ef;
+      border: 1px solid #f1d1a9;
+      border-radius: 28px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loop-card::after {
+      content: "";
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(249, 115, 22, 0.12);
+      right: -32px;
+      top: -34px;
+    }
+
+    .loop-card h3 {
+      font-size: 26px;
+      margin-bottom: 14px;
+    }
+
+    .loop-card p {
+      color: #6d4e38;
+      margin-bottom: 18px;
+    }
+
+    .loop-flow {
+      display: grid;
+      gap: 10px;
+      font-weight: 800;
+    }
+
+    .loop-flow div {
+      background: #fff;
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid #f4d8b3;
+    }
+
+    .loop-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 18px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #e64016;
+    }
+
+    .loop-link:hover {
+      text-decoration: underline;
+    }
+
+    .demo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #e64016;
+      background: #fff4ee;
+      border: 1px solid #f9c8b2;
+      border-radius: 999px;
+      padding: 6px 16px;
+    }
+
+    .demo-link:hover {
+      background: #ffe6d8;
+    }
+
+    /* ── iframe 缩放预览 ── */
+    .demo-panel {
+      min-height: 0;
+    }
+
+    .iframe-wrap {
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #080c10;
+      margin: 12px 0 8px;
+    }
+
+    .iframe-wrap iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border: none;
+      pointer-events: none;
+      transform-origin: top left;
+      display: block;
+    }
+
+    .loop-preview {
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #080c10;
+      margin-top: 18px;
+    }
+
+    .loop-preview iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border: none;
+      pointer-events: none;
+      transform-origin: top left;
+      display: block;
+    }
+
+    .preview-fade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 50%, rgba(8,12,16,0.75) 100%);
+      pointer-events: none;
+    }
+
+    .proof {
+      background: linear-gradient(135deg, #fff0d7, #ffe1bd);
+    }
+
+    .quote-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .quote-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid #efcda4;
+      box-shadow: 0 14px 30px rgba(93, 48, 14, 0.08);
+    }
+
+    .quote-card p {
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .quote-card span {
+      color: #7b5a40;
+      font-size: 14px;
+    }
+
+    .fit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .fit-card {
+      background: #fff;
+      border: 1px solid #efd2ae;
+      border-radius: 28px;
+      padding: 28px;
+    }
+
+    .fit-card .num {
+      color: #e64016;
+      font-size: 40px;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 14px;
+    }
+
+    .fit-card h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .fit-card p {
+      color: #70513b;
+    }
+
+    .final-cta {
+      background: #20130c;
+      color: #fff;
+      text-align: center;
+      padding: 88px 20px;
+    }
+
+    .final-cta h2 {
+      font-size: clamp(36px, 5vw, 62px);
+      line-height: 1.12;
+      margin-bottom: 20px;
+    }
+
+    .final-cta p {
+      color: #ffdcb5;
+      font-size: 21px;
+      margin-bottom: 30px;
+    }
+
+    .gift-box {
+      max-width: 760px;
+      margin: 28px auto 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .gift-box div {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 18px;
+      padding: 16px;
+      color: #ffe7cd;
+      font-weight: 700;
+    }
+
+    .sticky-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 720px;
+      background: rgba(32, 19, 12, 0.92);
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 12px 10px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.24);
+      backdrop-filter: blur(10px);
+      z-index: 20;
+    }
+
+    .sticky-bar span {
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .sticky-bar .btn {
+      min-height: 42px;
+      padding: 0 18px;
+      font-size: 15px;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .story-card,
+      .pain-grid,
+      .loop-grid,
+      .quote-grid,
+      .fit-grid,
+      .gift-box {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: 48px;
+      }
+
+      .phone-card {
+        transform: none;
+      }
+
+      .section {
+        padding: 56px 18px;
+      }
+
+      .sticky-bar {
+        border-radius: 24px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .sticky-bar .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero section">
+      <div class="container hero-grid">
+        <div>
+          <div class="badge">🍜 给餐饮老板的 AI 经营军师</div>
+          <h1>别再靠感觉开店，<span>每天让 AI 帮你多赚一点</span></h1>
+          <p class="hero-subtitle">
+            从开店判断、日常运营、微信成交到每日复盘，把餐饮经营变成一套看得懂、能执行、能闭环的赚钱系统。
+          </p>
+          <div class="hero-points">
+            <div class="hero-point"><span class="check">✓</span> 今天哪里漏钱，AI 直接告诉你</div>
+            <div class="hero-point"><span class="check">✓</span> 哪些客户快成交，AI 自动提醒跟进</div>
+            <div class="hero-point"><span class="check">✓</span> 明天该做什么，AI 每晚帮你复盘</div>
+          </div>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#diagnosis">免费领取 AI 经营诊断</a>
+            <a class="btn btn-secondary" href="#story">看老板的一天</a>
+          </div>
+          <p class="hero-note">不讲复杂系统，先看你的店今天可能漏了多少钱。</p>
+        </div>
+
+        <div class="phone-card">
+          <div class="phone-screen">
+            <div class="phone-top">
+              <span>今日老板日报</span>
+              <span>20:38</span>
+            </div>
+            <div class="profit-card">
+              <div class="label">AI 预计今日可追回收入</div>
+              <div class="money">¥2,300</div>
+            </div>
+            <div class="mini-card">
+              <strong>⚠️ 问题 1：午市点击率下降</strong>
+              <p>建议把“招牌双人餐”放到首页第一位。</p>
+            </div>
+            <div class="mini-card">
+              <strong>🔥 机会 2：3 个客户高意向未成交</strong>
+              <p>建议 30 分钟内回访，系统已生成话术。</p>
+            </div>
+            <div class="mini-card">
+              <strong>📘 复盘 3：今天活动有效</strong>
+              <p>晚市套餐转化提升，明天建议继续保留。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-title">
+          <h2>很多老板不是不努力，是每天都不知道问题出在哪</h2>
+          <p>忙了一天，只知道累；看了一堆数据，还是不知道明天该怎么干。</p>
+        </div>
+        <div class="pain-grid">
+          <div class="pain-card">
+            <div class="pain-icon">💸</div>
+            <h3>营业额掉了</h3>
+            <p>不知道是流量少、菜单差，还是客户不回头。</p>
+          </div>
+          <div class="pain-card">
+            <div class="pain-icon">💬</div>
+            <h3>微信客户跑了</h3>
+            <p>问完价格就没消息，忙起来也忘了跟。</p>
+          </div>
+          <div class="pain-card">
+            <div class="pain-icon">📉</div>
+            <h3>活动没效果</h3>
+            <p>钱花了，券发了，但到底有没有赚回来不清楚。</p>
+          </div>
+          <div class="pain-card">
+            <div class="pain-icon">🤯</div>
+            <h3>想开分店</h3>
+            <p>经验都在老板脑子里，复制出去风险很大。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="story" class="story-section section">
+      <div class="container">
+        <div class="section-title">
+          <h2>看一个餐饮老板，如何用 AI 经营一天</h2>
+          <p>不是学高科技，而是每天多一个会提醒、会复盘、会算账的经营助手。</p>
+        </div>
+
+        <div class="timeline">
+          <div class="story-card">
+            <div class="story-copy">
+              <div class="story-time">上午 10:00｜开门前</div>
+              <h3>AI 发现：今天午市可能少赚 3000</h3>
+              <p>系统发现首页点击率下降、老客回流少，于是直接告诉老板今天该做哪三件事。</p>
+              <div class="result-box">
+                <strong>结果：晚市追回 ¥2,300</strong><br />
+                老板不用看复杂图表，只看“问题、动作、结果”。
+              </div>
+            </div>
+            <div class="demo-panel">
+              <div class="demo-title">商业模式工作台 · 餐饮运营版</div>
+              <div class="iframe-wrap" data-nw="1280" data-nh="820">
+                <iframe src="business.html" scrolling="no" loading="lazy" title="商业模式工作台预览"></iframe>
+              </div>
+              <a class="demo-link" href="business.html" target="_blank">进入工作台，开始经营诊断 →</a>
+            </div>
+          </div>
+
+          <div class="story-card">
+            <div class="story-copy">
+              <div class="story-time">下午 3:00｜高峰过后</div>
+              <h3>AI 提醒：有 3 个客户快成交了，别让他们跑</h3>
+              <p>客户加微信问完价格没回复，系统判断是高意向客户，并自动生成回访话术。</p>
+              <div class="result-box">
+                <strong>结果：追回 2 单，多赚 ¥480</strong><br />
+                以前靠老板记，现在系统帮你盯。
+              </div>
+            </div>
+            <div class="demo-panel">
+              <div class="demo-title">微信成交助手 · 餐饮私域版</div>
+              <div class="iframe-wrap" data-nw="1280" data-nh="820">
+                <iframe src="wechat_agent.html" scrolling="no" loading="lazy" title="微信成交助手预览"></iframe>
+              </div>
+              <a class="demo-link" href="wechat_agent.html" target="_blank">进入成交助手，盯住高意向客户 →</a>
+            </div>
+          </div>
+
+          <div class="story-card">
+            <div class="story-copy">
+              <div class="story-time">晚上 10:30｜关店后</div>
+              <h3>AI 复盘：今天为什么赚，明天怎么继续赚</h3>
+              <p>系统把今天做过的动作、客户反馈、营业结果串起来，让老板知道哪些经验值得保留。</p>
+              <div class="result-box">
+                <strong>结果：老板越来越会经营</strong><br />
+                不是靠运气赚钱，而是每天训练判断力。
+              </div>
+            </div>
+            <div class="demo-panel">
+              <div class="demo-title">模拟开店训练舱 · 每日经营轨迹</div>
+              <div class="iframe-wrap" data-nw="1280" data-nh="820">
+                <iframe src="store_simulator.html" scrolling="no" loading="lazy" title="模拟开店训练舱预览"></iframe>
+              </div>
+              <a class="demo-link" href="store_simulator.html" target="_blank">进入训练舱，模拟今天的经营决策 →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="loop-section section">
+      <div class="container">
+        <div class="section-title">
+          <h2>每个功能点，都不是展示功能，而是完成一个赚钱闭环</h2>
+          <p>低门槛、看得懂、有结果，才愿意继续用。</p>
+        </div>
+        <div class="loop-grid">
+          <div class="loop-card">
+            <h3>赚钱闭环</h3>
+            <p>适合解决营业额下降、活动没效果、外卖转化差。</p>
+            <div class="loop-flow">
+              <div>发现问题</div>
+              <div>分析原因</div>
+              <div>给出动作</div>
+              <div>看到收益</div>
+            </div>
+            <div class="loop-preview" data-nw="960" data-nh="640">
+              <iframe src="business.html" scrolling="no" loading="lazy" title="商业模式工作台"></iframe>
+              <div class="preview-fade"></div>
+            </div>
+            <a class="loop-link" href="business.html" target="_blank">体验商业模式工作台 →</a>
+          </div>
+          <div class="loop-card">
+            <h3>成交闭环</h3>
+            <p>适合解决客户加微信不下单、团餐客户流失。</p>
+            <div class="loop-flow">
+              <div>客户进来</div>
+              <div>判断意向</div>
+              <div>自动跟进</div>
+              <div>成交沉淀</div>
+            </div>
+            <div class="loop-preview" data-nw="960" data-nh="640">
+              <iframe src="wechat_agent.html" scrolling="no" loading="lazy" title="微信成交助手"></iframe>
+              <div class="preview-fade"></div>
+            </div>
+            <a class="loop-link" href="wechat_agent.html" target="_blank">体验微信成交助手 →</a>
+          </div>
+          <div class="loop-card">
+            <h3>成长闭环</h3>
+            <p>适合解决老板不会复盘、想开分店但经验不可复制。</p>
+            <div class="loop-flow">
+              <div>每日练习</div>
+              <div>模拟选择</div>
+              <div>AI 复盘</div>
+              <div>越做越会</div>
+            </div>
+            <div class="loop-preview" data-nw="960" data-nh="640">
+              <iframe src="store_simulator.html" scrolling="no" loading="lazy" title="模拟开店训练舱"></iframe>
+              <div class="preview-fade"></div>
+            </div>
+            <a class="loop-link" href="store_simulator.html" target="_blank">体验模拟开店训练舱 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="proof section">
+      <div class="container">
+        <div class="section-title">
+          <h2>老板最喜欢的，不是高科技</h2>
+          <p>而是每天能看见这些变化。</p>
+        </div>
+        <div class="quote-grid">
+          <div class="quote-card">
+            <p>“终于知道钱漏在哪。”</p>
+            <span>每天不是只看流水，而是知道问题原因。</span>
+          </div>
+          <div class="quote-card">
+            <p>“客户不会白白跑掉。”</p>
+            <span>微信客户有人盯，有人提醒，有话术。</span>
+          </div>
+          <div class="quote-card">
+            <p>“员工知道今天干什么。”</p>
+            <span>AI 输出执行清单，老板不用反复交代。</span>
+          </div>
+          <div class="quote-card">
+            <p>“开店不再全靠猜。”</p>
+            <span>每天复盘，每天训练，经验能沉淀下来。</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-title">
+          <h2>特别适合这 3 类餐饮老板</h2>
+          <p>不是所有店都需要复杂系统，但这些老板最容易马上看到价值。</p>
+        </div>
+        <div class="fit-grid">
+          <div class="fit-card">
+            <div class="num">01</div>
+            <h3>店里很忙，但利润越来越薄</h3>
+            <p>每天有人买，但不知道为什么赚不到钱，需要 AI 帮你找漏点。</p>
+          </div>
+          <div class="fit-card">
+            <div class="num">02</div>
+            <h3>微信客户多，但成交很低</h3>
+            <p>客户咨询后没下文，需要系统帮你识别意向、提醒回访。</p>
+          </div>
+          <div class="fit-card">
+            <div class="num">03</div>
+            <h3>想开分店，但不会复制经验</h3>
+            <p>老板经验都在脑子里，需要每日复盘，把经营方法沉淀下来。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="diagnosis" class="final-cta">
+      <div class="container">
+        <h2>先别急着买系统，先看看你的店一天漏多少钱</h2>
+        <p>加微信，免费领取一次 AI 餐饮经营诊断。</p>
+        <a class="btn btn-primary" href="javascript:void(0)">免费领取 AI 经营诊断</a>
+        <div class="gift-box">
+          <div>看店铺赚钱漏洞</div>
+          <div>看客户成交卡点</div>
+          <div>给明天 3 个动作</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="sticky-bar">
+    <span>想知道你的店今天可能漏了多少钱？</span>
+    <a class="btn btn-primary" href="#diagnosis">免费诊断</a>
+  </div>
+
+  <script>
+    function scaleIframes() {
+      document.querySelectorAll('.iframe-wrap, .loop-preview').forEach(function(el) {
+        var iframe = el.querySelector('iframe');
+        if (!iframe) return;
+        var nw = parseInt(el.dataset.nw || 1280);
+        var nh = parseInt(el.dataset.nh || 800);
+        var scale = el.clientWidth / nw;
+        iframe.style.width = nw + 'px';
+        iframe.style.height = nh + 'px';
+        iframe.style.transform = 'scale(' + scale + ')';
+        el.style.height = Math.round(nh * scale) + 'px';
+      });
+    }
+    scaleIframes();
+    window.addEventListener('resize', scaleIframes);
+  </script>
+</body>
+</html>
