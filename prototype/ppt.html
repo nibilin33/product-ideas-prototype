@@ -127,6 +127,37 @@
       #dot-nav { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); display:flex; gap:6px; z-index:100; }
       .dot { width:6px; height:6px; border-radius:9999px; background:rgba(255,255,255,0.2); transition:all 0.3s ease; cursor:pointer; }
       .dot.active { width:20px; background:rgba(52,211,153,0.8); }
+      .slide-anchor {
+        position: fixed;
+        top: 50%;
+        z-index: 120;
+        width: 44px;
+        height: 44px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.06);
+        color: rgba(244,244,245,0.86);
+        backdrop-filter: blur(14px);
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        line-height: 1;
+        font-weight: 900;
+        cursor: pointer;
+        transform: translateY(-50%);
+        transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+      }
+      .slide-anchor:hover {
+        background: rgba(52,211,153,0.14);
+        transform: translateY(-50%) scale(1.04);
+      }
+      .slide-anchor:disabled {
+        opacity: 0.22;
+        cursor: default;
+        pointer-events: none;
+      }
+      .slide-anchor.prev { left: 24px; }
+      .slide-anchor.next { right: 24px; }
       .act-num { font-size:96px; font-weight:900; line-height:1; background:linear-gradient(135deg,rgba(52,211,153,0.9),rgba(34,211,238,0.5)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-align:center; }
       .act-label { font-size:18px; font-weight:900; color:rgba(244,244,245,0.9); text-align:center; margin-top:4px; }
       .act-range { font-size:12px; color:rgba(244,244,245,0.4); text-align:center; margin-top:8px; letter-spacing:0.08em; }
@@ -134,6 +165,175 @@
       .change-dot { width:8px; height:8px; border-radius:9999px; background:rgba(52,211,153,0.8); flex-shrink:0; margin-top:5px; }
       .change-text { font-size:13px; line-height:1.6; color:rgba(244,244,245,0.75); }
       .change-text strong { color:rgba(244,244,245,0.95); font-weight:900; }
+      .talk-card {
+        width: 100%;
+        max-width: 760px;
+        text-align: left;
+      }
+      .talk-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        height: 28px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: rgba(240,179,72,0.12);
+        border: 1px solid rgba(240,179,72,0.22);
+        color: #ffd797;
+        font-size: 12px;
+        font-weight: 900;
+        margin-bottom: 18px;
+      }
+      .talk-title {
+        font-size: clamp(34px, 7vw, 58px);
+        line-height: 1.08;
+        font-weight: 950;
+        color: rgba(244,244,245,0.98);
+        letter-spacing: 0;
+      }
+      .talk-title span {
+        color: #9cf6da;
+      }
+      .talk-sub {
+        margin-top: 18px;
+        font-size: 18px;
+        line-height: 1.75;
+        color: rgba(244,244,245,0.7);
+        font-weight: 700;
+      }
+      .talk-grid {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .talk-point {
+        padding: 16px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.045);
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+      .talk-point em {
+        display: block;
+        color: rgba(52,211,153,0.86);
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 900;
+        margin-bottom: 8px;
+      }
+      .talk-point strong {
+        display: block;
+        color: rgba(244,244,245,0.95);
+        font-size: 16px;
+        line-height: 1.45;
+      }
+      .phone-demo {
+        margin-top: 24px;
+        padding: 16px;
+        border-radius: 26px;
+        background: linear-gradient(180deg, #102024, #050708);
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 0 26px 70px rgba(0,0,0,0.36);
+      }
+      .phone-screen {
+        border-radius: 20px;
+        padding: 18px;
+        background:
+          radial-gradient(circle at 14% 10%, rgba(34,211,238,0.16), transparent 30%),
+          radial-gradient(circle at 92% 8%, rgba(52,211,153,0.18), transparent 28%),
+          linear-gradient(180deg, rgba(13,31,36,0.98), rgba(7,12,14,0.98));
+      }
+      .phone-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 12px;
+        font-weight: 900;
+        color: rgba(244,244,245,0.9);
+      }
+      .phone-pill {
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: rgba(52,211,153,0.14);
+        color: #9cf6da;
+        font-size: 10px;
+      }
+      .money-card {
+        margin-top: 14px;
+        padding: 18px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #22c55e, #22d3ee);
+        color: #fff;
+      }
+      .money-card em {
+        display: block;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 800;
+        opacity: 0.9;
+      }
+      .money-card strong {
+        display: block;
+        margin-top: 5px;
+        font-size: 38px;
+        line-height: 1;
+        font-weight: 950;
+      }
+      .todo-list {
+        margin-top: 12px;
+        display: grid;
+        gap: 9px;
+      }
+      .todo-item {
+        display: grid;
+        grid-template-columns: 26px minmax(0, 1fr);
+        gap: 10px;
+        align-items: center;
+        padding: 12px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.055);
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+      .todo-item em {
+        width: 26px;
+        height: 26px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: rgba(52,211,153,0.16);
+        color: #9cf6da;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 950;
+      }
+      .todo-item strong {
+        display: block;
+        color: rgba(244,244,245,0.94);
+        font-size: 14px;
+      }
+      .todo-item span {
+        display: block;
+        margin-top: 2px;
+        color: rgba(244,244,245,0.58);
+        font-size: 12px;
+      }
+      .final-actions {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .final-action {
+        display: block;
+        padding: 16px;
+        border-radius: 16px;
+        background: rgba(52,211,153,0.1);
+        border: 1px solid rgba(52,211,153,0.18);
+        color: rgba(244,244,245,0.94);
+        font-size: 15px;
+        font-weight: 900;
+        text-align: center;
+      }
       .cover-typewrap {
         max-width: 480px;
         margin: 0 auto;
@@ -260,6 +460,38 @@
       }
 
       @media (max-width: 640px) {
+        body {
+          overflow: hidden;
+        }
+        .slide {
+          padding: 34px 18px;
+        }
+        .slide-anchor {
+          top: auto;
+          bottom: 58px;
+          width: 38px;
+          height: 38px;
+          font-size: 20px;
+        }
+        .slide-anchor.prev {
+          left: 18px;
+        }
+        .slide-anchor.next {
+          right: 18px;
+        }
+        .gcard {
+          padding: 24px 18px;
+        }
+        .talk-title {
+          font-size: 32px;
+        }
+        .talk-sub {
+          font-size: 15px;
+        }
+        .talk-grid,
+        .final-actions {
+          grid-template-columns: 1fr;
+        }
         .type-line {
           font-size: 28px;
           line-height: 1.25;
@@ -284,58 +516,147 @@
     <div id="dot-nav"></div>
     <div id="progress-bar"></div>
     <div id="slide-counter"></div>
+    <button class="slide-anchor prev" id="prev-slide" type="button" aria-label="上一页">‹</button>
+    <button class="slide-anchor next" id="next-slide" type="button" aria-label="下一页">›</button>
 
     <div id="deck">
 
-      <!-- SLIDE 0 COVER -->
+      <!-- SLIDE 0 -->
       <div class="slide active" data-index="0">
-        <div class="gcard" style="text-align:center;padding:40px 28px;max-width:680px;">
-          <div class="cover-typewrap" style="margin-bottom:16px;">
-            <div class="type-block">
-              <div class="type-line" style="--typing-duration:0.7s; --delay:0.15s;"><span class="type-seg">我朋友开</span><span class="type-seg type-seg--accent">餐饮店</span><span class="type-seg">，</span></div>
-              <div class="type-line" style="--typing-duration:0.9s; --delay:0.95s;"><span class="type-seg">花了</span><span class="type-seg type-seg--warn">一万多</span><span class="type-seg">学</span><span class="type-seg type-seg--accent">短视频</span><span class="type-seg">，</span></div>
-              <div class="type-line done-caret" style="--typing-duration:0.45s; --delay:1.95s;"><span class="type-seg">想</span><span class="type-seg type-seg--accent">引流</span></div>
-              <div class="type-line" style="--typing-duration:0.65s; --delay:2.7s;"><span class="type-seg">做完</span><span class="type-seg type-seg--danger">没流量</span><span class="type-seg">，</span></div>
-              <div class="type-line done-caret" style="--typing-duration:0.55s; --delay:3.45s;"><span class="type-seg">也</span><span class="type-seg type-seg--danger">没生意</span></div>
-              <div class="type-line" style="--typing-duration:0.9s; --delay:4.25s;"><span class="type-seg">他以为是</span><span class="type-seg type-seg--warn">流量问题</span><span class="type-seg">，</span></div>
-              <div class="type-line" style="--typing-duration:1.15s; --delay:5.3s;"><span class="type-seg">其实连</span><span class="type-seg type-seg--warn">店出了什么问题</span><span class="type-seg">，</span></div>
-              <div class="type-line done-caret" style="--typing-duration:0.6s; --delay:6.65s;"><span class="type-seg type-seg--danger">都不清楚</span></div>
+        <div class="gcard talk-card">
+          <div class="talk-eyebrow">60 秒判断 · 我的店适不适合</div>
+          <div class="talk-title">先别急着上系统，<br />先看你的店<span>值不值得用</span></div>
+          <div class="talk-sub">
+            这 60 秒不是讲一堆功能，而是帮你判断：你的店现在是不是已经到了“需要一张老板行动单”的阶段。
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 1 -->
+      <div class="slide" data-index="1">
+        <div class="gcard talk-card">
+          <div class="talk-eyebrow">第一步：看你有没有这些情况</div>
+          <div class="talk-title">如果每天都在忙，<br />但还是靠感觉经营</div>
+          <div class="talk-grid">
+            <div class="talk-point">
+              <em>早上</em>
+              <strong>不知道今天该推什么、停什么</strong>
+            </div>
+            <div class="talk-point">
+              <em>中午</em>
+              <strong>客户问完很多，但总有人漏掉</strong>
+            </div>
+            <div class="talk-point">
+              <em>晚上</em>
+              <strong>晚上复盘，说不清赚在哪</strong>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- SLIDE 1 INSERTED -->
-      <div class="slide demo-zoom-slide" data-index="1">
-        <div class="demo-zoom-stage">
-          <img class="demo-zoom-image" src="./demo.png" alt="demo" />
-        </div>
-        <div class="gcard demo-zoom-copy" style="text-align:center;padding:40px 28px;max-width:680px;">
-          <div class="cover-typewrap" style="margin-bottom:16px;">
-            <div class="type-block" style="align-items:center;">
-              <div class="type-line done-caret" style="--typing-duration:1.2s; --delay:0.25s;"><span class="type-seg">我给他看了</span><span class="type-seg type-seg--accent">这个</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLIDE 2 END CARD -->
+      <!-- SLIDE 2 -->
       <div class="slide" data-index="2">
-        <div style="text-align:center;display:flex;flex-direction:column;align-items:center;">
-          <div style="font-size:80px;font-weight:900;line-height:1;color:rgba(244,244,245,0.97);">完</div>
+        <div class="gcard talk-card">
+          <div class="talk-eyebrow">第二步：看你需要什么结果</div>
+          <div class="talk-title">适合的店，最先需要的不是后台，<br />而是<span>今日老板日报</span></div>
+          <div class="phone-demo">
+            <div class="phone-screen">
+              <div class="phone-head">
+                <span>今日老板日报</span>
+                <span class="phone-pill">已生成 08:30</span>
+              </div>
+              <div class="money-card">
+                <em>今天最值得追回的生意</em>
+                <strong>¥2,780</strong>
+              </div>
+              <div class="todo-list">
+                <div class="todo-item">
+                  <em>1</em>
+                  <div><strong>先跟 6 个团餐客户</strong><span>下午 3 点后最容易成交</span></div>
+                </div>
+                <div class="todo-item">
+                  <em>2</em>
+                  <div><strong>停掉午市低转化券</strong><span>曝光高、核销低，继续做会压利润</span></div>
+                </div>
+                <div class="todo-item">
+                  <em>3</em>
+                  <div><strong>今晚补一条老客微信</strong><span>18 个老客沉默太久，适合回访</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3 -->
+      <div class="slide" data-index="3">
+        <div class="gcard talk-card">
+          <div class="talk-eyebrow">第三步：看它能不能接住你的日常</div>
+          <div class="talk-title">适合这套工具的店，<br />通常有三条日常链路</div>
+          <div class="talk-grid">
+            <div class="talk-point">
+              <em>商业模式工作台</em>
+              <strong>判断问题出在客流、下单、复购还是口碑</strong>
+            </div>
+            <div class="talk-point">
+              <em>微信成交助手</em>
+              <strong>把客户按轻重缓急排好，提醒怎么跟</strong>
+            </div>
+            <div class="talk-point">
+              <em>模拟开店训练舱</em>
+              <strong>记录动作和结果，告诉老板明天先改哪里</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 4 -->
+      <div class="slide" data-index="4">
+        <div class="gcard talk-card">
+          <div class="talk-eyebrow">第四步：看你期待的变化对不对</div>
+          <div class="talk-title">适合，不代表马上变轻松，<br />而是每天<span>更少靠猜</span></div>
+          <div class="change-item">
+            <div class="change-dot"></div>
+            <div class="change-text"><strong>以前：</strong>看了很多数据，还是不知道先做什么。<br /><strong>现在：</strong>打开就知道今天先抓哪件事。</div>
+          </div>
+          <div class="change-item">
+            <div class="change-dot"></div>
+            <div class="change-text"><strong>以前：</strong>微信客户问完就散，老板忙起来容易漏。<br /><strong>现在：</strong>高意向客户会被排出来，每天有跟进清单。</div>
+          </div>
+          <div class="change-item">
+            <div class="change-dot"></div>
+            <div class="change-text"><strong>以前：</strong>忙完只知道累，不知道哪里赚了钱。<br /><strong>现在：</strong>知道哪一步带来了客流、下单和利润。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 5 -->
+      <div class="slide" data-index="5">
+        <div class="gcard talk-card">
+          <div class="talk-eyebrow">最后：怎么判断适不适合</div>
+          <div class="talk-title">如果刚才这些都很像，<br />下一步就看<span>问题出在哪</span></div>
+          <div class="talk-sub">
+            不用先决定买不买，也不用先学系统。先做一次经营诊断，看你的问题更像客流、下单、复购，还是客户跟进断了。
+          </div>
+          <div class="final-actions">
+            <a class="final-action" href="./business.html">做一次经营诊断</a>
+            <a class="final-action" href="./index.html#cta">回去选择下一步</a>
+          </div>
         </div>
       </div>
 
     </div>
 
     <script>
-      const TOTAL = 3;
+      const TOTAL = 6;
       let current = 0;
       let isAnimating = false;
       const slides = Array.from(document.querySelectorAll('.slide'));
       const progressBar = document.getElementById('progress-bar');
       const counter = document.getElementById('slide-counter');
       const dotNav = document.getElementById('dot-nav');
+      const prevSlide = document.getElementById('prev-slide');
+      const nextSlide = document.getElementById('next-slide');
       const typingTimers = new Set();
 
       function parseTimeValue(value) {
@@ -450,6 +771,8 @@
         progressBar.style.width = pct + '%';
         counter.textContent = (current + 1) + ' / ' + TOTAL;
         document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+        prevSlide.disabled = current === 0;
+        nextSlide.disabled = current === TOTAL - 1;
       }
 
       function goTo(idx) {
@@ -485,6 +808,8 @@
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
         if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(current - 1); }
       });
+      prevSlide.addEventListener('click', () => goTo(current - 1));
+      nextSlide.addEventListener('click', () => goTo(current + 1));
       let touchStartX = 0;
       document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
       document.addEventListener('touchend', e => {
