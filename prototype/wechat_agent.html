@@ -769,7 +769,7 @@
         </div>
 
         <!-- Segmented navigation (keep your existing layout) -->
-        <div class="mt-4 flex justify-center">
+        <div class="mt-4 flex justify-center" id="wdaDealSegWrap">
           <div class="seg-wrap">
             <div class="seg" id="wdaSeg">
               <button class="seg-btn active" type="button" data-sec="radar">
@@ -1024,7 +1024,7 @@
             prefs: {
               persona: "私域商家",
               followup: { enabled: true, auto_queue: true, demo_send: false },
-              tuning: { key: "", label: "", effect: "", updated_at: "", lesson_count: 18 },
+              tuning: { key: "", label: "", effect: "", updated_at: "", lesson_count: 18, followup_gap_days: 2 },
               clone: {
                 tone_sample: "",
                 store_info: "",
@@ -1073,6 +1073,8 @@
           if (typeof s.prefs.tuning.label !== "string") s.prefs.tuning.label = "";
           if (typeof s.prefs.tuning.effect !== "string") s.prefs.tuning.effect = "";
           if (typeof s.prefs.tuning.lesson_count !== "number") s.prefs.tuning.lesson_count = 18;
+          if (typeof s.prefs.tuning.followup_gap_days !== "number") s.prefs.tuning.followup_gap_days = 2;
+          s.prefs.tuning.followup_gap_days = clamp(Math.round(Number(s.prefs.tuning.followup_gap_days) || 2), 1, 7);
           if (typeof s.prefs.clone.tone_sample !== "string") s.prefs.clone.tone_sample = "";
           if (typeof s.prefs.clone.store_info !== "string") s.prefs.clone.store_info = "";
           if (typeof s.prefs.clone.signature_style !== "string") s.prefs.clone.signature_style = "";
@@ -1377,6 +1379,8 @@
           const allowedSecs = new Set(["onboarding", "radar", "customers", "tasks", "copilot", "safety"]);
           state.ui.sec = allowedSecs.has(sec) ? sec : "radar";
           saveState(state);
+          const dealSegWrap = document.getElementById("wdaDealSegWrap");
+          if (dealSegWrap) dealSegWrap.classList.toggle("hidden", state.ui.sec === "onboarding");
           document.querySelectorAll("#wdaSeg [data-sec]").forEach((b) => b.classList.toggle("active", b.dataset.sec === state.ui.sec));
           document.querySelectorAll(".main-tab[data-sec]").forEach((b) => {
             const isDeal = state.ui.sec !== "onboarding" && b.dataset.sec === "radar";
@@ -1793,6 +1797,8 @@
           const tuneText = tuning.key === "lower_high_price" ? "少推高价套餐，优先中档稳妥方案" :
             tuning.key === "less_deposit_pressure" ? "少催定金，先确认时间/人数/预算" :
             "团建客户重点看人数、包间和预算";
+          const followupGapDays = clamp(Math.round(Number(tuning.followup_gap_days) || 2), 1, 7);
+          const toneText = clone.signature_style || "说话可以随意一点，适当带点 emoji";
           const styleOptions = ["直接一点", "热情一点", "熟人语气", "少点套路", "可以带emoji"];
           const aiBubble = (content, extra = "") => `
             <div class="flex items-start gap-2 ${extra}">
@@ -1831,10 +1837,13 @@
                   <div class="mt-2 grid gap-1 text-xs text-zinc-200/70 leading-5">
                     <div>· ${escapeHtml(priceStyleText)}</div>
                     <div>· ${escapeHtml(tuneText)}</div>
-                    <div>· 跟进间隔不少于 2 天，别让客户觉得被催</div>
-                    <div>· 说话可以随意一点，适当带点 emoji</div>
+                    <div>· 跟进间隔不少于 ${escapeHtml(String(followupGapDays))} 天，别让客户觉得被催</div>
+                    <div>· ${escapeHtml(toneText)}</div>
                   </div>
-                  <div class="mt-2 text-xs text-zinc-200/50 leading-5">这些是你教我的，随时可以调整。</div>
+                  <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <div class="text-xs text-zinc-200/50 leading-5">这些是你教我的，随时可以调整。</div>
+                    <button class="btn-secondary btn-sm" type="button" data-action="openGrowthAdjust">调整学习内容</button>
+                  </div>
                 </div>
               </div>
 
@@ -2061,6 +2070,7 @@
           const action = String(lead.next_best_action || "").trim();
           const tuning = state.prefs.tuning || {};
           const clone = state.prefs.clone || {};
+          const followupGapDays = clamp(Math.round(Number(tuning.followup_gap_days) || 2), 1, 7);
           const tuningHint = tuning.key ? `\n\n老板偏好：${tuning.label}。本次回复已按这个偏好调整。` : "";
           const priceStyleHint =
             tuning.price_style === "low_first" ? "\n\n老板训练：客户问价格时，先给最低可选方案，再补充升级选择。" :
@@ -2101,7 +2111,7 @@
             items: [
               { step: "reply_now", label: "立即回复", delay_h: 0, text: replyNow },
               { step: "followup_4h", label: "未回复 4 小时", delay_h: 4, text: fu4h },
-              { step: "followup_24h", label: "未回复 24 小时", delay_h: 24, text: fu24h }
+              { step: "followup_gap", label: `未回复 ${followupGapDays} 天`, delay_h: followupGapDays * 24, text: fu24h }
             ]
           };
         }
@@ -2633,6 +2643,7 @@
           const p = presets[key];
           if (!p) return;
           state.prefs.tuning = {
+            ...(state.prefs.tuning || {}),
             key,
             label: p.label,
             effect: p.effect,
@@ -2676,6 +2687,145 @@
           saveState(state);
           render();
           toast(`第二天 AI：${p.effect}`, 2600);
+        }
+
+        function openGrowthAdjust() {
+          const tuning = state.prefs.tuning || {};
+          const clone = state.prefs.clone || {};
+          const styleOptions = ["直接一点", "热情一点", "熟人语气", "少点套路", "可以带emoji"];
+          const selectedStyle = String(clone.signature_style || "");
+          openModal({
+            title: "调整成长进度",
+            bodyHtml: `
+              <div class="grid gap-3">
+                <div class="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-3">
+                  <div class="text-xs font-black text-emerald-100/90">学习档案</div>
+                  <div class="mt-1 text-sm text-zinc-100/85 leading-6">这里改的是 AI 已经学到的偏好。保存后，“生成回复”和“自动跟进”会按新的偏好走。</div>
+                </div>
+
+                <label class="block rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div class="text-xs font-black text-zinc-200/60">客户问价格时</div>
+                  <select id="gaPriceStyle" class="wda-select mt-2">
+                    <option value="">继续学习，还不固定</option>
+                    <option value="low_first" ${tuning.price_style === "low_first" ? "selected" : ""}>先给最低可选方案</option>
+                    <option value="value_first" ${tuning.price_style === "value_first" ? "selected" : ""}>先讲价值，再给价格区间</option>
+                    <option value="visit_first" ${tuning.price_style === "visit_first" ? "selected" : ""}>先确认人数/时间/场景</option>
+                  </select>
+                </label>
+
+                <label class="block rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div class="text-xs font-black text-zinc-200/60">成交偏好</div>
+                  <select id="gaTuneKey" class="wda-select mt-2">
+                    <option value="" ${!tuning.key ? "selected" : ""}>团建客户重点看人数、包间和预算</option>
+                    <option value="lower_high_price" ${tuning.key === "lower_high_price" ? "selected" : ""}>少推高价套餐，优先中档稳妥方案</option>
+                    <option value="less_deposit_pressure" ${tuning.key === "less_deposit_pressure" ? "selected" : ""}>少催定金，先确认时间/人数/预算</option>
+                  </select>
+                </label>
+
+                <label class="block rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div class="text-xs font-black text-zinc-200/60">跟进间隔</div>
+                  <div class="mt-2 flex items-center gap-2">
+                    <input id="gaFollowupGap" class="wda-input h-10 max-w-[120px]" type="number" min="1" max="7" value="${escapeHtml(String(clamp(Math.round(Number(tuning.followup_gap_days) || 2), 1, 7)))}" />
+                    <span class="text-sm font-black text-zinc-100/85">天以内不主动催</span>
+                  </div>
+                </label>
+
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  <div class="text-xs font-black text-zinc-200/60">说话风格</div>
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    ${styleOptions.map((x) => `
+                      <button class="btn-pill ${selectedStyle.includes(x) ? "btn-pill--cyan" : ""}" type="button" data-action="growthStylePick" data-style="${escapeHtml(x)}">${escapeHtml(x)}</button>
+                    `).join("")}
+                  </div>
+                  <input id="gaSignatureStyle" type="hidden" value="${escapeHtml(selectedStyle)}" />
+                  <div class="mt-2 text-xs text-zinc-200/55" id="gaStyleText">当前：${escapeHtml(selectedStyle || "还没选择")}</div>
+                </div>
+              </div>
+            `,
+            footHtml: `
+              <button class="btn-secondary btn-sm" type="button" data-action="closeModal">取消</button>
+              <button class="btn-primary btn-sm" type="button" data-action="saveGrowthAdjust">保存调整</button>
+            `
+          });
+        }
+
+        function growthStylePick(style) {
+          const input = document.getElementById("gaSignatureStyle");
+          const text = document.getElementById("gaStyleText");
+          if (!input) return;
+          const parts = String(input.value || "").split("、").map((x) => x.trim()).filter(Boolean);
+          const idx = parts.indexOf(style);
+          if (idx >= 0) parts.splice(idx, 1);
+          else parts.push(style);
+          input.value = parts.join("、");
+          if (text) text.textContent = "当前：" + (input.value || "还没选择");
+          document.querySelectorAll("[data-action='growthStylePick']").forEach((b) => {
+            b.classList.toggle("btn-pill--cyan", parts.includes(b.dataset.style));
+          });
+        }
+
+        function saveGrowthAdjust() {
+          const pricePresets = {
+            low_first: {
+              label: "客户问价格时先报最低价",
+              effect: "已把价格回复调整为：先给最低可选方案，再补充升级选择。"
+            },
+            value_first: {
+              label: "客户问价格时先介绍价值",
+              effect: "已把价格回复调整为：先讲菜品分量、服务和稳定性，再给价格区间。"
+            },
+            visit_first: {
+              label: "客户问价格时引导到店再报价",
+              effect: "已把价格回复调整为：先确认人数、时间和场景，再给更准确报价。"
+            }
+          };
+          const tunePresets = {
+            lower_high_price: {
+              label: "别总推高价套餐",
+              effect: "已降低高价套餐推荐频率 40%，优先给中档稳妥方案。"
+            },
+            less_deposit_pressure: {
+              label: "少一点催定金",
+              effect: "已降低定金催促强度，先确认时间/人数/预算后再提醒锁档。"
+            }
+          };
+          const priceStyle = String(document.getElementById("gaPriceStyle")?.value || "");
+          const tuneKey = String(document.getElementById("gaTuneKey")?.value || "");
+          const followupGapDays = clamp(Math.round(Number(document.getElementById("gaFollowupGap")?.value || 2)), 1, 7);
+          const signatureStyle = String(document.getElementById("gaSignatureStyle")?.value || "").trim();
+          const oldTuning = state.prefs.tuning || {};
+          const oldClone = state.prefs.clone || {};
+          const price = pricePresets[priceStyle] || { label: "", effect: "" };
+          const tune = tunePresets[tuneKey] || { label: "", effect: "" };
+          const changed =
+            oldTuning.price_style !== priceStyle ||
+            oldTuning.key !== tuneKey ||
+            Number(oldTuning.followup_gap_days || 2) !== followupGapDays ||
+            String(oldClone.signature_style || "") !== signatureStyle;
+
+          state.prefs.tuning = {
+            ...oldTuning,
+            key: tuneKey,
+            label: tune.label,
+            effect: tune.effect,
+            updated_at: nowISO(),
+            price_style: priceStyle,
+            price_style_label: price.label,
+            price_style_effect: price.effect,
+            price_style_updated_at: priceStyle ? nowISO() : "",
+            followup_gap_days: followupGapDays,
+            lesson_count: Math.max(0, Number(oldTuning.lesson_count || 0)) + (changed ? 1 : 0)
+          };
+          state.prefs.clone = {
+            ...oldClone,
+            signature_style: signatureStyle,
+            completed: !!(oldClone.tone_sample && oldClone.store_info && signatureStyle),
+            updated_at: nowISO()
+          };
+          saveState(state);
+          closeModal();
+          render();
+          toast(changed ? "已调整学习内容" : "学习内容没有变化");
         }
 
         function openOnboarding() {
@@ -2900,6 +3050,9 @@
           if (act === "toggleFollowupDemoSend") return toggleFollowupDemoSend();
           if (act === "tuneAssistant") return tuneAssistant(btn.dataset.tune);
           if (act === "trainPriceStyle") return trainPriceStyle(btn.dataset.style);
+          if (act === "openGrowthAdjust") return openGrowthAdjust();
+          if (act === "growthStylePick") return growthStylePick(btn.dataset.style);
+          if (act === "saveGrowthAdjust") return saveGrowthAdjust();
           if (act === "openOnboarding") return openOnboarding();
           if (act === "onboardingStylePick") return onboardingStylePick(btn.dataset.style);
           if (act === "saveOnboarding") return saveOnboarding();
